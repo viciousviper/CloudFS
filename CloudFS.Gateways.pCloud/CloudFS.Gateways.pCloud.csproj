@@ -103,7 +103,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll "pCloud.NET SDK.dll") do copy %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\</PostBuildEvent>
+for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll "pCloud.NET SDK.dll") do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

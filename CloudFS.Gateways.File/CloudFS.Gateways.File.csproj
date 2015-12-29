@@ -80,7 +80,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-copy $(TargetFileName) $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\</PostBuildEvent>
+xcopy /D /Y $(TargetFileName) $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
