@@ -1,0 +1,63 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:IgorSoft.CloudFS.Authentication"
+    x:Class="IgorSoft.CloudFS.Authentication.LoginWindow"
+    mc:Ignorable="d"
+    d:DesignHeight="250" d:DesignWidth="500" WindowStyle="ToolWindow">
+    <Grid x:Name="Root">
+        <Grid.Resources>
+            <sys:Double x:Key="CommonFontSize">11</sys:Double>
+            <Style TargetType="Label">
+                <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="Margin" Value="5,2" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Margin" Value="5,2" />
+            </Style>
+            <Style TargetType="PasswordBox">
+                <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Margin" Value="5,2" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="FontSize" Value="{StaticResource CommonFontSize}" />
+                <Setter Property="HorizontalAlignment" Value="Center" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Padding" Value="15,2" />
+            </Style>
+        </Grid.Resources>
+
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="210" MaxWidth="400">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Please enter your credentials" HorizontalAlignment="Center" FontSize="14" />
+                <Label Grid.Row="1" Grid.Column="0" Content="Account:" />
+                <TextBox x:Name="tbAccount" Grid.Row="1" Grid.Column="1" TextChanged="OnTextChanged" />
+                <Label Grid.Row="2" Grid.Column="0" Content="Password:" />
+                <PasswordBox x:Name="pbPassword" Grid.Row="2" Grid.Column="1" PasswordChanged="OnPasswordChanged" />
+            </Grid>
+            <Button x:Name="btnAuthenticate" Grid.Row="1" Content="Authenticate" />
+        </Grid>
+    </Grid>
+</Window>
