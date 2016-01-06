@@ -41,6 +41,17 @@ Several cloud storage services require additional authentication of external app
 - create a cloud application configuration with sufficient rights to access the cloud filesystem
 - enter the service-provided authentication details into the prepared fields in the `Secrets` class of the affected PowerShellCloudProvider gateway project
 
+At the time of writing this Readme, the following URLs provided access to application management tasks such as registering a new application or changing an application's configuration:
+
+| Cloud storage service | Application registration / configuration URL           |
+| :-------------------- | :----------------------------------------------------: |
+| Microsoft OneDrive    | https://account.live.com/developers/applications/index |
+| Google Drive          | https://console.developers.google.com                  |
+| Box                   | https://app.box.com/developers/services/edit/          |
+| Copy                  | https://developers.copy.com/applications               |
+| MEGA                  | https://mega.nz/#sdk                                   |
+| pCloud                | *- no configuration required -*                        |
+
 ## Release Notes
 
 2015-12-29 Version 1.0.0.0 - Initial release
