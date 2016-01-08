@@ -57,7 +57,8 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 ## Release Notes
 
-2015-12-29 Version 1.0.0.0 - Initial release
+- 2016-01-08 Version 1.0.0-alpha - Initial release and NuGet registration
+- 2015-12-29 Version 1.0.0.0 - Initial commit
 
 ## Future plans
 
