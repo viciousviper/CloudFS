@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.GatewayTests", "Clo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{20C61427-573E-4493-9DE4-22E7A07CCD88}"
 	ProjectSection(SolutionItems) = preProject
+		CloudFS.nuspec = CloudFS.nuspec
+		CloudFS.Signed.nuspec = CloudFS.Signed.nuspec
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 		SignAssembly.cmd = SignAssembly.cmd
