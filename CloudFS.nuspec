@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>CloudFS</id>
+    <version>1.0.0-alpha</version>
+    <title>CloudFS</title>
+    <authors>IgorSoft</authors>
+    <owners>IgorSoft</owners>
+    <projectUrl>https://github.com/viciousviper/CloudFS</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The CloudFS library is a collection of .NET assemblies as gateways to various publicly accessible Cloud storage services.</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright © 2016</copyright>
+	<tags>Cloud Filesystem</tags>
+    <dependencies>
+        <group targetFramework="net45">
+          <dependency id="Microsoft.Composition" version="[10.0.30,)" />
+          <dependency id="Newtonsoft.Json" version="[8.0.1-beta3,)" />
+          <dependency id="SemanticTypes" version="[0.12.0,)" />
+          <dependency id="Box.V2" version="[2.6.2,)" />
+          <dependency id="CopyRestApi" version="[1.1.0,)" />
+          <dependency id="Google.Apis.Drive.v2" version="1.10.0.1960" />
+          <dependency id="MegaApiClient" version="[1.1.3,)" />
+        </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="CloudFS.GatewayTests\bin\Release\IgorSoft.AppDomainResolver.dll" target="lib\net46\IgorSoft.AppDomainResolver.dll" />
+    <file src="CloudFS.GatewayTests\bin\Release\IgorSoft.CloudFS.Authentication.dll" target="lib\net46\IgorSoft.CloudFS.Authentication.dll" />
+    <file src="CloudFS.GatewayTests\bin\Release\IgorSoft.CloudFS.Interface.dll" target="lib\net46\IgorSoft.CloudFS.Interface.dll" />
+    <file src="CloudFS.GatewayTests\bin\Release\Gateways\IgorSoft.CloudFS.Gateways.*.dll" target="lib\net46\Gateways" />
+    <file src="CloudFS.GatewayTests\bin\Release\Gateways\IgorSoft.CloudFS.Gateways.*.dll.config" target="lib\net46\Gateways" />
+    <file src="Library\OneDriveSDK.dll" target="lib\net46\Gateways\OneDriveSDK.dll" />
+    <file src="Library\OneDriveSDK.LICENSE" target="lib\net46\Gateways\OneDriveSDK.LICENSE" />
+    <file src="Library\pCloud.NET SDK.dll" target="lib\net46\Gateways\pCloud.NET SDK.dll" />
+  </files>
+</package>
