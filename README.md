@@ -1,6 +1,7 @@
 # CloudFS
 The **CloudFS** library is a collection of .NET assemblies as gateways to various publicly accessible Cloud storage services.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs)
 [![Version](https://img.shields.io/nuget/v/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads](https://img.shields.io/nuget/dt/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads](https://img.shields.io/nuget/dt/CloudFS-Signed.svg)](https://www.nuget.org/packages/CloudFS-Signed)

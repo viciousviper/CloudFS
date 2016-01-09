@@ -1,0 +1,20 @@
+version: 1.0.0-alpha {build}
+
+branches:
+  only:
+  - develop
+
+configuration:
+- Debug
+- Release
+
+platform: Any CPU
+
+before_build:
+- cmd: nuget restore
+
+build:
+  project: CloudFS.sln
+  verbosity: detailed
+
+test: off
