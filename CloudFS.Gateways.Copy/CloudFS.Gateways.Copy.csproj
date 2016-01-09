@@ -168,10 +168,10 @@ for %25%25f in ($(TargetFileName) $(TargetFileName).config bouncy_castle_hmac_sh
   </Target>
   <PropertyGroup>
     <PreBuildEvent>
-if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-if not exist $(SolutionDir)SignedLibrary\bouncy_castle_hmac_sha_pcl.dll cmd /c "$(SolutionDir)SignAssembly.cmd bouncy_castle_hmac_sha_pcl $(SolutionDir)packages\CopyRestAPI.1.1.0\lib\portable-net45+win8+wpa81 $(SolutionDir)SignedLibrary"
-if not exist $(SolutionDir)SignedLibrary\CopyRestAPI.dll cmd /c "$(SolutionDir)SignAssembly.cmd CopyRestAPI $(SolutionDir)packages\CopyRestAPI.1.1.0\lib\portable-net45+win8+wpa81 $(SolutionDir)SignedLibrary"
-if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\bouncy_castle_hmac_sha_pcl.dll cmd /c "$(SolutionDir)SignAssembly.cmd bouncy_castle_hmac_sha_pcl $(SolutionDir)packages\CopyRestAPI.1.1.0\lib\portable-net45+win8+wpa81 $(SolutionDir)SignedLibrary"
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\CopyRestAPI.dll cmd /c "$(SolutionDir)SignAssembly.cmd CopyRestAPI $(SolutionDir)packages\CopyRestAPI.1.1.0\lib\portable-net45+win8+wpa81 $(SolutionDir)SignedLibrary"
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

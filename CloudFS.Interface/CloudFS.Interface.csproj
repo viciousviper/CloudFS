@@ -23,7 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-	<PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	<PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Signed|AnyCPU' ">
     <OutputPath>bin\Signed\</OutputPath>
@@ -45,7 +45,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
-	<PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <AssemblyOriginatorKeyFile>..\..\..\IgorSoft\IgorSoft.OpenSource.snk.pfx</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
@@ -115,8 +115,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
-if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -29,7 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\TestAssemblies.ruleset</CodeAnalysisRuleSet>
-	<PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,7 +40,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>..\TestAssemblies.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-	<PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Signed|AnyCPU' ">
     <OutputPath>bin\Signed\</OutputPath>
@@ -51,7 +51,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>..\TestAssemblies.ruleset</CodeAnalysisRuleSet>
-	<PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
     <AssemblyOriginatorKeyFile>..\..\..\IgorSoft\IgorSoft.OpenSource.snk.pfx</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
@@ -174,9 +174,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
-if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-if not exist $(SolutionDir)SignedLibrary\IgorSoft.AppDomainResolver.dll cmd /c "$(SolutionDir)SignAssembly.cmd IgorSoft.AppDomainResolver $(SolutionDir)Library $(SolutionDir)SignedLibrary"
-if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\IgorSoft.AppDomainResolver.dll cmd /c "$(SolutionDir)SignAssembly.cmd IgorSoft.AppDomainResolver $(SolutionDir)Library $(SolutionDir)SignedLibrary"
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -185,6 +185,6 @@ if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir
   </Target>-->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll" />
   <Target Name="AfterBuild" Condition=" Exists('App.$(Configuration).config') ">
-	<TransformXml Source="App.config" Destination="$(OutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />
+    <TransformXml Source="App.config" Destination="$(OutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />
   </Target>
 </Project>
