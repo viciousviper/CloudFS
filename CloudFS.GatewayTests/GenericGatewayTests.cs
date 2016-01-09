@@ -65,13 +65,13 @@ namespace IgorSoft.CloudFS.GatewayTests
             fixture = null;
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void Import_Gateways_MatchConfigurations()
         {
             CollectionAssert.AreEquivalent(Fixture.GetGatewayConfigurations().Select(c => c.Schema).ToList(), fixture.Gateways.Select(g => g.Metadata.CloudService).ToList(), "Gateway configurations do not match imported gateways");
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void GetRoot_ReturnsResult()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -85,7 +85,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.GetRoot, false);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void GetDrive_ReturnsResult()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -101,7 +101,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.GetDrive);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void GetChildItem_ReturnsResults()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -121,7 +121,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.GetChildItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void ClearContent_ExecutesClear()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -142,7 +142,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.ClearContent);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void GetContent_ReturnsResult()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -159,7 +159,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.GetContent);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void SetContent_ExecutesSet()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -178,7 +178,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.SetContent);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void SetContent_WhereContentIsLarge_ExecutesSet()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -204,7 +204,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.SetContent);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void CopyItem_WhereItemIsDirectory_ExecutesCopy()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -230,7 +230,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.CopyDirectoryItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void CopyItem_WhereItemIsFile_ExecutesCopy()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -252,7 +252,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.CopyFileItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void MoveItem_WhereItemIsDirectory_ExecutesMove()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -279,7 +279,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.MoveDirectoryItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void MoveItem_WhereItemIsFile_ExecutesMove()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -303,7 +303,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.MoveFileItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void NewDirectoryItem_CreatesDirectory()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -321,7 +321,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.NewDirectoryItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void NewFileItem_CreatesFile()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -341,7 +341,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.NewFileItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void NewFileItem_WhereContentIsLarge_CreatesFile()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -368,7 +368,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.NewFileItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void RemoveItem_WhereItemIsDirectory_ExecutesRemove()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -387,7 +387,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.RemoveItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void RemoveItem_WhereItemIsFile_ExecutesRemove()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -405,7 +405,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.RemoveItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void RenameItem_WhereItemIsDirectory_ExecutesRename()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -424,7 +424,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             }, ConfigManager.GatewayCapabilities.RenameDirectoryItem);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void RenameItem_WhereItemIsFile_ExecutesRename()
         {
             fixture.ExecuteByConfiguration(config => {

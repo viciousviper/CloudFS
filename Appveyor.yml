@@ -16,6 +16,9 @@ before_build:
 
 build:
   project: CloudFS.sln
-  verbosity: detailed
+  verbosity: normal
 
-test: off
+test:
+  categories:
+    except:
+    - Online
