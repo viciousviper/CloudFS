@@ -23,13 +23,11 @@ SOFTWARE.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Composition;
 using System.Linq;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-using System.Threading.Tasks;
+using IgorSoft.CloudFS.GatewayTests.Config;
 
 namespace IgorSoft.CloudFS.GatewayTests
 {
@@ -43,9 +41,9 @@ namespace IgorSoft.CloudFS.GatewayTests
 
             private readonly DirectoryInfoContract directory;
 
-            public DirectoryId Id => directory.Id;
+            internal DirectoryId Id => directory.Id;
 
-            public TestDirectoryFixture(ICloudGateway gateway, RootName root, string apiKey, string path)
+            private TestDirectoryFixture(ICloudGateway gateway, RootName root, string apiKey, string path)
             {
                 this.gateway = gateway;
                 this.root = root;
@@ -59,83 +57,15 @@ namespace IgorSoft.CloudFS.GatewayTests
                 directory = gateway.NewDirectoryItem(root, rootDirectory.Id, path);
             }
 
-            public void Dispose()
+            internal static TestDirectoryFixture CreateTestDirectory(GatewayElement config, GatewayTestsFixture fixture)
+            {
+                return new TestDirectoryFixture(fixture.GetGateway(config), fixture.GetRootName(config), config.ApiKey, config.TestDirectory);
+            }
+
+            void IDisposable.Dispose()
             {
                 gateway.RemoveItem(root, directory.Id, true);
             }
-        }
-
-        private class Fixture
-        {
-            private const string COMPOSITION_DIRECTORY = "Gateways";
-
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for MEF composition")]
-            [ImportMany]
-            public IList<ExportFactory<ICloudGateway, CloudGatewayMetadata>> Gateways { get; set; }
-
-            public static void Initialize()
-            {
-                CompositionInitializer.Preload(typeof(ICloudGateway));
-                CompositionInitializer.Initialize(COMPOSITION_DIRECTORY);
-            }
-
-            private static void Log(string message)
-            {
-                Console.WriteLine(message);
-            }
-
-            public static IEnumerable<ConfigManager.GatewayConfigElement> GetGatewayConfigurations(ConfigManager.GatewayCapabilities capability = ConfigManager.GatewayCapabilities.None)
-            {
-                return ConfigManager.GetGatewayConfigurations().Where(g => capability == ConfigManager.GatewayCapabilities.None || !g.Exclusions.HasFlag(capability));
-            }
-
-            public ICloudGateway GetGateway(ConfigManager.GatewayConfigElement config)
-            {
-                return Gateways.Single(g => g.Metadata.CloudService == config.Schema).CreateExport().Value;
-            }
-
-            public RootName GetRootName(ConfigManager.GatewayConfigElement config) => new RootName(config.Schema, config.UserName, config.Root);
-
-            public TestDirectoryFixture CreateTestDirectory(ConfigManager.GatewayConfigElement config) => new TestDirectoryFixture(GetGateway(config), GetRootName(config), config.ApiKey, config.TestDirectory);
-
-            public void ExecuteByConfiguration(Action<ConfigManager.GatewayConfigElement> test, ConfigManager.GatewayCapabilities capability, bool inParallel = true)
-            {
-                var failures = new List<Tuple<string, Exception>>();
-
-                if (inParallel) {
-                    Parallel.ForEach(GetGatewayConfigurations(capability), config => {
-                        try {
-                            var startedAt = DateTime.Now;
-                            test(config);
-                            var completedAt = DateTime.Now;
-                            Log($"Parallel test for schema '{config.Schema}' completed in {completedAt - startedAt}");
-                        } catch (Exception ex) {
-                            Log($"Parallel test for schema '{config.Schema}' failed");
-                            lock (failures) {
-                                failures.Add(new Tuple<string, Exception>(config.Schema, ex));
-                            }
-                        }
-                    });
-                } else {
-                    foreach (var config in GetGatewayConfigurations(capability)) {
-                        try {
-                            var startedAt = DateTime.Now;
-                            test(config);
-                            var completedAt = DateTime.Now;
-                            Log($"Sequential test for schema '{config.Schema}' completed in {completedAt - startedAt}");
-                        } catch (Exception ex) {
-                            Log($"Sequential test for schema '{config.Schema}' failed");
-                            failures.Add(new Tuple<string, Exception>(config.Schema, ex));
-                        }
-                    };
-                }
-
-                if (failures.Any())
-                    throw new AggregateException("Test failed in " + string.Join(", ", failures.Select(t => t.Item1)), failures.Select(t => t.Item2));
-            }
-
-            public IProgress<ProgressValue> GetProgressReporter() => new NullProgressReporter();
         }
     }
 }

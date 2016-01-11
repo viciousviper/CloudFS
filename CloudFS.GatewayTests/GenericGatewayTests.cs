@@ -28,7 +28,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.AppDomainResolver;
+using IgorSoft.CloudFS.GatewayTests.Config;
 
 namespace IgorSoft.CloudFS.GatewayTests
 {
@@ -39,14 +39,11 @@ namespace IgorSoft.CloudFS.GatewayTests
 
         private static byte[] largeContent = null;
 
-        private Fixture fixture;
+        private GatewayTestsFixture fixture;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            AssemblyResolver.Initialize();
-            Fixture.Initialize();
-
             largeContent = new byte[12 * (1 << 20)];
             for (int i = 0; i < largeContent.Length; ++i)
                 largeContent[i] = (byte)(i % 251 + 1);
@@ -55,7 +52,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         [TestInitialize]
         public void Initialize()
         {
-            fixture = new Fixture();
+            fixture = new GatewayTestsFixture();
             CompositionInitializer.SatisfyImports(fixture);
         }
 
@@ -68,7 +65,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         [TestMethod]
         public void Import_Gateways_MatchConfigurations()
         {
-            CollectionAssert.AreEquivalent(Fixture.GetGatewayConfigurations().Select(c => c.Schema).ToList(), fixture.Gateways.Select(g => g.Metadata.CloudService).ToList(), "Gateway configurations do not match imported gateways");
+            CollectionAssert.AreEquivalent(GatewayTestsFixture.GetGatewayConfigurations(GatewayType.Sync).Select(c => c.Schema).ToList(), fixture.Gateways.Select(g => g.Metadata.CloudService).ToList(), "Gateway configurations do not match imported gateways");
         }
 
         [TestMethod]
@@ -82,7 +79,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                 Assert.IsNotNull(root, "Root is null");
                 Assert.AreEqual(Path.DirectorySeparatorChar.ToString(), root.Name, "Unexpected root name");
-            }, ConfigManager.GatewayCapabilities.GetRoot, false);
+            }, GatewayType.Sync, GatewayCapabilities.GetRoot, false);
         }
 
         [TestMethod]
@@ -98,7 +95,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 Assert.IsNotNull(drive.Id, $"Missing drive ID ({config.Schema})");
                 Assert.IsNotNull(drive.FreeSpace, $"Missing free space ({config.Schema})");
                 Assert.IsNotNull(drive.UsedSpace, $"Missing used space ({config.Schema})");
-            }, ConfigManager.GatewayCapabilities.GetDrive);
+            }, GatewayType.Sync, GatewayCapabilities.GetDrive);
         }
 
         [TestMethod]
@@ -108,7 +105,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     gateway.NewDirectoryItem(rootName, testDirectory.Id, "DirectoryContent");
                     gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(new byte[100]), fixture.GetProgressReporter());
 
@@ -118,7 +115,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     Assert.IsTrue(items.OfType<DirectoryInfoContract>().Any(i => i.Name == "DirectoryContent"), "Expected directory is missing");
                     Assert.IsTrue(items.OfType<FileInfoContract>().Any(i => i.Name == "File.ext" && i.Size == 100), "Expected file is missing");
                 }
-            }, ConfigManager.GatewayCapabilities.GetChildItem);
+            }, GatewayType.Sync, GatewayCapabilities.GetChildItem);
         }
 
         [TestMethod]
@@ -128,7 +125,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(new byte[100]), fixture.GetProgressReporter());
 
                     gateway.ClearContent(rootName, testFile.Id);
@@ -139,7 +136,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     Assert.AreEqual("File.ext", testFile.Name, "Expected file is missing");
                     Assert.AreEqual(0, testFile.Size, "Mismatched content size");
                 }
-            }, ConfigManager.GatewayCapabilities.ClearContent);
+            }, GatewayType.Sync, GatewayCapabilities.ClearContent);
         }
 
         [TestMethod]
@@ -149,14 +146,14 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
                     using (var result = gateway.GetContent(rootName, testFile.Id)) {
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.GetContent);
+            }, GatewayType.Sync, GatewayCapabilities.GetContent);
         }
 
         [TestMethod]
@@ -166,7 +163,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(new byte[100]), fixture.GetProgressReporter());
 
                     gateway.SetContent(rootName, testFile.Id, new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
@@ -175,7 +172,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.SetContent);
+            }, GatewayType.Sync, GatewayCapabilities.SetContent);
         }
 
         [TestMethod]
@@ -185,7 +182,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(new byte[100]), fixture.GetProgressReporter());
 
                     gateway.SetContent(rootName, testFile.Id, new MemoryStream(largeContent), fixture.GetProgressReporter());
@@ -201,7 +198,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                         CollectionAssert.AreEqual(largeContent, buffer, "Mismatched result content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.SetContent);
+            }, GatewayType.Sync, GatewayCapabilities.SetContent);
         }
 
         [TestMethod]
@@ -211,7 +208,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var directoryOriginal = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
                     var fileOriginal = gateway.NewFileItem(rootName, directoryOriginal.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
@@ -227,7 +224,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     }
                     Assert.AreNotEqual(fileOriginal.Id, copiedFile.Id, "Duplicate copied file Id");
                 }
-            }, ConfigManager.GatewayCapabilities.CopyDirectoryItem);
+            }, GatewayType.Sync, GatewayCapabilities.CopyDirectoryItem);
         }
 
         [TestMethod]
@@ -237,7 +234,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var fileOriginal = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
                     var fileCopy = (FileInfoContract)gateway.CopyItem(rootName, fileOriginal.Id, "File-Copy.ext", testDirectory.Id, false);
@@ -249,7 +246,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.CopyFileItem);
+            }, GatewayType.Sync, GatewayCapabilities.CopyFileItem);
         }
 
         [TestMethod]
@@ -259,7 +256,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var directoryOriginal = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
                     var directoryTarget = gateway.NewDirectoryItem(rootName, testDirectory.Id, "DirectoryTarget");
                     var fileOriginal = gateway.NewFileItem(rootName, directoryOriginal.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
@@ -276,7 +273,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.MoveDirectoryItem);
+            }, GatewayType.Sync, GatewayCapabilities.MoveDirectoryItem);
         }
 
         [TestMethod]
@@ -286,7 +283,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var directoryTarget = gateway.NewDirectoryItem(rootName, testDirectory.Id, "DirectoryTarget");
                     var fileOriginal = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
@@ -300,7 +297,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.MoveFileItem);
+            }, GatewayType.Sync, GatewayCapabilities.MoveFileItem);
         }
 
         [TestMethod]
@@ -310,7 +307,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
 
                     var newDirectory = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
 
@@ -318,7 +315,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     Assert.AreEqual(1, items.Count(i => i.Name == "Directory"), "Expected directory is missing");
                     Assert.AreEqual(items.Single(i => i.Name == "Directory").Id, newDirectory.Id, "Mismatched directory Id");
                 }
-            }, ConfigManager.GatewayCapabilities.NewDirectoryItem);
+            }, GatewayType.Sync, GatewayCapabilities.NewDirectoryItem);
         }
 
         [TestMethod]
@@ -328,7 +325,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var newFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
                     var items = gateway.GetChildItem(rootName, testDirectory.Id);
@@ -338,7 +335,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.NewFileItem);
+            }, GatewayType.Sync, GatewayCapabilities.NewFileItem);
         }
 
         [TestMethod]
@@ -348,7 +345,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var newFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(largeContent), fixture.GetProgressReporter());
 
                     var items = gateway.GetChildItem(rootName, testDirectory.Id);
@@ -365,7 +362,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                         CollectionAssert.AreEqual(largeContent, buffer, "Mismatched result content");
                     }
                 }
-            }, ConfigManager.GatewayCapabilities.NewFileItem);
+            }, GatewayType.Sync, GatewayCapabilities.NewFileItem);
         }
 
         [TestMethod]
@@ -375,7 +372,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var directory = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
                     gateway.NewFileItem(rootName, directory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
@@ -384,7 +381,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     var items = gateway.GetChildItem(rootName, testDirectory.Id);
                     Assert.IsFalse(items.Any(i => i.Name == "Directory"), "Excessive directory found");
                 }
-            }, ConfigManager.GatewayCapabilities.RemoveItem);
+            }, GatewayType.Sync, GatewayCapabilities.RemoveItem);
         }
 
         [TestMethod]
@@ -394,7 +391,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var file = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
                     gateway.RemoveItem(rootName, file.Id, false);
@@ -402,7 +399,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     var items = gateway.GetChildItem(rootName, testDirectory.Id);
                     Assert.IsFalse(items.Any(i => i.Name == "File.ext"), "Excessive file found");
                 }
-            }, ConfigManager.GatewayCapabilities.RemoveItem);
+            }, GatewayType.Sync, GatewayCapabilities.RemoveItem);
         }
 
         [TestMethod]
@@ -412,7 +409,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var directory = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
 
                     gateway.RenameItem(rootName, directory.Id, "Directory-Renamed");
@@ -421,7 +418,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     Assert.IsTrue(items.Any(i => i.Name == "Directory-Renamed"), "Expected renamed directory is missing");
                     Assert.IsFalse(items.Any(i => i.Name == "Directory"), "Excessive directory found");
                 }
-            }, ConfigManager.GatewayCapabilities.RenameDirectoryItem);
+            }, GatewayType.Sync, GatewayCapabilities.RenameDirectoryItem);
         }
 
         [TestMethod]
@@ -431,7 +428,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var gateway = fixture.GetGateway(config);
                 var rootName = fixture.GetRootName(config);
 
-                using (var testDirectory = fixture.CreateTestDirectory(config)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     var file = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter());
 
                     gateway.RenameItem(rootName, file.Id, "File-Renamed.ext");
@@ -443,7 +440,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     }
                     Assert.IsFalse(items.Any(i => i.Name == "File.ext"), "Excessive file found");
                 }
-            }, ConfigManager.GatewayCapabilities.RenameFileItem);
+            }, GatewayType.Sync, GatewayCapabilities.RenameFileItem);
         }
     }
 }

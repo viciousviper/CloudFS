@@ -20,9 +20,9 @@ Consideration of a cloud storage service as a target for CloudFS depends on thes
 
 Currently the following cloud storage services are supported in CloudFS via the specified API libraries:
 
-| Cloud storage service                                       | API library                                                      | sync/async | status    |
-| :---------------------------------------------------------- | :--------------------------------------------------------------: | :--------: | :-------: |
-| *(local files)*                                             | *System.IO (.NET Framework)*                                     | *sync*     |           |
+| Cloud storage service                                       | API library                                                       | sync/async | status    |
+| :---------------------------------------------------------- | :---------------------------------------------------------------- | :--------: | :-------: |
+| *(local files)*                                             | *System.IO (.NET Framework)*                                      | *sync*     |           |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive") | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)  | async      | official  |
 | [Google Drive](https://drive.google.com/ "Google Drive")    | [Google Apis](https://github.com/google/google-api-dotnet-client) | async      | official  |
 | [Box](https://app.box.com/ "Box")                           | [Box.V2](https://github.com/box/box-windows-sdk-v2)               | async      | official  |
