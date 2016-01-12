@@ -38,7 +38,7 @@ using IgorSoft.CloudFS.GatewayTests.Config;
 namespace IgorSoft.CloudFS.GatewayTests
 {
     [TestClass]
-    internal class GatewayTestsFixture
+    public class GatewayTestsFixture
     {
         private static TestSection testSection;
 
