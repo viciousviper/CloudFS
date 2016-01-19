@@ -45,6 +45,7 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
             set { this[schemaPropertyName] = value; }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1721:PropertyNamesShouldNotMatchGetMethods")]
         [ConfigurationProperty(typePropertyName)]
         public GatewayType Type
         {

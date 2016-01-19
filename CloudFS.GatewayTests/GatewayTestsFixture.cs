@@ -69,6 +69,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             Console.WriteLine(message);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
         public static IEnumerable<GatewayElement> GetGatewayConfigurations(GatewayType type, GatewayCapabilities capability = GatewayCapabilities.None)
         {
             return testSection.Gateways.Where(g => g.Type == type && (capability == GatewayCapabilities.None || !g.Exclusions.HasFlag(capability)));
@@ -84,8 +85,16 @@ namespace IgorSoft.CloudFS.GatewayTests
             return Gateways.Single(g => g.Metadata.CloudService == config.Schema).CreateExport().Value;
         }
 
-        public RootName GetRootName(GatewayElement config) => new RootName(config.Schema, config.UserName, config.Root);
+        public RootName GetRootName(GatewayElement config)
+        {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
 
+            return new RootName(config.Schema, config.UserName, config.Root);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public void ExecuteByConfiguration(Action<GatewayElement> test, GatewayType type, GatewayCapabilities capability, bool inParallel = true)
         {
             var failures = new List<Tuple<string, Exception>>();
