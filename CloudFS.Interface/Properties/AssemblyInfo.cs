@@ -55,7 +55,7 @@ using System.Runtime.InteropServices;
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.2.0")]
 [assembly: CLSCompliant(true)]
 #if SIGNED
 [assembly: InternalsVisibleTo("IgorSoft.CloudFS.GatewayTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001009547612c133725b41a315580576d52ee25006bb46da8f9476b643efa5795bbb7f568d17183e24b72305f4af5d9c980f1b1948f430d74d568f605ed46e1e033b3fe8528cd288241b35556e4d5a9e3c4941dad05fb522a42053f2dd160cf920af73f4f5a544732775916797cb7640f6e6e2aabc9e49910144e2025d375e80738b9")]

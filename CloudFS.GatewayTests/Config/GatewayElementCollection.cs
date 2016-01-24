@@ -36,7 +36,7 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
 
         protected override ConfigurationElement CreateNewElement() => new GatewayElement();
 
-        protected override ConfigurationElement CreateNewElement(string elementName) => new GatewayElement() { Root = elementName };
+        protected override ConfigurationElement CreateNewElement(string elementName) => new GatewayElement() { Mount = elementName };
 
         protected override string ElementName => "gateway";
 

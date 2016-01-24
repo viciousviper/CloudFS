@@ -44,34 +44,47 @@ namespace IgorSoft.CloudFS.Gateways.File
 
         private const string API = "mscorlib";
 
-        public DriveInfoContract GetDrive(RootName root, string apiKey)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1707:IdentifiersShouldNotContainUnderscores")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "PARAMETER")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ROOT")]
+        public const string PARAMETER_ROOT = "root";
+
+        private string rootPath;
+
+        public DriveInfoContract GetDrive(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
+            if (parameters == null || !parameters.TryGetValue(PARAMETER_ROOT, out rootPath))
+                throw new ArgumentException($"Required {PARAMETER_ROOT} missing in {nameof(parameters)}");
+            if (string.IsNullOrEmpty(rootPath))
+                throw new ArgumentException($"{PARAMETER_ROOT} cannot be empty");
 
-            var drive = new DriveInfo(Path.GetFullPath(root.Root));
-            return new DriveInfoContract(drive.Name, drive.AvailableFreeSpace, drive.TotalSize - drive.AvailableFreeSpace);
+            var drive = new DriveInfo(Path.GetFullPath(rootPath));
+            return new DriveInfoContract(root.Value, drive.AvailableFreeSpace, drive.TotalSize - drive.AvailableFreeSpace);
         }
 
         public RootDirectoryInfoContract GetRoot(RootName root, string apiKey)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var directory = new DirectoryInfo(Path.GetFullPath(root.Root));
+            var directory = new DirectoryInfo(Path.GetFullPath(rootPath));
             return new RootDirectoryInfoContract(Path.DirectorySeparatorChar.ToString(), directory.CreationTime, directory.LastWriteTime);
         }
 
-        private static string GetFullPath(RootName root, string path)
+        private static string GetFullPath(string rootPath, string path)
         {
             if (Path.IsPathRooted(path))
                 path = path.Remove(0, Path.GetPathRoot(path).Length);
-            return Path.Combine(Path.GetFullPath(root.Root), path);
+            return Path.Combine(Path.GetFullPath(rootPath), path);
         }
 
-        private static string GetRelativePath(RootName root, string path)
+        private static string GetRelativePath(string rootPath, string path)
         {
-            var fullRootPath = Path.GetFullPath(root.Root);
+            var fullRootPath = Path.GetFullPath(rootPath);
             if (path.StartsWith(fullRootPath, StringComparison.Ordinal))
                 path = path.Remove(0, fullRootPath.Length);
             return path.TrimEnd(Path.DirectorySeparatorChar);
@@ -83,13 +96,15 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(root));
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, parent.Value);
+            var effectivePath = GetFullPath(rootPath, parent.Value);
 
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists)
-                return directory.EnumerateDirectories().Select(d => new DirectoryInfoContract(GetRelativePath(root, d.FullName), d.Name, d.CreationTime, d.LastWriteTime)).Cast<FileSystemInfoContract>().Concat(
-                    directory.EnumerateFiles().Select(f => new FileInfoContract(GetRelativePath(root, f.FullName), f.Name, f.CreationTime, f.LastWriteTime, f.Length, null)).Cast<FileSystemInfoContract>());
+                return directory.EnumerateDirectories().Select(d => new DirectoryInfoContract(GetRelativePath(rootPath, d.FullName), d.Name, d.CreationTime, d.LastWriteTime)).Cast<FileSystemInfoContract>().Concat(
+                    directory.EnumerateFiles().Select(f => new FileInfoContract(GetRelativePath(rootPath, f.FullName), f.Name, f.CreationTime, f.LastWriteTime, f.Length, null)).Cast<FileSystemInfoContract>());
             else
                 return new FileSystemInfoContract[] { };
         }
@@ -100,8 +115,10 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(root));
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, target.Value);
+            var effectivePath = GetFullPath(rootPath, target.Value);
 
             var file = new FileInfo(effectivePath);
             if (!file.Exists)
@@ -118,8 +135,10 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(root));
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, source.Value);
+            var effectivePath = GetFullPath(rootPath, source.Value);
 
             var file = new FileInfo(effectivePath);
             if (!file.Exists)
@@ -136,8 +155,10 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(target));
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, target.Value);
+            var effectivePath = GetFullPath(rootPath, target.Value);
 
             var file = new FileInfo(effectivePath);
             using (var stream = file.OpenWrite()) {
@@ -155,23 +176,25 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(copyName));
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, source.Value);
+            var effectivePath = GetFullPath(rootPath, source.Value);
             var destinationPath = destination.Value;
             if (Path.IsPathRooted(destinationPath))
                 destinationPath = destinationPath.Remove(0, Path.GetPathRoot(destinationPath).Length);
-            var effectiveCopyPath = GetFullPath(root, Path.Combine(destinationPath, copyName));
+            var effectiveCopyPath = GetFullPath(rootPath, Path.Combine(destinationPath, copyName));
 
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists) {
                 var directoryCopy = directory.CopyTo(effectiveCopyPath, recurse);
-                return new DirectoryInfoContract(GetRelativePath(root, directoryCopy.FullName), directoryCopy.Name, directoryCopy.CreationTime, directoryCopy.LastWriteTime);
+                return new DirectoryInfoContract(GetRelativePath(rootPath, directoryCopy.FullName), directoryCopy.Name, directoryCopy.CreationTime, directoryCopy.LastWriteTime);
             }
 
             var file = new FileInfo(effectivePath);
             if (file.Exists) {
                 var fileCopy = file.CopyTo(effectiveCopyPath);
-                return new FileInfoContract(GetRelativePath(root, fileCopy.FullName), fileCopy.Name, fileCopy.CreationTime, fileCopy.LastWriteTime, fileCopy.Length, null);
+                return new FileInfoContract(GetRelativePath(rootPath, fileCopy.FullName), fileCopy.Name, fileCopy.CreationTime, fileCopy.LastWriteTime, fileCopy.Length, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.PathNotFound, source.Value));
@@ -187,23 +210,25 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(moveName));
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, source.Value);
+            var effectivePath = GetFullPath(rootPath, source.Value);
             var destinationPath = destination.Value;
             if (Path.IsPathRooted(destinationPath))
                 destinationPath = destinationPath.Remove(0, Path.GetPathRoot(destinationPath).Length);
-            var effectiveMovePath = GetFullPath(root, Path.Combine(destinationPath, moveName));
+            var effectiveMovePath = GetFullPath(rootPath, Path.Combine(destinationPath, moveName));
 
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists) {
                 directory.MoveTo(effectiveMovePath);
-                return new DirectoryInfoContract(GetRelativePath(root, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
+                return new DirectoryInfoContract(GetRelativePath(rootPath, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
             }
 
             var file = new FileInfo(effectivePath);
             if (file.Exists) {
                 file.MoveTo(effectiveMovePath);
-                return new FileInfoContract(GetRelativePath(root, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
+                return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.PathNotFound, source.Value));
@@ -217,8 +242,10 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(parent));
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, Path.Combine(parent.Value, name));
+            var effectivePath = GetFullPath(rootPath, Path.Combine(parent.Value, name));
 
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists)
@@ -226,7 +253,7 @@ namespace IgorSoft.CloudFS.Gateways.File
 
             directory.Create();
 
-            return new DirectoryInfoContract(GetRelativePath(root, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
+            return new DirectoryInfoContract(GetRelativePath(rootPath, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
         }
 
         public FileInfoContract NewFileItem(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
@@ -237,8 +264,10 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(parent));
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, Path.Combine(parent.Value, name));
+            var effectivePath = GetFullPath(rootPath, Path.Combine(parent.Value, name));
 
             var file = new FileInfo(effectivePath);
             if (file.Exists)
@@ -250,7 +279,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             }
 
             file.Refresh();
-            return new FileInfoContract(GetRelativePath(root, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
+            return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
         }
 
         public void RemoveItem(RootName root, FileSystemId target, bool recurse)
@@ -259,8 +288,10 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(root));
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, target.Value);
+            var effectivePath = GetFullPath(rootPath, target.Value);
 
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists) {
@@ -285,20 +316,22 @@ namespace IgorSoft.CloudFS.Gateways.File
                 throw new ArgumentNullException(nameof(target));
             if (string.IsNullOrEmpty(newName))
                 throw new ArgumentNullException(nameof(newName));
+            if (string.IsNullOrEmpty(rootPath))
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
 
-            var effectivePath = GetFullPath(root, target.Value);
-            var newPath = GetFullPath(root, Path.Combine(Path.GetDirectoryName(target.Value), newName));
+            var effectivePath = GetFullPath(rootPath, target.Value);
+            var newPath = GetFullPath(rootPath, Path.Combine(Path.GetDirectoryName(target.Value), newName));
 
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists) {
                 directory.MoveTo(newPath);
-                return new DirectoryInfoContract(GetRelativePath(root, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
+                return new DirectoryInfoContract(GetRelativePath(rootPath, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
             }
 
             var file = new FileInfo(effectivePath);
             if (file.Exists) {
                 file.MoveTo(newPath);
-                return new FileInfoContract(GetRelativePath(root, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
+                return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.PathNotFound, target.Value));
@@ -306,6 +339,6 @@ namespace IgorSoft.CloudFS.Gateways.File
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private static string DebuggerDisplay => nameof(FileGateway);
+        private string DebuggerDisplay => $"{nameof(FileGateway)} rootPath='{rootPath}'";
     }
 }

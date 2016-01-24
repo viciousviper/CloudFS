@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
@@ -43,11 +44,12 @@ namespace IgorSoft.CloudFS.GatewayTests
 
             internal DirectoryId Id => directory.Id;
 
-            private TestDirectoryFixture(ICloudGateway gateway, RootName root, string apiKey, string path)
+            private TestDirectoryFixture(ICloudGateway gateway, RootName root, string apiKey, IDictionary<string, string> parameters, string path)
             {
                 this.gateway = gateway;
                 this.root = root;
 
+                gateway.GetDrive(root, apiKey, parameters);
                 var rootDirectory = gateway.GetRoot(root, apiKey);
 
                 var residualDirectory = gateway.GetChildItem(root, rootDirectory.Id).SingleOrDefault(f => f.Name == path) as DirectoryInfoContract;
@@ -59,7 +61,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
             internal static TestDirectoryFixture CreateTestDirectory(GatewayElement config, GatewayTestsFixture fixture)
             {
-                return new TestDirectoryFixture(fixture.GetGateway(config), fixture.GetRootName(config), config.ApiKey, config.TestDirectory);
+                return new TestDirectoryFixture(fixture.GetGateway(config), fixture.GetRootName(config), config.ApiKey, fixture.GetParameters(config), config.TestDirectory);
             }
 
             void IDisposable.Dispose()
