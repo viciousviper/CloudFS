@@ -31,7 +31,7 @@ namespace IgorSoft.CloudFS.Interface.Composition
 {
     public interface ICloudGateway
     {
-        DriveInfoContract GetDrive(RootName root, string apiKey);
+        DriveInfoContract GetDrive(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         RootDirectoryInfoContract GetRoot(RootName root, string apiKey);
 

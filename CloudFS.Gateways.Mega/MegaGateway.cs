@@ -75,7 +75,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             return result;
         }
 
-        public DriveInfoContract GetDrive(RootName root, string apiKey)
+        public DriveInfoContract GetDrive(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));

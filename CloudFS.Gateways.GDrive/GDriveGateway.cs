@@ -88,7 +88,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             return result;
         }
 
-        public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey)
+        public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContext(root, apiKey);
 

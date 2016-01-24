@@ -96,7 +96,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             return long.Parse(fileId.Value.Substring(1), NumberStyles.Number);
         }
 
-        public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey)
+        public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContext(root, apiKey);
 

@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>CloudFS-Signed</id>
-    <version>1.0.1-alpha</version>
+    <version>1.0.2-alpha</version>
     <title>CloudFS-Signed</title>
     <authors>IgorSoft</authors>
     <owners>IgorSoft</owners>
     <projectUrl>https://github.com/viciousviper/CloudFS</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The CloudFS library is a collection of .NET assemblies as gateways to various publicly accessible Cloud storage services.</description>
-    <releaseNotes>Initial release</releaseNotes>
+    <releaseNotes>Gateway configuration extended to accept custom parameters<br/>File Gateway now configurable with target root directory</releaseNotes>
     <copyright>Copyright © 2016</copyright>
 	<tags>Cloud Filesystem</tags>
     <dependencies>

@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
@@ -43,7 +44,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
             internal DirectoryId Id => directory.Id;
 
-            private TestDirectoryFixture(IAsyncCloudGateway gateway, RootName root, string apiKey, string path)
+            private TestDirectoryFixture(IAsyncCloudGateway gateway, RootName root, string apiKey, IDictionary<string, string> parameters, string path)
             {
                 this.gateway = gateway;
                 this.root = root;
@@ -59,7 +60,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
             internal static TestDirectoryFixture CreateTestDirectory(GatewayElement config, GatewayTestsFixture fixture)
             {
-                return new TestDirectoryFixture(fixture.GetAsyncGateway(config), fixture.GetRootName(config), config.ApiKey, config.TestDirectory);
+                return new TestDirectoryFixture(fixture.GetAsyncGateway(config), fixture.GetRootName(config), config.ApiKey, fixture.GetParameters(config), config.TestDirectory);
             }
 
             internal DirectoryInfoContract ToContract()

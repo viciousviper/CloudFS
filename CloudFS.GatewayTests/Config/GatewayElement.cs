@@ -33,8 +33,9 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         private const string schemaPropertyName = "schema";
         private const string typePropertyName = "type";
         private const string userNamePropertyName = "userName";
-        private const string rootPropertyName = "root";
+        private const string mountPropertyName = "mount";
         private const string apiKeyPropertyName = "apiKey";
+        private const string parametersPropertyName = "parameters";
         private const string exclusionsPropertyName = "exclusions";
         private const string testDirectoryPropertyName = "testDirectory";
 
@@ -60,11 +61,11 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
             set { this[userNamePropertyName] = value; }
         }
 
-        [ConfigurationProperty(rootPropertyName, IsRequired = true)]
-        public string Root
+        [ConfigurationProperty(mountPropertyName, IsRequired = true)]
+        public string Mount
         {
-            get { return (string)this[rootPropertyName]; }
-            set { this[rootPropertyName] = value; }
+            get { return (string)this[mountPropertyName]; }
+            set { this[mountPropertyName] = value; }
         }
 
         [ConfigurationProperty(apiKeyPropertyName)]
@@ -72,6 +73,13 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         {
             get { return (string)this[apiKeyPropertyName]; }
             set { this[apiKeyPropertyName] = value; }
+        }
+
+        [ConfigurationProperty(parametersPropertyName)]
+        public string Parameters
+        {
+            get { return (string)this[parametersPropertyName]; }
+            set { this[parametersPropertyName] = value; }
         }
 
         [ConfigurationProperty(exclusionsPropertyName)]
@@ -90,6 +98,6 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(GatewayElement)} schema='{Schema}', userName='{UserName}', root='{Root}', apiKey='{ApiKey}', exclusions='{Exclusions}', testDirectory='{TestDirectory}'";
+        private string DebuggerDisplay => $"{nameof(GatewayElement)} schema='{Schema}', userName='{UserName}', mount='{Mount}', apiKey='{ApiKey}', parameters=[{Parameters?.Length ?? 0}], exclusions='{Exclusions}', testDirectory='{TestDirectory}'";
     }
 }

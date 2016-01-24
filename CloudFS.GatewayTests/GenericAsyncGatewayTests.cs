@@ -74,6 +74,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             fixture.ExecuteByConfiguration(config => {
                 var gateway = fixture.GetAsyncGateway(config);
                 var rootName = fixture.GetRootName(config);
+                var parameters = fixture.GetParameters(config);
 
                 var root = gateway.GetRootAsync(rootName, config.ApiKey).Result;
 
@@ -88,8 +89,9 @@ namespace IgorSoft.CloudFS.GatewayTests
             fixture.ExecuteByConfiguration(config => {
                 var gateway = fixture.GetAsyncGateway(config);
                 var rootName = fixture.GetRootName(config);
+                var parameters = fixture.GetParameters(config);
 
-                var drive = gateway.GetDriveAsync(rootName, config.ApiKey).Result;
+                var drive = gateway.GetDriveAsync(rootName, config.ApiKey, parameters).Result;
 
                 Assert.IsNotNull(drive, $"Drive is null ({config.Schema})");
                 Assert.IsNotNull(drive.Id, $"Missing drive ID ({config.Schema})");

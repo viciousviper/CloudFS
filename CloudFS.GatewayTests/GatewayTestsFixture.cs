@@ -90,7 +90,24 @@ namespace IgorSoft.CloudFS.GatewayTests
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            return new RootName(config.Schema, config.UserName, config.Root);
+            return new RootName(config.Schema, config.UserName, config.Mount);
+        }
+
+        public IDictionary<string, string> GetParameters(GatewayElement config)
+        {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
+            if (string.IsNullOrEmpty(config.Parameters))
+                return null;
+
+            var result = new Dictionary<string, string>();
+            foreach (var parameter in config.Parameters.Split('|')) {
+                var components = parameter.Split(new[] { '=' }, 2);
+                result.Add(components[0], components.Length == 2 ? components[1] : null);
+            }
+
+            return result;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]

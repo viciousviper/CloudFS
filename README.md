@@ -35,7 +35,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 - Platform
   - .NET 4.6
 - Operating system
-  - tested on Windows 8.1 x64 and Windows Server 2012 R2
+  - tested on Windows 8.1 x64 and Windows Server 2012 R2 (until version 1.0.0-alpha) /<br/>Windows 10 x64 (from version 1.0.1-alpha)
   - expected to run on Windows 7/8/8.1/10 and Windows Server 2008(R2)/2012(R2)
 
 ## Local compilation
@@ -59,8 +59,12 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 ## Release Notes
 
-- 2016-01-08 Version 1.0.0-alpha - Initial release and NuGet registration
-- 2015-12-29 Version 1.0.0.0 - Initial commit
+| Date       | Version     | Comments                                                                       |
+| :--------- | :---------- | :----------------------------------------------------------------------------- |
+| 2016-01-24 | 1.0.2-alpha | - Gateway configuration extended to accept custom parameters. This change **breaks compatibility** with earlier API versions.<br/>- File Gateway now configurable with target root directory |
+| 2016-01-19 | 1.0.1-alpha | - NuGet dependencies updated, schema of App.config in tests project refactored |
+| 2016-01-08 | 1.0.0-alpha | - Initial release and NuGet registration                                       |
+| 2015-12-29 | 1.0.0.0     | - Initial commit                                                               |
 
 ## Future plans
 
