@@ -62,7 +62,11 @@ namespace IgorSoft.CloudFS.Authentication
                     browser.Navigating += (s, e) => {
                         if (redirectUri.IsBaseOf(e.Uri) && redirectUri.AbsolutePath == e.Uri.AbsolutePath) {
                             var parameters = new NameValueCollection();
-                            foreach (var parameter in e.Uri.Query.TrimStart('?').Split('&')) {
+                            foreach (var parameter in e.Uri.Query.TrimStart('?').Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)) {
+                                var nameValue = parameter.Split('=');
+                                parameters.Add(nameValue[0], nameValue[1]);
+                            }
+                            foreach (var parameter in e.Uri.Fragment.TrimStart('#').Split(new[] { '&' }, StringSplitOptions.RemoveEmptyEntries)) {
                                 var nameValue = parameter.Split('=');
                                 parameters.Add(nameValue[0], nameValue[1]);
                             }

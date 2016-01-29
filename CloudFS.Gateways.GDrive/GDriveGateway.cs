@@ -46,7 +46,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), GDriveGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), GDriveGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), GDriveGateway.API)]
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class GDriveGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "gdrive";
@@ -72,6 +72,8 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
         }
 
         private IDictionary<RootName, GDriveContext> contextCache = new Dictionary<RootName, GDriveContext>();
+
+        public bool PreservesId => true;
 
         private async Task<GDriveContext> RequireContext(RootName root, string apiKey = null)
         {
@@ -218,6 +220,6 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private static string DebuggerDisplay => nameof(GDriveGateway);
+        private static string DebuggerDisplay() => nameof(GDriveGateway);
     }
 }

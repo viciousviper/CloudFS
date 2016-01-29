@@ -26,7 +26,7 @@ using System;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class FileSystemInfoLocator
     {
         public FileSystemId Id { get; }
@@ -47,6 +47,6 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used for DebuggerDisplay")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(FileSystemInfoLocator)} {Id.Value} Name={Name} ParentId={ParentId.Value}";
+        private string DebuggerDisplay() => $"{nameof(FileSystemInfoLocator)} {Id.Value} Name={Name} ParentId={ParentId.Value}";
     }
 }

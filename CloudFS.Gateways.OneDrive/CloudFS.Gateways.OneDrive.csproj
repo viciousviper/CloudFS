@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IgorSoft.CloudFS.Gateways.OneDrive</RootNamespace>
     <AssemblyName>IgorSoft.CloudFS.Gateways.OneDrive</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -117,7 +117,6 @@
     <ProjectReference Include="..\CloudFS.Interface\CloudFS.Interface.csproj">
       <Project>{3c92bdc3-ae94-4269-8fc6-9114a90184ac}</Project>
       <Name>CloudFS.Interface</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\CloudFS.Authentication\CloudFS.Authentication.csproj">
       <Project>{f4b1d5e1-04bb-4b01-9079-fc2685e71434}</Project>

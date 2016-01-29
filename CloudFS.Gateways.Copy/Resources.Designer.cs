@@ -24,20 +24,20 @@ SOFTWARE.
 
 namespace IgorSoft.CloudFS.Gateways.Copy {
     using System;
-    
+
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
@@ -48,7 +48,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy {
                 return resourceMan;
             }
         }
-        
+
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture {
             get {
@@ -58,7 +58,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Copy does not support copying of files or directories.
         /// </summary>
@@ -67,7 +67,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy {
                 return ResourceManager.GetString("CopyingOfFilesOrDirectoriesNotSupported", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The file/folder &apos;{0}&apos; could not be moved to &apos;{1}{2}&apos;.
         /// </summary>
@@ -76,7 +76,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy {
                 return ResourceManager.GetString("MoveFailed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The file/folder &apos;{0}&apos; could not be renamed to &apos;{1}&apos;.
         /// </summary>
@@ -85,7 +85,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy {
                 return ResourceManager.GetString("RenameFailed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}
         /// </summary>

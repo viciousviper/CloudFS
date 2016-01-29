@@ -26,7 +26,7 @@ using System;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class FileInfoContract : FileSystemInfoContract
     {
         public new FileId Id => (FileId)base.Id;
@@ -49,6 +49,6 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(FileInfoContract)} {Id} ({Name})";
+        private string DebuggerDisplay() => $"{nameof(FileInfoContract)} {Id} ({Name})";
     }
 }

@@ -27,7 +27,7 @@ using SemanticTypes;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class DriveId : SemanticType<string>
     {
         public DriveId(string id) : base(i => !string.IsNullOrEmpty(i), id)
@@ -36,6 +36,6 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used for DebuggerDisplay")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(DriveId)} {Value}";
+        private string DebuggerDisplay() => $"{nameof(DriveId)} {Value}";
     }
 }

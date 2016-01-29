@@ -162,7 +162,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
             var browser = new BrowserLogOn();
             browser.Authenticated += (s, e) => {
-                authCode = e.Parameters.Get("code");
+                authCode = e.Parameters.Get("code")?.TrimStart('M');
                 browser.Close();
             };
             browser.Show("OneDrive", account, authenticationUri, redirectUri);
@@ -184,7 +184,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             if (response == null) {
                 if (string.IsNullOrEmpty(code)) {
                     var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
-                    code = GetAuthCode(account, authenticationUri, new Uri(LIVE_LOGIN_DESKTOP_URI))?.TrimStart('M');
+                    code = GetAuthCode(account, authenticationUri, new Uri(LIVE_LOGIN_DESKTOP_URI));
                     if (string.IsNullOrEmpty(code))
                         throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
                 }

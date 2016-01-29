@@ -42,7 +42,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), BoxGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), BoxGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), BoxGateway.API)]
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class BoxGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "box";
@@ -68,6 +68,8 @@ namespace IgorSoft.CloudFS.Gateways.Box
         }
 
         private IDictionary<RootName, BoxContext> contextCache = new Dictionary<RootName, BoxContext>();
+
+        public bool PreservesId => true;
 
         private async Task<BoxContext> RequireContext(RootName root, string apiKey = null)
         {
@@ -225,6 +227,6 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private static string DebuggerDisplay => nameof(BoxGateway);
+        private static string DebuggerDisplay() => nameof(BoxGateway);
     }
 }

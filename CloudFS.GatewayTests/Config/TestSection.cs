@@ -27,7 +27,7 @@ using System.Configuration;
 
 namespace IgorSoft.CloudFS.GatewayTests.Config
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class TestSection : ConfigurationSection
     {
         public const string Name = "test";
@@ -48,6 +48,6 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(TestSection)} libPath='{LibPath}'";
+        private string DebuggerDisplay() => $"{nameof(TestSection)} libPath='{LibPath}'";
     }
 }

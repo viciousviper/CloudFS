@@ -43,7 +43,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), CopyGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), CopyGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(CopyRestAPI))]
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class CopyGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "copy";
@@ -63,6 +63,8 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         }
 
         private IDictionary<RootName, CopyContext> contextCache = new Dictionary<RootName, CopyContext>();
+
+        public bool PreservesId => true;
 
         private async Task<CopyContext> RequireContext(RootName root, string apiKey = null)
         {
@@ -201,6 +203,6 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private static string DebuggerDisplay => nameof(CopyGateway);
+        private static string DebuggerDisplay() => nameof(CopyGateway);
     }
 }

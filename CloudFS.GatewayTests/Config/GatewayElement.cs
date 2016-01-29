@@ -27,7 +27,7 @@ using System.Configuration;
 
 namespace IgorSoft.CloudFS.GatewayTests.Config
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public class GatewayElement : ConfigurationElement
     {
         private const string schemaPropertyName = "schema";
@@ -98,6 +98,6 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(GatewayElement)} schema='{Schema}', userName='{UserName}', mount='{Mount}', apiKey='{ApiKey}', parameters=[{Parameters?.Length ?? 0}], exclusions='{Exclusions}', testDirectory='{TestDirectory}'";
+        private string DebuggerDisplay() => $"{nameof(GatewayElement)} schema='{Schema}', userName='{UserName}', mount='{Mount}', apiKey='{ApiKey}', parameters=[{Parameters?.Length ?? 0}], exclusions='{Exclusions}', testDirectory='{TestDirectory}'";
     }
 }

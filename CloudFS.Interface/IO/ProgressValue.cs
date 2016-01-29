@@ -26,7 +26,7 @@ using System;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public struct ProgressValue
     {
         public int PercentCompleted { get; }
@@ -59,6 +59,6 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used for DebuggerDisplay")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{BytesTransferred}/{BytesTotal} ({PercentCompleted}%)";
-    } 
+        private string DebuggerDisplay() => $"{BytesTransferred}/{BytesTotal} ({PercentCompleted}%)";
+    }
 }

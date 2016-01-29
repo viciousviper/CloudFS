@@ -273,12 +273,15 @@ namespace IgorSoft.CloudFS.GatewayTests
                     Assert.AreEqual(targetItems.Single(i => i.Name == "Directory").Id, directoryMoved.Id, "Mismatched moved directory Id");
                     var originalItems = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                     Assert.IsNull(originalItems.SingleOrDefault(i => i.Name == "Directory"), "Original directory remains");
-                    var movedFile = (FileInfoContract)gateway.GetChildItemAsync(rootName, directoryMoved.Id).Result.SingleOrDefault(i => i.Name == "File.ext");
-                    Assert.IsTrue(movedFile != null, "Expected moved file is missing");
-                    using (var result = gateway.GetContentAsync(rootName, movedFile.Id).Result) {
+                    var fileMoved = (FileInfoContract)gateway.GetChildItemAsync(rootName, directoryMoved.Id).Result.SingleOrDefault(i => i.Name == "File.ext");
+                    Assert.IsTrue(fileMoved != null, "Expected moved file is missing");
+                    using (var result = gateway.GetContentAsync(rootName, fileMoved.Id).Result) {
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
-                    Assert.AreEqual(fileOriginal.Id, movedFile.Id, "Mismatched moved file Id");
+                    if (gateway.PreservesId) {
+                        Assert.AreEqual(directoryOriginal.Id, directoryMoved.Id, "Mismatched moved directory Id");
+                        Assert.AreEqual(fileOriginal.Id, fileMoved.Id, "Mismatched moved file Id");
+                    }
                 }
             }, GatewayType.Async, GatewayCapabilities.MoveDirectoryItem);
         }
@@ -304,6 +307,8 @@ namespace IgorSoft.CloudFS.GatewayTests
                     using (var result = gateway.GetContentAsync(rootName, fileMoved.Id).Result) {
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                     }
+                    if (gateway.PreservesId)
+                        Assert.AreEqual(fileOriginal.Id, fileMoved.Id, "Mismatched moved file Id");
                 }
             }, GatewayType.Async, GatewayCapabilities.MoveFileItem);
         }

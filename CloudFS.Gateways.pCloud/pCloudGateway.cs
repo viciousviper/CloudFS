@@ -44,7 +44,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), pCloudGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), pCloudGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), pCloudGateway.API)]
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public class pCloudGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "pcloud";
@@ -66,6 +66,8 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         }
 
         private IDictionary<RootName, pCloudContext> contextCache = new Dictionary<RootName, pCloudContext>();
+
+        public bool PreservesId => true;
 
         private async Task<pCloudContext> RequireContext(RootName root, string apiKey = null)
         {
@@ -256,6 +258,6 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private static string DebuggerDisplay => nameof(pCloudGateway);
+        private static string DebuggerDisplay() => nameof(pCloudGateway);
     }
 }

@@ -27,7 +27,7 @@ using System.IO;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class RootDirectoryInfoContract : DirectoryInfoContract
     {
         public DriveInfoContract Drive { get; set; }
@@ -40,6 +40,6 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(RootDirectoryInfoContract)} {Id} ({Name})";
+        private string DebuggerDisplay() => $"{nameof(RootDirectoryInfoContract)} {Id} ({Name})";
     }
 }

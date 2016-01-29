@@ -20,15 +20,17 @@ Consideration of a cloud storage service as a target for CloudFS depends on thes
 
 Currently the following cloud storage services are supported in CloudFS via the specified API libraries:
 
-| Cloud storage service                                       | API library                                                       | sync/async | status    |
-| :---------------------------------------------------------- | :---------------------------------------------------------------- | :--------: | :-------: |
-| *(local files)*                                             | *System.IO (.NET Framework)*                                      | *sync*     |           |
-| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive") | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)  | async      | official  |
-| [Google Drive](https://drive.google.com/ "Google Drive")    | [Google Apis](https://github.com/google/google-api-dotnet-client) | async      | official  |
-| [Box](https://app.box.com/ "Box")                           | [Box.V2](https://github.com/box/box-windows-sdk-v2)               | async      | official  |
-| [Copy](https://www.copy.com/ "Copy")                        | [CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)           | async      | 3rd party |
-| [MEGA](https://mega.co.nz/ "MEGA")                          | [MegaApiClient](https://github.com/gpailler/MegaApiClient)        | sync       | 3rd party |
-| [pCloud](https://www.pcloud.com/ "pCloud")                  | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)             | async      | 3rd party |
+| Cloud storage service                                       | API library                                                       | version     | sync/async | origin    | status |
+| :---------------------------------------------------------- | :---------------------------------------------------------------- | :---------: | :--------: | :-------: | :----: |
+| *(local files)*                                             | *System.IO (.NET Framework)*                                      | *N/A*       | *sync*     |           | stable |
+| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive") | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)  | N/A         | async      | official  | stable<sup id="a1">[1](#f1)</sup> |
+| [Google Drive](https://drive.google.com/ "Google Drive")    | [Google Apis](https://github.com/google/google-api-dotnet-client) | 1.10.0.1990 | async      | official  | stable |
+| [Box](https://app.box.com/ "Box")                           | [Box.V2](https://github.com/box/box-windows-sdk-v2)               | 2.6.2       | async      | official  | stable |
+| [Copy](https://www.copy.com/ "Copy")                        | [CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)           | 1.1.0       | async      | 3rd party | stable |
+| [MEGA](https://mega.co.nz/ "MEGA")                          | [MegaApiClient](https://github.com/gpailler/MegaApiClient)        | 1.1.3       | sync       | 3rd party | stable |
+| [pCloud](https://www.pcloud.com/ "pCloud")                  | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)             | N/A         | async      | 3rd party | stable |
+
+> <sup><b id="f1">1</b></sup>This version of OneDriveSDK has been deprecated by Microsoft. It will be replaced by [OneDrive SDK for C#](https://github.com/OneDrive/onedrive-sdk-csharp) at some point in the future. [^](#a1)
 
 ## System Requirements
 

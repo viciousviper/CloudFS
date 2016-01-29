@@ -37,7 +37,7 @@ namespace IgorSoft.CloudFS.Gateways.File
     [ExportAsCloudGateway("File")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), FileGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), FileGateway.API)]
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class FileGateway : ICloudGateway
     {
         private const string SCHEMA = "file";
@@ -50,6 +50,8 @@ namespace IgorSoft.CloudFS.Gateways.File
         public const string PARAMETER_ROOT = "root";
 
         private string rootPath;
+
+        public bool PreservesId => false;
 
         public DriveInfoContract GetDrive(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
@@ -339,6 +341,6 @@ namespace IgorSoft.CloudFS.Gateways.File
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(FileGateway)} rootPath='{rootPath}'";
+        private string DebuggerDisplay() => $"{nameof(FileGateway)} rootPath='{rootPath}'";
     }
 }

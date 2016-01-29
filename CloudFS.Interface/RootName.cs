@@ -30,7 +30,7 @@ using SemanticTypes;
 
 namespace IgorSoft.CloudFS.Interface
 {
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class RootName : SemanticType<string>
     {
         private const string rootNamePattern = @"^(?<Schema>[a-z]+)(@(?<UserName>[_a-zA-Z0-9]+))?(\|(?<Root>.+))?$";
@@ -71,6 +71,6 @@ namespace IgorSoft.CloudFS.Interface
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used for DebuggerDisplay")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay => $"{nameof(RootName)} {Format(Schema, UserName, Root)}";
+        private string DebuggerDisplay() => $"{nameof(RootName)} {Format(Schema, UserName, Root)}";
     }
 }

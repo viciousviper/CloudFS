@@ -39,7 +39,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), MegaGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), MegaGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), MegaGateway.API)]
-    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class MegaGateway : ICloudGateway
     {
         private const string SCHEMA = "mega";
@@ -61,6 +61,8 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         }
 
         private IDictionary<RootName, MegaContext> contextCache = new Dictionary<RootName, MegaContext>();
+
+        public bool PreservesId => true;
 
         private MegaContext RequireContext(RootName root, string apiKey = null)
         {
@@ -183,6 +185,6 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private static string DebuggerDisplay => nameof(MegaGateway);
+        private static string DebuggerDisplay() => nameof(MegaGateway);
     }
 }

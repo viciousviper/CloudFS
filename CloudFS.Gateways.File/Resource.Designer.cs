@@ -24,20 +24,20 @@ SOFTWARE.
 
 namespace IgorSoft.CloudFS.Gateways.File {
     using System;
-    
+
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resource {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resource() {
         }
-        
+
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
@@ -48,7 +48,7 @@ namespace IgorSoft.CloudFS.Gateways.File {
                 return resourceMan;
             }
         }
-        
+
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture {
             get {
@@ -58,7 +58,7 @@ namespace IgorSoft.CloudFS.Gateways.File {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is already present.
         /// </summary>
@@ -67,7 +67,7 @@ namespace IgorSoft.CloudFS.Gateways.File {
                 return ResourceManager.GetString("DuplicatePath", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Path &apos;{0}&apos; does not exist.
         /// </summary>
@@ -76,7 +76,7 @@ namespace IgorSoft.CloudFS.Gateways.File {
                 return ResourceManager.GetString("PathNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Deletion of nonempty directory &apos;{0}&apos; requires parameter &apos;-Recurse&apos;.
         /// </summary>

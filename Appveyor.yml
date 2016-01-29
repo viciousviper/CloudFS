@@ -5,6 +5,8 @@ branches:
   - master
   - develop
 
+skip_tags: true
+
 configuration:
 - Debug
 - Release
