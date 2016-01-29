@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{1B8C
 		Library\pCloud.NET SDK.pdb = Library\pCloud.NET SDK.pdb
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.Yandex", "CloudFS.Gateways.Yandex\CloudFS.Gateways.Yandex.csproj", "{F98FBDF7-D153-4368-9A0D-4D79F1A4BB7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,12 @@ Global
 		{080956F5-0A71-4A71-B16D-05502B2C9DC1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{080956F5-0A71-4A71-B16D-05502B2C9DC1}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
 		{080956F5-0A71-4A71-B16D-05502B2C9DC1}.Signed|Any CPU.Build.0 = Signed|Any CPU
+		{F98FBDF7-D153-4368-9A0D-4D79F1A4BB7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F98FBDF7-D153-4368-9A0D-4D79F1A4BB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F98FBDF7-D153-4368-9A0D-4D79F1A4BB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F98FBDF7-D153-4368-9A0D-4D79F1A4BB7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F98FBDF7-D153-4368-9A0D-4D79F1A4BB7F}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{F98FBDF7-D153-4368-9A0D-4D79F1A4BB7F}.Signed|Any CPU.Build.0 = Signed|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
