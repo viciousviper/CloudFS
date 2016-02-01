@@ -91,8 +91,8 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="YandexDisk.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\YandexDisk.Client.1.0.5\lib\net46\YandexDisk.Client.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Library\YandexDisk.Client.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

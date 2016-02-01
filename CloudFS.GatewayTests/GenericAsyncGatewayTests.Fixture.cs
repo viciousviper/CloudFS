@@ -53,7 +53,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                 var residualDirectory = gateway.GetChildItemAsync(root, rootDirectory.Id).Result.SingleOrDefault(f => f.Name == path) as DirectoryInfoContract;
                 if (residualDirectory != null)
-                    gateway.RemoveItemAsync(root, residualDirectory.Id, true);
+                    gateway.RemoveItemAsync(root, residualDirectory.Id, true).Wait();
 
                 directory = gateway.NewDirectoryItemAsync(root, rootDirectory.Id, path).Result;
             }
@@ -70,7 +70,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
             void IDisposable.Dispose()
             {
-                gateway.RemoveItemAsync(root, directory.Id, true);
+                gateway.RemoveItemAsync(root, directory.Id, true).Wait();
             }
         }
     }

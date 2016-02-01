@@ -31,6 +31,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using YandexDisk.Client;
+using YandexDisk.Client.Clients;
 using YandexDisk.Client.Protocol;
 using IgorSoft.CloudFS.Gateways.Yandex.OAuth;
 using IgorSoft.CloudFS.Interface;
@@ -81,12 +82,15 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
         private async Task<bool> OperationProgress(YandexContext context, Link link)
         {
-            var operation = default(Operation);
-            do {
-                operation = await context.Client.Commands.GetOperationStatus(link, CancellationToken.None);
-                if (operation.Status == OperationStatus.Failure)
-                    return false;
-            } while (operation.Status == OperationStatus.InProgress);
+            if (link.HttpStatusCode == System.Net.HttpStatusCode.Accepted) {
+                var operation = default(Operation);
+                do {
+                    Thread.Sleep(100);
+                    operation = await context.Client.Commands.GetOperationStatus(link, CancellationToken.None);
+                    if (operation.Status == OperationStatus.Failure)
+                        return false;
+                } while (operation.Status == OperationStatus.InProgress);
+            }
             return true;
         }
 
@@ -189,7 +193,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var request = new ResourceRequest() { Path = parent.Value.TrimEnd('/') + '/' + name };
             var link = await context.Client.Commands.CreateDictionaryAsync(request.Path, CancellationToken.None);
             if (!await OperationProgress(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.CreateDictionaryAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(ICommandsClient.CreateDictionaryAsync)));
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
             return new DirectoryInfoContract(item.Path, item.Name, item.Created, item.Modified);
@@ -214,7 +218,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var request = new DeleteFileRequest() { Path = target.Value };
             var link = await context.Client.Commands.DeleteAsync(request, CancellationToken.None);
             if (!await OperationProgress(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.DeleteAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(ICommandsClient.DeleteAsync)));
 
             return true;
         }
@@ -228,7 +232,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var moveRequest = new MoveFileRequest() { From = target.Value, Path = path };
             var link = await context.Client.Commands.MoveAsync(moveRequest, CancellationToken.None);
             if (!await OperationProgress(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.MoveAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(ICommandsClient.MoveAsync)));
             var request = new ResourceRequest() { Path = path };
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
