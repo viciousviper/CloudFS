@@ -69,21 +69,6 @@ namespace IgorSoft.CloudFS.GatewayTests
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
-        public void GetRootAsync_ReturnsResult()
-        {
-            fixture.ExecuteByConfiguration(config => {
-                var gateway = fixture.GetAsyncGateway(config);
-                var rootName = fixture.GetRootName(config);
-                var parameters = fixture.GetParameters(config);
-
-                var root = gateway.GetRootAsync(rootName, config.ApiKey).Result;
-
-                Assert.IsNotNull(root, "Root is null");
-                Assert.AreEqual(Path.DirectorySeparatorChar.ToString(), root.Name, "Unexpected root name");
-            }, GatewayType.Async, GatewayCapabilities.GetRoot, false);
-        }
-
-        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void GetDriveAsync_ReturnsResult()
         {
             fixture.ExecuteByConfiguration(config => {
@@ -98,6 +83,21 @@ namespace IgorSoft.CloudFS.GatewayTests
                 Assert.IsNotNull(drive.FreeSpace, $"Missing free space ({config.Schema})");
                 Assert.IsNotNull(drive.UsedSpace, $"Missing used space ({config.Schema})");
             }, GatewayType.Async, GatewayCapabilities.GetDrive);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void GetRootAsync_ReturnsResult()
+        {
+            fixture.ExecuteByConfiguration(config => {
+                var gateway = fixture.GetAsyncGateway(config);
+                var rootName = fixture.GetRootName(config);
+                var parameters = fixture.GetParameters(config);
+
+                var root = gateway.GetRootAsync(rootName, config.ApiKey).Result;
+
+                Assert.IsNotNull(root, "Root is null");
+                Assert.AreEqual(Path.DirectorySeparatorChar.ToString(), root.Name, "Unexpected root name");
+            }, GatewayType.Async, GatewayCapabilities.GetRoot, false);
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
@@ -207,7 +207,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
-        public void CopyItemAsync_WhereItemIsDirectory_ExecutesCopy()
+        public void CopyItemAsync_WhereItemIsDirectory_ToSameDirectory_ExecutesCopy()
         {
             fixture.ExecuteByConfiguration(config => {
                 var gateway = fixture.GetAsyncGateway(config);
@@ -233,7 +233,35 @@ namespace IgorSoft.CloudFS.GatewayTests
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
-        public void CopyItemAsync_WhereItemIsFile_ExecutesCopy()
+        public void CopyItemAsync_WhereItemIsDirectory_ToDifferentDirectory_ExecutesCopy()
+        {
+            fixture.ExecuteByConfiguration(config => {
+                var gateway = fixture.GetAsyncGateway(config);
+                var rootName = fixture.GetRootName(config);
+
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                    var directoryOriginal = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Directory").Result;
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, directoryOriginal.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var directoryTarget = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Target").Result;
+
+                    var directoryCopy = (DirectoryInfoContract)gateway.CopyItemAsync(rootName, directoryOriginal.Id, "Directory-Copy", directoryTarget.Id, true).Result;
+
+                    var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
+                    var targetItems = gateway.GetChildItemAsync(rootName, directoryTarget.Id).Result;
+                    Assert.AreEqual(targetItems.Single(i => i.Name == "Directory-Copy").Id, directoryCopy.Id, "Mismatched copied directory Id");
+                    Assert.IsNotNull(items.SingleOrDefault(i => i.Name == "Directory"), "Original directory is missing");
+                    var copiedFile = (FileInfoContract)gateway.GetChildItemAsync(rootName, directoryCopy.Id).Result.SingleOrDefault(i => i.Name == "File.ext");
+                    Assert.IsTrue(copiedFile != null, "Expected copied file is missing");
+                    using (var result = gateway.GetContentAsync(rootName, copiedFile.Id).Result) {
+                        Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                    }
+                    Assert.AreNotEqual(fileOriginal.Id, copiedFile.Id, "Duplicate copied file Id");
+                }
+            }, GatewayType.Async, GatewayCapabilities.CopyDirectoryItem);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void CopyItemAsync_WhereItemIsFile_ToSameDirectory_ExecutesCopy()
         {
             fixture.ExecuteByConfiguration(config => {
                 var gateway = fixture.GetAsyncGateway(config);
@@ -246,6 +274,30 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                     Assert.AreEqual(items.Single(i => i.Name == "File-Copy.ext").Id, fileCopy.Id, "Mismatched copied file Id");
+                    Assert.IsNotNull(items.SingleOrDefault(i => i.Name == "File.ext"), "Original file is missing");
+                    using (var result = gateway.GetContentAsync(rootName, fileCopy.Id).Result) {
+                        Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                    }
+                }
+            }, GatewayType.Async, GatewayCapabilities.CopyFileItem);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void CopyItemAsync_WhereItemIsFile_ToDifferentDirectory_ExecutesCopy()
+        {
+            fixture.ExecuteByConfiguration(config => {
+                var gateway = fixture.GetAsyncGateway(config);
+                var rootName = fixture.GetRootName(config);
+
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var directoryTarget = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Target").Result;
+
+                    var fileCopy = (FileInfoContract)gateway.CopyItemAsync(rootName, fileOriginal.Id, "File-Copy.ext", directoryTarget.Id, false).Result;
+
+                    var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
+                    var targetItems = gateway.GetChildItemAsync(rootName, directoryTarget.Id).Result;
+                    Assert.AreEqual(targetItems.Single(i => i.Name == "File-Copy.ext").Id, fileCopy.Id, "Mismatched copied file Id");
                     Assert.IsNotNull(items.SingleOrDefault(i => i.Name == "File.ext"), "Original file is missing");
                     using (var result = gateway.GetContentAsync(rootName, fileCopy.Id).Result) {
                         Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");

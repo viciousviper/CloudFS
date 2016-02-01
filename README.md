@@ -26,12 +26,14 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)        | N/A         | async      | official  | stable<sup id="a1">[1](#f1)</sup> |
 | [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis](https://github.com/google/google-api-dotnet-client)       | 1.10.0.1990 | async      | official  | stable |
 | [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.6.2       | async      | official  | stable |
-| [Copy](https://www.copy.com/ "Copy")                             | [CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)                 | 1.1.0       | async      | 3<sup>rd</sup> party | stable |
+| [Copy](https://www.copy.com/ "Copy")                             | [CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)                 | 1.1.0       | async      | 3<sup>rd</sup> party | experimental |
+| [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.2     | async      | 3<sup>rd</sup> party | experimental |
 | [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.1.3       | sync       | 3<sup>rd</sup> party | stable |
 | [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A         | async      | 3<sup>rd</sup> party | stable |
-| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.5       | async      | 3<sup>rd</sup> party | **experimental** |
+| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | N/A<sup id="a2">[2](#f2)</sup>  | async      | 3<sup>rd</sup> party | experimental |
 
 > <sup><b id="f1">1</b></sup>This version of OneDriveSDK has been deprecated by Microsoft. It will be replaced by [OneDrive SDK for C#](https://github.com/OneDrive/onedrive-sdk-csharp) at some point in the future. [^](#a1)
+> <sup><b id="f2">2</b>Locally built version based on 1.0.5 with additional fixes by original author.</sup> [^](#a2)
 
 ## System Requirements
 
@@ -57,6 +59,7 @@ At the time of writing this Readme, the following URLs provided access to applic
 | Google Drive          | https://console.developers.google.com                  |
 | Box                   | https://app.box.com/developers/services/edit/          |
 | Copy                  | https://developers.copy.com/applications               |
+| MediaFire             | https://www.mediafire.com/index.php#settings/applications |
 | MEGA                  | https://mega.nz/#sdk                                   |
 | pCloud                | *- no configuration required -*                        |
 
