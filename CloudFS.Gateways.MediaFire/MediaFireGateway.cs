@@ -58,12 +58,9 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
         {
             public MediaFireAgent Agent { get; }
 
-            public string SessionToken { get; }
-
-            public MediaFireContext(MediaFireAgent agent, string sessionToken)
+            public MediaFireContext(MediaFireAgent agent)
             {
                 Agent = agent;
-                SessionToken = sessionToken;
             }
         }
 
@@ -78,8 +75,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
             var result = default(MediaFireContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var loginInfo = await Authenticator.Login(root.UserName, apiKey);
-                contextCache.Add(root, result = new MediaFireContext(loginInfo.Item1, loginInfo.Item2));
+                var agent = await Authenticator.Login(root.UserName, apiKey);
+                contextCache.Add(root, result = new MediaFireContext(agent));
             }
             return result;
         }

@@ -53,6 +53,10 @@
           <HintPath>..\packages\SemanticTypes.0.12.0\lib\net35\SemanticTypes.dll</HintPath>
           <Private>True</Private>
         </Reference>
+        <Reference Include="YandexDisk.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <SpecificVersion>False</SpecificVersion>
+          <HintPath>..\Library\YandexDisk.Client.dll</HintPath>
+        </Reference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -60,6 +64,10 @@
         <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
           <HintPath>..\SignedLibrary\SemanticTypes.dll</HintPath>
           <Private>True</Private>
+        </Reference>
+        <Reference Include="YandexDisk.Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+          <SpecificVersion>False</SpecificVersion>
+          <HintPath>..\SignedLibrary\YandexDisk.Client.dll</HintPath>
         </Reference>
       </ItemGroup>
     </Otherwise>
@@ -90,10 +98,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="YandexDisk.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Library\YandexDisk.Client.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OAuth\OAuthAuthenticator.cs" />

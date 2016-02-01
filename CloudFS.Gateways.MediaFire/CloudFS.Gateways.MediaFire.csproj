@@ -38,7 +38,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signed|AnyCPU'">
     <OutputPath>bin\Signed\</OutputPath>
-    <DefineConstants>TRACE;SIGNED</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS;SIGNED</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,6 +52,10 @@
   <Choose>
     <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
       <ItemGroup>
+        <Reference Include="MediaFireSDK, Version=1.0.0.2, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\MediaFireSDK.1.0.0.2\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\MediaFireSDK.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
         <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>..\packages\SemanticTypes.0.12.0\lib\net35\SemanticTypes.dll</HintPath>
           <Private>True</Private>
@@ -60,6 +64,10 @@
     </When>
     <Otherwise>
       <ItemGroup>
+        <Reference Include="MediaFireSDK, Version=1.0.0.2, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+          <HintPath>..\SignedLibrary\MediaFireSDK.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
         <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
           <HintPath>..\SignedLibrary\SemanticTypes.dll</HintPath>
           <Private>True</Private>
@@ -70,10 +78,6 @@
   <ItemGroup>
     <Reference Include="crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.BouncyCastle.1.8.1\lib\net46\crypto.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MediaFireSDK, Version=1.0.0.2, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MediaFireSDK.1.0.0.2\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10\MediaFireSDK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -146,6 +150,7 @@
   <PropertyGroup>
     <PreBuildEvent>
 if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
+if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\MediaFireSDK.dll cmd /c "$(SolutionDir)SignAssembly.cmd MediaFireSDK $(SolutionDir)packages\MediaFireSDK.1.0.0.2\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10 $(SolutionDir)SignedLibrary"
 if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
 </PreBuildEvent>
   </PropertyGroup>

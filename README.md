@@ -26,14 +26,16 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)        | N/A         | async      | official  | stable<sup id="a1">[1](#f1)</sup> |
 | [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis](https://github.com/google/google-api-dotnet-client)       | 1.10.0.1990 | async      | official  | stable |
 | [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.6.2       | async      | official  | stable |
-| [Copy](https://www.copy.com/ "Copy")                             | [CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)                 | 1.1.0       | async      | 3<sup>rd</sup> party | experimental |
+| [Copy](https://www.copy.com/ "Copy")<sup id="a2">[2](#f2)</sup>  | [CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)                 | 1.1.0       | async      | 3<sup>rd</sup> party | experimental |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.2     | async      | 3<sup>rd</sup> party | experimental |
 | [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.1.3       | sync       | 3<sup>rd</sup> party | stable |
 | [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A         | async      | 3<sup>rd</sup> party | stable |
-| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | N/A<sup id="a2">[2](#f2)</sup>  | async      | 3<sup>rd</sup> party | experimental |
+| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | N/A<sup id="a2">[3](#f3)</sup>  | async      | 3<sup>rd</sup> party | experimental |
 
-> <sup><b id="f1">1</b></sup>This version of OneDriveSDK has been deprecated by Microsoft. It will be replaced by [OneDrive SDK for C#](https://github.com/OneDrive/onedrive-sdk-csharp) at some point in the future. [^](#a1)
-> <sup><b id="f2">2</b>Locally built version based on 1.0.5 with additional fixes by original author.</sup> [^](#a2)
+> <sup><b id="f1">1</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. The gateway will switch to [OneDrive SDK for C#](https://github.com/OneDrive/onedrive-sdk-csharp) at some point in the future. [^](#a1)
+> <sup><b id="f2">2</b></sup> The Copy cloud storage service is slated to be discontinued as of May 1<sup>st</sup> 2016 according to this [Announcement](https://www.copy.com/page/home;cs_login:login;;section:plans). [^](#a2)
+> <sup><b id="f3">3</b></sup> Locally built version based on 1.0.5 with additional fixes by original author. [^](#a3)
+
 
 ## System Requirements
 
@@ -55,18 +57,20 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 | Cloud storage service | Application registration / configuration URL           |
 | :-------------------- | :----------------------------------------------------: |
-| Microsoft OneDrive    | https://account.live.com/developers/applications/index |
-| Google Drive          | https://console.developers.google.com                  |
-| Box                   | https://app.box.com/developers/services/edit/          |
-| Copy                  | https://developers.copy.com/applications               |
-| MediaFire             | https://www.mediafire.com/index.php#settings/applications |
-| MEGA                  | https://mega.nz/#sdk                                   |
+| Microsoft OneDrive    | [Microsoft Account - Developer Center](https://account.live.com/developers/applications/index) |
+| Google Drive          | [Google Developers Console](https://console.developers.google.com) |
+| Box                   | [Box Developers Services](https://app.box.com/developers/services/edit/) |
+| Copy                  | [Copy Developers - Applications](https://developers.copy.com/applications) |
+| MediaFire             | [MediaFire - Developers](https://www.mediafire.com/index.php#settings/applications) |
+| MEGA                  | [Mega Core SDK - Developers](https://mega.nz/#sdk)     |
 | pCloud                | *- no configuration required -*                        |
+| Yandex Disk           | [Yandex OAuth Access](https://oauth.yandex.com/)       |
 
 ## Release Notes
 
 | Date       | Version     | Comments                                                                       |
 | :--------- | :---------- | :----------------------------------------------------------------------------- |
+| 2016-02-01 | 1.0.3-alpha | - New gateways for MediaFire and Yandex Disk added.                            |
 | 2016-01-24 | 1.0.2-alpha | - Gateway configuration extended to accept custom parameters. This change **breaks compatibility** with earlier API versions.<br/>- File Gateway now configurable with target root directory |
 | 2016-01-19 | 1.0.1-alpha | - NuGet dependencies updated, schema of App.config in tests project refactored |
 | 2016-01-08 | 1.0.0-alpha | - Initial release and NuGet registration                                       |

@@ -100,7 +100,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             return authCode;
         }
 
-        public static async Task<Tuple<MediaFireAgent, string>> Login(string account, string code)
+        public static async Task<MediaFireAgent> Login(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
@@ -128,7 +128,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
             SaveRefreshToken(account, refreshToken);
 
-            return new Tuple<MediaFireAgent, string>(agent, refreshToken);
+            return agent;
         }
     }
 }

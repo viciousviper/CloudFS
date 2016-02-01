@@ -11,7 +11,7 @@
     <description>The CloudFS library is a collection of .NET assemblies as gateways to various publicly accessible Cloud storage services.</description>
     <releaseNotes>Gateway configuration extended to accept custom parameters. File Gateway now configurable with target root directory</releaseNotes>
     <copyright>Copyright © 2016</copyright>
-	<tags>Cloud Filesystem Box Copy GoogleDrive Mega OneDrive pCloud YandexDisk</tags>
+	<tags>Cloud Filesystem Box Copy GoogleDrive MediaFire Mega OneDrive pCloud YandexDisk</tags>
     <dependencies>
         <group targetFramework="net45">
           <dependency id="Microsoft.Composition" version="[1.0.30,)" />
