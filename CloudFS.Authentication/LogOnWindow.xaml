@@ -6,7 +6,8 @@
     xmlns:local="clr-namespace:IgorSoft.CloudFS.Authentication"
     x:Class="IgorSoft.CloudFS.Authentication.LoginWindow"
     mc:Ignorable="d"
-    d:DesignHeight="250" d:DesignWidth="500" WindowStyle="ToolWindow">
+    WindowStyle="ToolWindow"
+    Height="250" Width="500" d:DesignHeight="250" d:DesignWidth="500">
     <Grid x:Name="Root">
         <Grid.Resources>
             <sys:Double x:Key="CommonFontSize">11</sys:Double>
