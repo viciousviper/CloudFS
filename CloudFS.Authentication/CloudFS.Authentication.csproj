@@ -61,6 +61,7 @@
     <Compile Include="AuthenticatedEventArgs.cs" />
     <Compile Include="DirectLogOn.cs" />
     <Compile Include="BrowserLogOn.cs" />
+    <Compile Include="UIThread.cs" />
     <Compile Include="LogOnWindow.xaml.cs">
       <DependentUpon>LogOnWindow.xaml</DependentUpon>
     </Compile>

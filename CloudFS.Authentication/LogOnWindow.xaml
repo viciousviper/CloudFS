@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:local="clr-namespace:IgorSoft.CloudFS.Authentication"
-    x:Class="IgorSoft.CloudFS.Authentication.LoginWindow"
+    x:Class="IgorSoft.CloudFS.Authentication.LogOnWindow"
     mc:Ignorable="d"
     WindowStyle="ToolWindow"
     Height="250" Width="500" d:DesignHeight="250" d:DesignWidth="500">

@@ -27,6 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using IgorSoft.CloudFS.Authentication;
 using IgorSoft.CloudFS.Interface.IO;
 using IgorSoft.CloudFS.GatewayTests.Config;
 
@@ -47,6 +48,12 @@ namespace IgorSoft.CloudFS.GatewayTests
             largeContent = new byte[12 * (1 << 20)];
             for (int i = 0; i < largeContent.Length; ++i)
                 largeContent[i] = (byte)(i % 251 + 1);
+        }
+
+        [ClassCleanup]
+        public static void ClassCleanup()
+        {
+            UIThread.Shutdown();
         }
 
         [TestInitialize]

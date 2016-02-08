@@ -28,6 +28,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace IgorSoft.CloudFS.Authentication
 {
@@ -47,7 +48,8 @@ namespace IgorSoft.CloudFS.Authentication
         {
             if (window == null) {
                 waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-                var uiThread = new Thread(() => {
+
+                UIThread.GetDispatcher().Invoke(() => {
                     window = new Window() { Title = $"{serviceName} authentication - {account}" };
                     window.Closing += (s, e) => {
                         window.Hide();
@@ -82,15 +84,11 @@ namespace IgorSoft.CloudFS.Authentication
 
                     window.Content = browser;
                     window.Show();
-
-                    System.Windows.Threading.Dispatcher.Run();
                 });
-                uiThread.SetApartmentState(ApartmentState.STA);
-                uiThread.Start();
             } else {
                 window.Dispatcher.Invoke(() => {
-                    browser.Source = authenticationUri;
-                    window.Title = account;
+                    window.Title = $"{serviceName} authentication - {account}";
+                    browser.Navigate(authenticationUri);
                     window.Show();
                 });
             }

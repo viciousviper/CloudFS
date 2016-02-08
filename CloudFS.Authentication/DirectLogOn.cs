@@ -34,7 +34,7 @@ namespace IgorSoft.CloudFS.Authentication
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private static LoginWindow window;
+        private static LogOnWindow window;
 
         private static EventWaitHandle waitHandle;
 
@@ -42,8 +42,9 @@ namespace IgorSoft.CloudFS.Authentication
         {
             if (window == null) {
                 waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-                var uiThread = new Thread(() => {
-                    window = new LoginWindow() { Title = $"{serviceName} authentication - {account}" };
+
+                UIThread.GetDispatcher().Invoke(() => {
+                    window = new LogOnWindow() { Title = $"{serviceName} authentication - {account}" };
                     window.Closing += (s, e) => {
                         window.Hide();
                         waitHandle.Set();
@@ -60,11 +61,7 @@ namespace IgorSoft.CloudFS.Authentication
                     };
 
                     window.Show();
-
-                    System.Windows.Threading.Dispatcher.Run();
                 });
-                uiThread.SetApartmentState(ApartmentState.STA);
-                uiThread.Start();
             } else {
                 window.Dispatcher.Invoke(() => {
                     window.Title = $"{serviceName} authentication - {account}";

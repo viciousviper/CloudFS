@@ -23,34 +23,37 @@ SOFTWARE.
 */
 
 using System;
-using System.Windows;
-using System.Windows.Controls;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace IgorSoft.CloudFS.Authentication
 {
-    /// <summary>
-    /// Interaction logic for LogOnWindow.xaml
-    /// </summary>
-    public partial class LogOnWindow : Window
+    public static class UIThread
     {
-        public LogOnWindow()
+        private static Dispatcher dispatcher;
+
+        public static Dispatcher GetDispatcher()
         {
-            InitializeComponent();
+            if (dispatcher == null) {
+                var waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+
+                var uiThread = new Thread(() => {
+                    dispatcher = Dispatcher.CurrentDispatcher;
+                    waitHandle.Set();
+                    Dispatcher.Run();
+                });
+                uiThread.SetApartmentState(ApartmentState.STA);
+                uiThread.Start();
+
+                waitHandle.WaitOne();
+            }
+
+            return dispatcher;
         }
 
-        private void UpdateAuthenticateState()
+        public static void Shutdown()
         {
-            btnAuthenticate.IsEnabled = !string.IsNullOrEmpty(tbAccount.Text) && !string.IsNullOrEmpty(pbPassword.Password);
-        }
-
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            UpdateAuthenticateState();
-        }
-
-        private void OnPasswordChanged(object sender, RoutedEventArgs e)
-        {
-            UpdateAuthenticateState();
+            dispatcher?.InvokeShutdown();
         }
     }
 }
