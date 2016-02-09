@@ -59,8 +59,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticatedEventArgs.cs" />
+    <Compile Include="LogOnBase.cs" />
     <Compile Include="DirectLogOn.cs" />
     <Compile Include="BrowserLogOn.cs" />
+    <Compile Include="Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="UIThread.cs" />
     <Compile Include="LogOnWindow.xaml.cs">
       <DependentUpon>LogOnWindow.xaml</DependentUpon>
@@ -72,6 +78,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

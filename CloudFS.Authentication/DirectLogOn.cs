@@ -28,56 +28,30 @@ using System.Threading;
 
 namespace IgorSoft.CloudFS.Authentication
 {
-    public class DirectLogOn
+    public sealed class DirectLogOn : LogOnBase
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        private static LogOnWindow window;
-
-        private static EventWaitHandle waitHandle;
+        public DirectLogOn(SynchronizationContext synchonizationContext) : base(synchonizationContext)
+        {
+        }
 
         public void Show(string serviceName, string account)
         {
-            if (window == null) {
-                waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-
-                UIThread.GetDispatcher().Invoke(() => {
-                    window = new LogOnWindow() { Title = $"{serviceName} authentication - {account}" };
-                    window.Closing += (s, e) => {
-                        window.Hide();
-                        waitHandle.Set();
-                        e.Cancel = true;
-                    };
-
+            base.Show(serviceName, account,
+                () => {
+                    var window = new LogOnWindow();
                     window.btnAuthenticate.Click += (s, e) => {
                         var parameters = new NameValueCollection();
                         parameters.Add("account", window.tbAccount.Text);
                         parameters.Add("password", window.pbPassword.Password);
 
-                        var handler = Authenticated;
-                        handler?.Invoke(this, new AuthenticatedEventArgs(parameters));
+                        OnAuthenticated(parameters);
+
+                        window.Close();
                     };
-
-                    window.Show();
-                });
-            } else {
-                window.Dispatcher.Invoke(() => {
-                    window.Title = $"{serviceName} authentication - {account}";
-                    window.Show();
-                });
-            }
-
-            waitHandle.WaitOne();
+                    return window;
+                },
+                window => { }
+            );
         }
-
-        public void Close()
-        {
-            window.Hide();
-            waitHandle.Set();
-        }
-
-        public event EventHandler<AuthenticatedEventArgs> Authenticated;
     }
 }

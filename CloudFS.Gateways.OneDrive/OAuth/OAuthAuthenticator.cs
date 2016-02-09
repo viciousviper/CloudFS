@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -43,6 +44,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
         private const string LIVE_LOGIN_TOKEN_URI = "https://login.live.com/oauth20_token.srf";
 
         private const string ONEDRIVE_API_URI = "https://api.onedrive.com/v1.0";
+
+        private static BrowserLogOn logOn;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for JSON deserialization")]
         private class AppTokenResponse
@@ -160,12 +163,12 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
         {
             string authCode = null;
 
-            var browser = new BrowserLogOn();
-            browser.Authenticated += (s, e) => {
-                authCode = e.Parameters.Get("code")?.TrimStart('M');
-                browser.Close();
-            };
-            browser.Show("OneDrive", account, authenticationUri, redirectUri);
+            if (logOn == null) {
+                logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
+                logOn.Authenticated += (s, e) => authCode = e.Parameters.Get("code")?.TrimStart('M');
+            }
+
+            logOn.Show("OneDrive", account, authenticationUri, redirectUri);
 
             return authCode;
         }

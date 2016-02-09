@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using CopyRestAPI;
@@ -34,6 +35,8 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
     internal static class OAuthAuthenticator
     {
         private const string COPY_LOGIN_DESKTOP_URI = "https://localhost/copy_login";
+
+        private static BrowserLogOn logOn;
 
         private static Tuple<string, string> LoadRefreshToken(string account)
         {
@@ -68,13 +71,16 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
         {
             string oauth_token = null, oauth_verifier = null;
 
-            var browser = new BrowserLogOn();
-            browser.Authenticated += (s, e) => {
-                oauth_token = e.Parameters["oauth_token"];
-                oauth_verifier = e.Parameters["oauth_verifier"];
-                browser.Close();
-            };
-            browser.Show("Copy", account, authenticationUri, redirectUri);
+            if (logOn == null) {
+                logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
+                logOn.Authenticated += (s, e) =>
+                {
+                    oauth_token = e.Parameters["oauth_token"];
+                    oauth_verifier = e.Parameters["oauth_verifier"];
+                };
+            }
+
+            logOn.Show("Copy", account, authenticationUri, redirectUri);
 
             return new Tuple<string, string>(oauth_token, oauth_verifier);
         }

@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,8 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
         private const string YANDEX_LOGIN_AUTHORIZE_URI = "https://oauth.yandex.com/authorize";
 
         private const string YANDEX_LOGIN_TOKEN_URI = "https://oauth.yandex.com/verification_code";
+
+        private static BrowserLogOn logOn;
 
         private static string LoadRefreshToken(string account)
         {
@@ -81,12 +84,12 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
         {
             string oauth_token = null;
 
-            var browser = new BrowserLogOn();
-            browser.Authenticated += (s, e) => {
-                oauth_token = e.Parameters["access_token"];
-                browser.Close();
-            };
-            browser.Show("Yandex", account, authenticationUri, redirectUri);
+            if (logOn == null) {
+                logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
+                logOn.Authenticated += (s, e) => oauth_token = e.Parameters["access_token"];
+            }
+
+            logOn.Show("Yandex", account, authenticationUri, redirectUri);
 
             return oauth_token;
         }

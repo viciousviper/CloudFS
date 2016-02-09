@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,6 +35,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 {
     internal static class Authenticator
     {
+        private static DirectLogOn logOn;
+
         private static string LoadRefreshToken(string account)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
@@ -90,12 +93,12 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
         {
             var authCode = string.Empty;
 
-            var login = new DirectLogOn();
-            login.Authenticated += (s, e) => {
-                authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
-                login.Close();
-            };
-            login.Show("Mediafire", account);
+            if (logOn == null) {
+                logOn = new DirectLogOn(AsyncOperationManager.SynchronizationContext);
+                logOn.Authenticated += (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
+            }
+
+            logOn.Show("Mediafire", account);
 
             return authCode;
         }

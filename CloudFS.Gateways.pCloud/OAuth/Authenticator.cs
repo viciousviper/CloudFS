@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using pCloud.NET;
@@ -32,6 +33,8 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
 {
     internal static class Authenticator
     {
+        private static DirectLogOn logOn;
+
         private static string LoadRefreshToken(string account)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
@@ -65,12 +68,12 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
         {
             string authCode = null;
 
-            var login = new DirectLogOn();
-            login.Authenticated += (s, e) => {
-                authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
-                login.Close();
-            };
-            login.Show("pCloud", account);
+            if (logOn == null) {
+                logOn = new DirectLogOn(AsyncOperationManager.SynchronizationContext);
+                logOn.Authenticated += (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
+            }
+
+            logOn.Show("pCloud", account);
 
             return authCode;
         }

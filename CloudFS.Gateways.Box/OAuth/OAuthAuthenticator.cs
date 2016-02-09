@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using IgorSoft.CloudFS.Authentication;
@@ -42,6 +43,8 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
         private const string BOX_LOGIN_TOKEN_URI = "https://app.box.com/api/oauth2/token";
 
         private const string BOX_API_URI = "https://api.box.com/2.0";
+
+        private static BrowserLogOn logOn;
 
         private static string LoadRefreshToken(string account)
         {
@@ -76,12 +79,12 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
         {
             string authCode = null;
 
-            var browser = new BrowserLogOn();
-            browser.Authenticated += (s, e) => {
-                authCode = e.Parameters.Get("code");
-                browser.Close();
-            };
-            browser.Show("Box", account, authenticationUri, redirectUri);
+            if (logOn == null) {
+                logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
+                logOn.Authenticated += (s, e) => authCode = e.Parameters.Get("code");
+            }
+
+            logOn.Show("Box", account, authenticationUri, redirectUri);
 
             return authCode;
         }

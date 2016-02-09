@@ -37,11 +37,12 @@ namespace IgorSoft.CloudFS.Authentication
             if (dispatcher == null) {
                 var waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
 
-                var uiThread = new Thread(() => {
+                var uiThread = new Thread(() =>
+                {
                     dispatcher = Dispatcher.CurrentDispatcher;
                     waitHandle.Set();
                     Dispatcher.Run();
-                });
+                }) { Name = "UI-Thread" };
                 uiThread.SetApartmentState(ApartmentState.STA);
                 uiThread.Start();
 

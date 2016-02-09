@@ -32,31 +32,19 @@ using System.Windows.Threading;
 
 namespace IgorSoft.CloudFS.Authentication
 {
-    public class BrowserLogOn
+    public sealed class BrowserLogOn : LogOnBase
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
+        private WebBrowser browser;
 
-        private static WebBrowser browser;
-
-        private static Window window;
-
-        private static EventWaitHandle waitHandle;
+        public BrowserLogOn(SynchronizationContext synchonizationContext) : base(synchonizationContext)
+        {
+        }
 
         public void Show(string serviceName, string account, Uri authenticationUri, Uri redirectUri)
         {
-            if (window == null) {
-                waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-
-                UIThread.GetDispatcher().Invoke(() => {
-                    window = new Window() { Title = $"{serviceName} authentication - {account}" };
-                    window.Closing += (s, e) => {
-                        window.Hide();
-                        waitHandle.Set();
-                        e.Cancel = true;
-                    };
-
+            base.Show(serviceName, account,
+                () => {
+                    var window = new Window();
                     browser = new WebBrowser();
                     browser.Loaded += (s, e) => {
                         browser.Navigate(authenticationUri);
@@ -72,36 +60,22 @@ namespace IgorSoft.CloudFS.Authentication
                                 var nameValue = parameter.Split('=');
                                 parameters.Add(nameValue[0], nameValue[1]);
                             }
-                            var handler = Authenticated;
-                            handler?.Invoke(this, new AuthenticatedEventArgs(parameters));
+
+                            OnAuthenticated(parameters);
+
                             e.Cancel = true;
+                            window.Close();
                         }
                     };
                     browser.Navigated += (s, e) => {
                         if (authenticationUri.IsBaseOf(e.Uri))
                             SetForegroundWindow(new WindowInteropHelper(window).Handle);
                     };
-
                     window.Content = browser;
-                    window.Show();
-                });
-            } else {
-                window.Dispatcher.Invoke(() => {
-                    window.Title = $"{serviceName} authentication - {account}";
-                    browser.Navigate(authenticationUri);
-                    window.Show();
-                });
-            }
-
-            waitHandle.WaitOne();
+                    return window;
+                },
+                window => browser.Navigate(authenticationUri)
+            );
         }
-
-        public void Close()
-        {
-            window.Hide();
-            waitHandle.Set();
-        }
-
-        public event EventHandler<AuthenticatedEventArgs> Authenticated;
     }
 }

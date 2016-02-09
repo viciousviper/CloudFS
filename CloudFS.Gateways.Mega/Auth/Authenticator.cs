@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Globalization;
 using CG.Web.MegaApiClient;
 using IgorSoft.CloudFS.Authentication;
@@ -31,6 +32,8 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
 {
     internal static class Authenticator
     {
+        private static DirectLogOn logOn;
+
         private static MegaApiClient.AuthInfos LoadRefreshToken(string account)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
@@ -64,12 +67,12 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
         {
             string authCode = null;
 
-            var login = new DirectLogOn();
-            login.Authenticated += (s, e) => {
-                authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
-                login.Close();
-            };
-            login.Show("Mega", account);
+            if (logOn == null) {
+                logOn = new DirectLogOn(AsyncOperationManager.SynchronizationContext);
+                logOn.Authenticated += (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
+            }
+
+            logOn.Show("Mega", account);
 
             return authCode;
         }
