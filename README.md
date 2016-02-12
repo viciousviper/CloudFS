@@ -26,15 +26,15 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)        | N/A         | async      | official  | stable<sup id="a1">[1](#f1)</sup> |
 | [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis](https://github.com/google/google-api-dotnet-client)       | 1.10.0.1990 | async      | official  | stable |
 | [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.6.2       | async      | official  | stable |
-| *[Copy](https://www.copy.com/ "Copy")*<sup id="a2">[2](#f2)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*     | *async*    | *3<sup>rd</sup> party* | *experimental* |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.2     | async      | 3<sup>rd</sup> party | experimental |
 | [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.1.3       | sync       | 3<sup>rd</sup> party | stable |
 | [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A         | async      | 3<sup>rd</sup> party | stable |
-| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | N/A<sup id="a2">[3](#f3)</sup>  | async      | 3<sup>rd</sup> party | experimental |
+| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.7       | async      | 3<sup>rd</sup> party | experimental |
+| **Obsolete services**                                            |
+| *[Copy](https://www.copy.com/ "Copy")*<sup id="a2">[2](#f2)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*     | *async*    | *3<sup>rd</sup> party* | *retired* |
 
 > <sup><b id="f1">1</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. The gateway will switch to [OneDrive SDK for C#](https://github.com/OneDrive/onedrive-sdk-csharp) at some point in the future. [^](#a1)<br/>
-> <sup><b id="f2">2</b></sup> The Copy cloud storage service is slated to be discontinued as of May 1<sup>st</sup> 2016 according to this [Announcement](https://www.copy.com/page/home;cs_login:login;;section:plans). [^](#a2)<br/>
-> <sup><b id="f3">3</b></sup> Locally built version based on 1.0.5 with additional fixes by original author. [^](#a3)
+> <sup><b id="f2">2</b></sup> The Copy cloud storage service is slated to be discontinued as of May 1<sup>st</sup> 2016 according to this [announcement](https://www.copy.com/page/home;cs_login:login;;section:plans).<br/>The Copy gateway will be retired from CloudFS at or shortly after this point in time. [^](#a2)<br/>
 
 
 ## System Requirements
