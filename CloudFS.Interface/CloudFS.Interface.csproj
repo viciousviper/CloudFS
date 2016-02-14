@@ -89,6 +89,7 @@
     <Compile Include="Composition\ExportAsAsyncCloudGatewayAttribute.cs" />
     <Compile Include="Composition\ExportAsCloudGatewayAttribute.cs" />
     <Compile Include="Composition\CloudGatewayMetadata.cs" />
+    <Compile Include="GatewayCapabilities.cs" />
     <Compile Include="Composition\IAsyncCloudGateway.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IO\DirectoryId.cs" />

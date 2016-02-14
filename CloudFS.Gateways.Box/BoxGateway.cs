@@ -40,12 +40,15 @@ namespace IgorSoft.CloudFS.Gateways.Box
 {
     [ExportAsAsyncCloudGateway("Box")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), BoxGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), BoxGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), BoxGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), BoxGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class BoxGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "box";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All;
 
         private const string URL = "https://app.box.com";
 
@@ -68,8 +71,6 @@ namespace IgorSoft.CloudFS.Gateways.Box
         }
 
         private IDictionary<RootName, BoxContext> contextCache = new Dictionary<RootName, BoxContext>();
-
-        public bool PreservesId => true;
 
         private async Task<BoxContext> RequireContext(RootName root, string apiKey = null)
         {

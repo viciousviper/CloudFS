@@ -38,12 +38,15 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 {
     [ExportAsAsyncCloudGateway("OneDrive")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), OneDriveGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), OneDriveGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), OneDriveGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), OneDriveGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class OneDriveGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "onedrive";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ClearContent;
 
         private const string URL = "https://onedrive.live.com";
 
@@ -65,8 +68,6 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         }
 
         private IDictionary<RootName, OneDriveContext> contextCache = new Dictionary<RootName, OneDriveContext>();
-
-        public bool PreservesId => true;
 
         private async Task<OneDriveContext> RequireContext(RootName root, string apiKey = null)
         {

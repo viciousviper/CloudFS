@@ -64,6 +64,11 @@ namespace IgorSoft.CloudFS.GatewayTests
                 return new TestDirectoryFixture(fixture.GetGateway(config), fixture.GetRootName(config), config.ApiKey, fixture.GetParameters(config), config.TestDirectory);
             }
 
+            internal DirectoryInfoContract ToContract()
+            {
+                return directory;
+            }
+
             void IDisposable.Dispose()
             {
                 gateway.RemoveItem(root, directory.Id, true);

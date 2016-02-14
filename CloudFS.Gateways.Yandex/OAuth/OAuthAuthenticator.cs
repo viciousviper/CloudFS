@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 using YandexDisk.Client;
@@ -106,7 +107,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
                 code = GetAuthCode(account, authenticationUri, new Uri(YANDEX_LOGIN_TOKEN_URI));
 
                 if (string.IsNullOrEmpty(code))
-                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
 
                 refreshToken = code;
             }

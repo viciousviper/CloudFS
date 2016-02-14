@@ -120,7 +120,6 @@
     <Compile Include="CompositionInitializer.cs" />
     <Compile Include="Config\ConfigStringExtensions.cs" />
     <Compile Include="Config\GatewayType.cs" />
-    <Compile Include="Config\GatewayCapabilities.cs" />
     <Compile Include="Config\GatewayElement.cs" />
     <Compile Include="Config\GatewayElementCollection.cs" />
     <Compile Include="Config\TestSection.cs" />

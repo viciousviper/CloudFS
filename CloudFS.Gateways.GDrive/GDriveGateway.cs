@@ -44,12 +44,15 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 {
     [ExportAsAsyncCloudGateway("GDrive")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), GDriveGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), GDriveGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), GDriveGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), GDriveGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class GDriveGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "gdrive";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.CopyDirectoryItem;
 
         private const string URL = "https://drive.google.com";
 
@@ -72,8 +75,6 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
         }
 
         private IDictionary<RootName, GDriveContext> contextCache = new Dictionary<RootName, GDriveContext>();
-
-        public bool PreservesId => true;
 
         private async Task<GDriveContext> RequireContext(RootName root, string apiKey = null)
         {
@@ -155,6 +156,9 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
         public async Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
+            if (source is DirectoryId)
+                throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
+
             var context = await RequireContext(root);
 
             var copy = new GoogleFile() { Title = copyName };

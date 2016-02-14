@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using IgorSoft.CloudFS.Authentication;
 using Box.V2;
@@ -114,7 +115,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
                     Uri authenticationUri = client.Config.AuthCodeUri;
                     code = GetAuthCode(account, authenticationUri, new Uri(BOX_LOGIN_DESKTOP_URI));
                     if (string.IsNullOrEmpty(code))
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
                 }
 
                 response = await client.Auth.AuthenticateAsync(code);

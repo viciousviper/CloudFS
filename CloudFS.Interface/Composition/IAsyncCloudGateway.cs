@@ -32,8 +32,6 @@ namespace IgorSoft.CloudFS.Interface.Composition
 {
     public interface IAsyncCloudGateway
     {
-        bool PreservesId { get; }
-
         Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey);

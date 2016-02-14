@@ -34,6 +34,7 @@ using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
 using IgorSoft.CloudFS.GatewayTests.Config;
+using System.Collections.Concurrent;
 
 namespace IgorSoft.CloudFS.GatewayTests
 {
@@ -70,7 +71,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
-        public static IEnumerable<GatewayElement> GetGatewayConfigurations(GatewayType type, GatewayCapabilities capability = GatewayCapabilities.None)
+        public static IEnumerable<GatewayElement> GetGatewayConfigurations(GatewayType type, GatewayCapabilities capability)
         {
             return testSection.Gateways.Where(g => g.Type == type && (capability == GatewayCapabilities.None || !g.Exclusions.HasFlag(capability)));
         }
@@ -110,44 +111,69 @@ namespace IgorSoft.CloudFS.GatewayTests
             return result;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void ExecuteByConfiguration(Action<GatewayElement> test, GatewayType type, GatewayCapabilities capability, bool inParallel = true)
+        private void CallTimedTestOnConfig<TGateway>(Action<TGateway, RootName, GatewayElement> test, GatewayElement config, Func<GatewayElement, TGateway> getGateway, IDictionary<string, Exception> failures, string mode)
         {
-            var failures = new List<Tuple<string, Exception>>();
+            try {
+                var startedAt = DateTime.Now;
+                var gateway = getGateway(config);
+                var rootName = GetRootName(config);
+                test(gateway, rootName, config);
+                var completedAt = DateTime.Now;
+                Log($"{mode} test for schema '{config.Schema}' completed in {completedAt - startedAt}");
+            } catch (Exception ex) {
+                Log($"{mode} test for schema '{config.Schema}' failed");
+                failures.Add(config.Schema, ex);
+            }
+        }
+
+        private void ExecuteByConfiguration<TGateway>(Action<TGateway, RootName, GatewayElement> test, GatewayType type, Func<GatewayElement, TGateway> getGateway, bool inParallel = true)
+        {
+            var configurations = GetGatewayConfigurations(type, GatewayCapabilities.None);
+            var failures = default(IDictionary<string, Exception>);
 
             if (inParallel) {
-                Parallel.ForEach(GetGatewayConfigurations(type, capability), config => {
-                    try {
-                        var startedAt = DateTime.Now;
-                        test(config);
-                        var completedAt = DateTime.Now;
-                        Log($"Parallel test for schema '{config.Schema}' completed in {completedAt - startedAt}");
-                    } catch (Exception ex) {
-                        Log($"Parallel test for schema '{config.Schema}' failed");
-                        lock (failures) {
-                            failures.Add(new Tuple<string, Exception>(config.Schema, ex));
-                        }
-                    }
+                failures = new ConcurrentDictionary<string, Exception>();
+                Parallel.ForEach(configurations, config => {
+                    CallTimedTestOnConfig<TGateway>(test, config, getGateway, failures, "Parallel");
                 });
             } else {
-                foreach (var config in GetGatewayConfigurations(type, capability)) {
-                    try {
-                        var startedAt = DateTime.Now;
-                        test(config);
-                        var completedAt = DateTime.Now;
-                        Log($"Sequential test for schema '{config.Schema}' completed in {completedAt - startedAt}");
-                    } catch (Exception ex) {
-                        Log($"Sequential test for schema '{config.Schema}' failed");
-                        failures.Add(new Tuple<string, Exception>(config.Schema, ex));
-                    }
+                failures = new Dictionary<string, Exception>();
+                foreach (var config in configurations) {
+                    CallTimedTestOnConfig<TGateway>(test, config, getGateway, failures, "Sequential");
                 }
             }
 
             if (failures.Any())
-                throw new AggregateException("Test failed in " + string.Join(", ", failures.Select(t => t.Item1)), failures.Select(t => t.Item2));
+                throw new AggregateException("Test failed in " + string.Join(", ", failures.Select(t => t.Key)), failures.Select(t => t.Value));
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        public void ExecuteByConfiguration(Action<IAsyncCloudGateway, RootName, GatewayElement> test, bool inParallel = true)
+        {
+            ExecuteByConfiguration(test, GatewayType.Async, config => GetAsyncGateway(config), inParallel);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        public void ExecuteByConfiguration(Action<ICloudGateway, RootName, GatewayElement> test, bool inParallel = true)
+        {
+            ExecuteByConfiguration(test, GatewayType.Sync, config => GetGateway(config), inParallel);
         }
 
         public IProgress<ProgressValue> GetProgressReporter() => new NullProgressReporter();
+
+        public void OnCondition(GatewayElement config, GatewayCapabilities capability, Action action)
+        {
+            bool capabilityExcluded = config.Exclusions.HasFlag(capability);
+
+            try {
+                action();
+
+                Assert.IsFalse(capabilityExcluded, $"Unexpected capability {capability}");
+            } catch (NotSupportedException) when (capabilityExcluded) {
+            } catch (AggregateException ex) when (capabilityExcluded && ex.InnerExceptions.Count == 1 && ex.InnerException is NotSupportedException) {
+            }
+        }
     }
 }

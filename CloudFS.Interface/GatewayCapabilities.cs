@@ -24,7 +24,7 @@ SOFTWARE.
 
 using System;
 
-namespace IgorSoft.CloudFS.GatewayTests.Config
+namespace IgorSoft.CloudFS.Interface
 {
     [Flags]
     public enum GatewayCapabilities
@@ -38,13 +38,17 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         SetContent = 0x0020,
         CopyFileItem = 0x0040,
         CopyDirectoryItem = 0x0080,
+        CopyItems = CopyFileItem | CopyDirectoryItem,
         MoveFileItem = 0x0100,
         MoveDirectoryItem = 0x0200,
+        MoveItems = MoveFileItem | MoveDirectoryItem,
         NewDirectoryItem = 0x0400,
         NewFileItem = 0x0800,
         RemoveItem = 0x1000,
         RenameDirectoryItem = 0x2000,
         RenameFileItem = 0x4000,
-        All = 0x4FFF
+        RenameItems = RenameDirectoryItem | RenameFileItem,
+        ItemId = 0x8000,
+        All = 0xFFFF
     }
 }

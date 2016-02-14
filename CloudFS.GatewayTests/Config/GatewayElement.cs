@@ -24,6 +24,7 @@ SOFTWARE.
 
 using System;
 using System.Configuration;
+using IgorSoft.CloudFS.Interface;
 
 namespace IgorSoft.CloudFS.GatewayTests.Config
 {

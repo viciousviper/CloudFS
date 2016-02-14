@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using CopyRestAPI;
 using CopyRestAPI.Models;
@@ -114,7 +115,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
                 var requestToken = await client.Authorization.GetRequestTokenAsync();
                 tokens = GetAuthCode(account, requestToken.AuthCodeUri, new Uri(COPY_LOGIN_DESKTOP_URI));
                 if (string.IsNullOrEmpty(tokens.Item1) || string.IsNullOrEmpty(tokens.Item2))
-                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, requestToken.AuthCodeUri.ToString()));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, requestToken.AuthCodeUri.ToString()));
 
                 await client.Authorization.GetAccessTokenAsync(tokens.Item2);
 

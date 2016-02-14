@@ -117,22 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CopyingOfFilesOrDirectoriesNotSupported" xml:space="preserve">
-    <value>Copy does not support copying of files or directories.</value>
-  </data>
-  <data name="MoveFailed" xml:space="preserve">
-    <value>The file/folder '{0}' could not be moved to '{1}{2}'.</value>
-  </data>
-  <data name="MovingOfFilesOrDirectoriesNotSupported" xml:space="preserve">
-    <value>Copy does not support moving of files or directories.</value>
-  </data>
-  <data name="RenameFailed" xml:space="preserve">
-    <value>The file/folder '{0}' could not be renamed to '{1}'.</value>
-  </data>
-  <data name="RenamingOfFilesOrDirectoriesNotSupported" xml:space="preserve">
-    <value>Copy does not support renaming of files or directories.</value>
-  </data>
-  <data name="RetrieveAuthenticationCodeFromUri" xml:space="preserve">
-    <value>Please retrieve an authentication code from the following Uri: {0}</value>
+  <data name="CopyingOfDirectoriesNotSupported" xml:space="preserve">
+    <value>Google Drive does not support copying of directories.</value>
   </data>
 </root>

@@ -43,12 +43,15 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 {
     [ExportAsAsyncCloudGateway("MediaFire")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), MediaFireGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), MediaFireGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), MediaFireGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(MediaFireSDK))]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class MediaFireGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "mediafire";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ClearContent ^ GatewayCapabilities.CopyDirectoryItem;
 
         private const string URL = "https://www.mediafire.com";
 
@@ -65,8 +68,6 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
         }
 
         private IDictionary<RootName, MediaFireContext> contextCache = new Dictionary<RootName, MediaFireContext>();
-
-        public bool PreservesId => true;
 
         private async Task<MediaFireContext> RequireContext(RootName root, string apiKey = null)
         {

@@ -29,6 +29,7 @@ using System.Reflection;
 
 namespace IgorSoft.CloudFS.Interface.Composition
 {
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class CloudGatewayMetadata
     {
         private IDictionary<string, object> values;
@@ -38,6 +39,14 @@ namespace IgorSoft.CloudFS.Interface.Composition
             get {
                 object result = null;
                 return values.TryGetValue(nameof(CloudService), out result) ? result as string : null;
+            }
+        }
+
+        public GatewayCapabilities Capabilities
+        {
+            get {
+                object result = null;
+                return values.TryGetValue(nameof(Capabilities), out result) ? (GatewayCapabilities)result : GatewayCapabilities.None;
             }
         }
 
@@ -64,5 +73,9 @@ namespace IgorSoft.CloudFS.Interface.Composition
 
             this.values = values;
         }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        private string DebuggerDisplay() => $"{nameof(CloudGatewayMetadata)} '{CloudService}' Capabilities={Capabilities} ServiceUri='{ServiceUri}' ApiAssembly='{ApiAssembly}'";
     }
 }

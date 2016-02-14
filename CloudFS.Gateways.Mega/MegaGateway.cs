@@ -37,12 +37,15 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 {
     [ExportAsCloudGateway("Mega")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), MegaGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), MegaGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), MegaGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), MegaGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class MegaGateway : ICloudGateway
     {
         private const string SCHEMA = "mega";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ClearContent ^ GatewayCapabilities.SetContent ^ GatewayCapabilities.CopyItems ^ GatewayCapabilities.RenameItems;
 
         private const string URL = "https://mega.co.nz";
 
@@ -62,8 +65,6 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         private IDictionary<RootName, MegaContext> contextCache = new Dictionary<RootName, MegaContext>();
 
-        public bool PreservesId => true;
-
         private MegaContext RequireContext(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -82,7 +83,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
-            return new DriveInfoContract(root.Value, null, null);
+            return new DriveInfoContract(root.Value, -1, -1);
         }
 
         public RootDirectoryInfoContract GetRoot(RootName root, string apiKey)

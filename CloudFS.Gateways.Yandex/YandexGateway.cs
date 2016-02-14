@@ -42,12 +42,15 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 {
     [ExportAsAsyncCloudGateway("Yandex")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), YandexGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), YandexGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), YandexGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(YandexDisk))]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class YandexGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "yandex";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ItemId;
 
         private const string URL = "https://www.yandex.com";
 
@@ -64,8 +67,6 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
         }
 
         private IDictionary<RootName, YandexContext> contextCache = new Dictionary<RootName, YandexContext>();
-
-        public bool PreservesId => false;
 
         private async Task<YandexContext> RequireContext(RootName root, string apiKey = null)
         {

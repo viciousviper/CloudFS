@@ -42,12 +42,15 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 {
     [ExportAsAsyncCloudGateway("pCloud")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), pCloudGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), pCloudGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), pCloudGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), pCloudGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public class pCloudGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "pcloud";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.CopyDirectoryItem;
 
         private const string URL = "https://www.pcloud.com";
 
@@ -66,8 +69,6 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         }
 
         private IDictionary<RootName, pCloudContext> contextCache = new Dictionary<RootName, pCloudContext>();
-
-        public bool PreservesId => true;
 
         private async Task<pCloudContext> RequireContext(RootName root, string apiKey = null)
         {

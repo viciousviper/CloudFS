@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using pCloud.NET;
 using IgorSoft.CloudFS.Authentication;
@@ -90,15 +91,12 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
             if (refreshToken != null) {
                 client = pCloudClient.FromAuthToken(refreshToken);
             } else {
-                if (string.IsNullOrEmpty(code)) {
+                if (string.IsNullOrEmpty(code))
                     code = GetAuthCode(account);
-                    if (string.IsNullOrEmpty(code))
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
-                }
 
-                var parts = code.Split(new[] { ',' }, 2);
+                var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
                 if (parts.Length != 2)
-                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
 
                 client = await pCloudClient.CreateClientAsync(parts[0], parts[1]);
             }

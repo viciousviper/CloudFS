@@ -30,6 +30,7 @@ namespace IgorSoft.CloudFS.Interface.Composition
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     [CLSCompliant(false)]
+    [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class ExportAsCloudGatewayAttribute : ExportAttribute
     {
         public string Name { get; }
@@ -41,5 +42,9 @@ namespace IgorSoft.CloudFS.Interface.Composition
 
             Name = name;
         }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        private string DebuggerDisplay() => $"{nameof(ExportAsCloudGatewayAttribute)} '{Name}'";
     }
 }

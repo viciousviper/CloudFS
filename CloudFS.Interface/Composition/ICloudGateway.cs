@@ -31,8 +31,6 @@ namespace IgorSoft.CloudFS.Interface.Composition
 {
     public interface ICloudGateway
     {
-        bool PreservesId { get; }
-
         DriveInfoContract GetDrive(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         RootDirectoryInfoContract GetRoot(RootName root, string apiKey);

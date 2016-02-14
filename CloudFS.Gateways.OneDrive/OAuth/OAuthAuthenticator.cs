@@ -28,6 +28,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using IgorSoft.CloudFS.Authentication;
 using Newtonsoft.Json;
@@ -189,7 +190,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                     var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
                     code = GetAuthCode(account, authenticationUri, new Uri(LIVE_LOGIN_DESKTOP_URI));
                     if (string.IsNullOrEmpty(code))
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
                 }
 
                 response = await RedeemAccessTokenAsync(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, code);

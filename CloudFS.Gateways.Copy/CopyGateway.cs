@@ -41,12 +41,15 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 {
     [ExportAsAsyncCloudGateway("Copy")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), CopyGateway.SCHEMA)]
+    [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), CopyGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), CopyGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(CopyRestAPI))]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class CopyGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "copy";
+
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.CopyItems ^ GatewayCapabilities.MoveItems ^ GatewayCapabilities.RenameItems;
 
         private const string URL = "https://www.copy.com";
 
@@ -63,8 +66,6 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         }
 
         private IDictionary<RootName, CopyContext> contextCache = new Dictionary<RootName, CopyContext>();
-
-        public bool PreservesId => true;
 
         private async Task<CopyContext> RequireContext(RootName root, string apiKey = null)
         {
@@ -144,20 +145,21 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.CopyingOfFilesOrDirectoriesNotSupported));
         }
 
-        public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
+        public /*async*/ Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = await RequireContext(root);
+            //var context = await RequireContext(root);
 
-            if (string.IsNullOrEmpty(moveName))
-                moveName = locatorResolver().Name;
-            var success = await AsyncFunc.Retry<bool, ServerException>(async () => await context.Client.FileSystemManager.MoveFileAsync(source.Value, destination.Value, moveName, false), RETRIES);
-            if (!success)
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.MoveFailed, source.Value, destination.Value, moveName?.Insert(0, @"/") ?? string.Empty));
+            //if (string.IsNullOrEmpty(moveName))
+            //    moveName = locatorResolver().Name;
+            //var success = await AsyncFunc.Retry<bool, ServerException>(async () => await context.Client.FileSystemManager.MoveFileAsync(source.Value, destination.Value, moveName, false), RETRIES);
+            //if (!success)
+            //    throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.MoveFailed, source.Value, destination.Value, moveName?.Insert(0, @"/") ?? string.Empty));
 
-            var movedItemPath = destination.Value.Substring(0, destination.Value.LastIndexOf('/')) + @"/" + moveName;
-            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.GetFileSystemInformationAsync(movedItemPath), RETRIES);
+            //var movedItemPath = destination.Value.Substring(0, destination.Value.LastIndexOf('/')) + @"/" + moveName;
+            //var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.GetFileSystemInformationAsync(movedItemPath), RETRIES);
 
-            return item.ToFileSystemInfoContract();
+            //return item.ToFileSystemInfoContract();
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.MovingOfFilesOrDirectoriesNotSupported));
         }
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
@@ -187,18 +189,19 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             return success;
         }
 
-        public async Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
+        public /*async*/ Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = await RequireContext(root);
+            //var context = await RequireContext(root);
 
-            var success = await AsyncFunc.Retry<bool, ServerException>(async () => await context.Client.FileSystemManager.RenameFileAsync(target.Value, newName, false), RETRIES);
-            if (!success)
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.RenameFailed, target.Value, newName));
+            //var success = await AsyncFunc.Retry<bool, ServerException>(async () => await context.Client.FileSystemManager.RenameFileAsync(target.Value, newName, false), RETRIES);
+            //if (!success)
+            //    throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.RenameFailed, target.Value, newName));
 
-            var renamedItemPath = target.Value.Substring(0, target.Value.LastIndexOf('/')) + @"/" + newName;
-            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.GetFileSystemInformationAsync(renamedItemPath), RETRIES);
+            //var renamedItemPath = target.Value.Substring(0, target.Value.LastIndexOf('/')) + @"/" + newName;
+            //var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.GetFileSystemInformationAsync(renamedItemPath), RETRIES);
 
-            return item.ToFileSystemInfoContract();
+            //return item.ToFileSystemInfoContract();
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.RenamingOfFilesOrDirectoriesNotSupported));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

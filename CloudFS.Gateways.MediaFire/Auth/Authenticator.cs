@@ -26,6 +26,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using MediaFireSDK;
 using MediaFireSDK.Model;
@@ -116,15 +117,12 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                 refreshToken = await RefreshSessionToken(agent, refreshToken);
 
             if (refreshToken == null) {
-                if (string.IsNullOrEmpty(code)) {
+                if (string.IsNullOrEmpty(code))
                     code = GetAuthCode(account);
-                    if (string.IsNullOrEmpty(code))
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
-                }
 
-                var parts = code.Split(new[] { ',' }, 2);
+                var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
                 if (parts.Length != 2)
-                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
 
                 refreshToken = await agent.User.GetSessionToken(parts[0], parts[1]);
             }
