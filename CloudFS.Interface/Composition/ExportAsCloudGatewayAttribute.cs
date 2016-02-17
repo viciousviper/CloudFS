@@ -24,6 +24,7 @@ SOFTWARE.
 
 using System;
 using System.Composition;
+using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.Composition
 {
@@ -45,6 +46,6 @@ namespace IgorSoft.CloudFS.Interface.Composition
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(ExportAsCloudGatewayAttribute)} '{Name}'";
+        private string DebuggerDisplay() => $"{nameof(ExportAsCloudGatewayAttribute)} '{Name}'".ToString(CultureInfo.CurrentCulture);
     }
 }

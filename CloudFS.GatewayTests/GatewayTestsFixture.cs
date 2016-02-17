@@ -24,8 +24,10 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Composition;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -34,7 +36,6 @@ using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
 using IgorSoft.CloudFS.GatewayTests.Config;
-using System.Collections.Concurrent;
 
 namespace IgorSoft.CloudFS.GatewayTests
 {
@@ -119,9 +120,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var rootName = GetRootName(config);
                 test(gateway, rootName, config);
                 var completedAt = DateTime.Now;
-                Log($"{mode} test for schema '{config.Schema}' completed in {completedAt - startedAt}");
+                Log($"{mode} test for schema '{config.Schema}' completed in {completedAt - startedAt}".ToString(CultureInfo.CurrentCulture));
             } catch (Exception ex) {
-                Log($"{mode} test for schema '{config.Schema}' failed");
+                Log($"{mode} test for schema '{config.Schema}' failed".ToString(CultureInfo.CurrentCulture));
                 failures.Add(config.Schema, ex);
             }
         }
@@ -170,7 +171,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             try {
                 action();
 
-                Assert.IsFalse(capabilityExcluded, $"Unexpected capability {capability}");
+                Assert.IsFalse(capabilityExcluded, $"Unexpected capability {capability}".ToString(CultureInfo.CurrentCulture));
             } catch (NotSupportedException) when (capabilityExcluded) {
             } catch (AggregateException ex) when (capabilityExcluded && ex.InnerExceptions.Count == 1 && ex.InnerException is NotSupportedException) {
             }

@@ -24,6 +24,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Threading;
 using System.Windows;
 
@@ -67,7 +68,7 @@ namespace IgorSoft.CloudFS.Authentication
                     };
                 }
 
-                window.Title = $"{serviceName} authentication - {account}";
+                window.Title = $"{serviceName} authentication - {account}".ToString(CultureInfo.CurrentCulture);
                 open(window);
                 window.Show();
             });

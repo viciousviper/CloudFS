@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
@@ -35,6 +36,6 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used for DebuggerDisplay")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(FileId)} {Value}";
+        private string DebuggerDisplay() => $"{nameof(FileId)} {Value}".ToString(CultureInfo.CurrentCulture);
     }
 }

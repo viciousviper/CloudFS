@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -150,8 +151,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             var locator = locatorResolver();
             var config = await context.Agent.Upload.GetUploadConfiguration(locator.Name, content.Length, locator.ParentId.Value, MediaFireActionOnDuplicate.Skip);
             config.Endpoint = config.Endpoint
-                .Remove(config.Endpoint.IndexOf($"&{MediaFireApiParameters.FolderKey}", StringComparison.InvariantCulture))
-                .Replace($"{MediaFireApiUploadMethods.Simple}?", $"{MediaFireApiUploadMethods.Update}?{MediaFireApiParameters.QuickKey}={target.Value}&");
+                .Remove(config.Endpoint.IndexOf($"&{MediaFireApiParameters.FolderKey}".ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCulture))
+                .Replace($"{MediaFireApiUploadMethods.Simple}?".ToString(CultureInfo.InvariantCulture), $"{MediaFireApiUploadMethods.Update}?{MediaFireApiParameters.QuickKey}={target.Value}&".ToString(CultureInfo.InvariantCulture));
             var mediaFireProgress = new Progress<MediaFireOperationProgress>(p => progress.Report(new ProgressValue((int)p.CurrentSize, (int)p.TotalSize)));
             var upload = await context.Agent.Upload.Simple(config, content, mediaFireProgress);
             //TODO: Fix code for direct execution of upload/update via PostStreamAsync<>()

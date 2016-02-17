@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -79,7 +80,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEquivalent(configuredGateways.Select(c => c.Schema).ToList(), importedGateways.Select(g => g.Metadata.CloudService).ToList(), "Gateway configurations do not match imported gateways");
             foreach (var configuredGateway in configuredGateways) {
                 var importedGateway = importedGateways.Single(g => g.Metadata.CloudService == configuredGateway.Schema);
-                Assert.AreEqual(GatewayCapabilities.All ^ configuredGateway.Exclusions, importedGateway.Metadata.Capabilities, $"Gateway capabilities for '{configuredGateway.Schema}' differ");
+                Assert.AreEqual(GatewayCapabilities.All ^ configuredGateway.Exclusions, importedGateway.Metadata.Capabilities, $"Gateway capabilities for '{configuredGateway.Schema}' differ".ToString(CultureInfo.CurrentCulture));
             }
         }
 
@@ -93,10 +94,10 @@ namespace IgorSoft.CloudFS.GatewayTests
                 {
                     var drive = gateway.GetDriveAsync(rootName, config.ApiKey, parameters).Result;
 
-                    Assert.IsNotNull(drive, $"Drive is null ({config.Schema})");
-                    Assert.IsNotNull(drive.Id, $"Missing drive ID ({config.Schema})");
-                    Assert.IsNotNull(drive.FreeSpace, $"Missing free space ({config.Schema})");
-                    Assert.IsNotNull(drive.UsedSpace, $"Missing used space ({config.Schema})");
+                    Assert.IsNotNull(drive, $"Drive is null ({config.Schema})".ToString(CultureInfo.CurrentCulture));
+                    Assert.IsNotNull(drive.Id, $"Missing drive ID ({config.Schema})".ToString(CultureInfo.CurrentCulture));
+                    Assert.IsNotNull(drive.FreeSpace, $"Missing free space ({config.Schema})".ToString(CultureInfo.CurrentCulture));
+                    Assert.IsNotNull(drive.UsedSpace, $"Missing used space ({config.Schema})".ToString(CultureInfo.CurrentCulture));
                 });
             });
         }

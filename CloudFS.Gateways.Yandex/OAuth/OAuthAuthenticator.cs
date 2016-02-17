@@ -74,7 +74,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
         private static Uri GetAuthenticationUri(string clientId)
         {
             var stringBuilder = new StringBuilder()
-                .Append($"client_id={clientId}")
+                .Append($"client_id={clientId}".ToString(CultureInfo.InvariantCulture))
                 .Append("&response_type=token")
                 .Append("&display=popup");
 
