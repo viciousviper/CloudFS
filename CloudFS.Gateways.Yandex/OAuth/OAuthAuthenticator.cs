@@ -26,11 +26,11 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Security.Authentication;
-using System.Text;
 using System.Threading.Tasks;
+using IgorSoft.CloudFS.Authentication;
+using static IgorSoft.CloudFS.Authentication.OAuth.Constants;
 using YandexDisk.Client;
 using YandexDisk.Client.Http;
-using IgorSoft.CloudFS.Authentication;
 
 namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
 {
@@ -73,12 +73,12 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
 
         private static Uri GetAuthenticationUri(string clientId)
         {
-            var stringBuilder = new StringBuilder()
-                .Append($"client_id={clientId}".ToString(CultureInfo.InvariantCulture))
-                .Append("&response_type=token")
-                .Append("&display=popup");
+            var queryBuilder = new QueryStringBuilder()
+                .AppendParameter(Parameters.ClientId, clientId)
+                .AppendParameter(Parameters.ResponseType, ResponseTypes.Token)
+                .AppendParameter("display", "popup");
 
-            return new UriBuilder(YANDEX_LOGIN_AUTHORIZE_URI) { Query = stringBuilder.ToString() }.Uri;
+            return new UriBuilder(YANDEX_LOGIN_AUTHORIZE_URI) { Query = queryBuilder.ToString() }.Uri;
         }
 
         private static string GetAuthCode(string account, Uri authenticationUri, Uri redirectUri)
@@ -87,7 +87,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
 
             if (logOn == null) {
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => oauth_token = e.Parameters["access_token"];
+                logOn.Authenticated += (s, e) => oauth_token = e.Parameters[Parameters.AccessToken];
             }
 
             logOn.Show("Yandex", account, authenticationUri, redirectUri);

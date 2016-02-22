@@ -28,6 +28,7 @@ using System.Globalization;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using IgorSoft.CloudFS.Authentication;
+using static IgorSoft.CloudFS.Authentication.OAuth.Constants;
 using Box.V2;
 using Box.V2.Config;
 using Box.V2.Auth;
@@ -82,7 +83,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
 
             if (logOn == null) {
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = e.Parameters.Get("code");
+                logOn.Authenticated += (s, e) => authCode = e.Parameters[Parameters.Code];
             }
 
             logOn.Show("Box", account, authenticationUri, redirectUri);
@@ -102,7 +103,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
 
             var response = default(OAuthSession);
             if (!string.IsNullOrEmpty(refreshToken)) {
-                client = new BoxClient(config, new OAuthSession(null, refreshToken, 0, "bearer"));
+                client = new BoxClient(config, new OAuthSession(null, refreshToken, 0, TokenTypes.Bearer));
                 try {
                     response = await client.Auth.RefreshAccessTokenAsync(refreshToken);
                 } catch (BoxSessionInvalidatedException) {

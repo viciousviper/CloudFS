@@ -31,6 +31,7 @@ using System.Net;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using IgorSoft.CloudFS.Authentication;
+using static IgorSoft.CloudFS.Authentication.OAuth.Constants;
 using Newtonsoft.Json;
 using OneDrive;
 
@@ -51,22 +52,19 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for JSON deserialization")]
         private class AppTokenResponse
         {
-            [JsonProperty("token_type")]
+            [JsonProperty(Parameters.TokenType)]
             public string TokenType { get; set; }
 
-            [JsonProperty("expires_in")]
-            public int AccessTokenExpirationDuration { get; set; }
+            [JsonProperty(Parameters.Scope)]
+            public string Scope { get; set; }
 
-            [JsonProperty("scope")]
-            public string Scopes { get; set; }
-
-            [JsonProperty("access_token")]
+            [JsonProperty(Parameters.AccessToken)]
             public string AccessToken { get; set; }
 
-            [JsonProperty("authentication_token")]
-            public string AuthenticationToken { get; set; }
+            [JsonProperty(Parameters.ExpiresIn)]
+            public int AccessTokenExpirationDuration { get; set; }
 
-            [JsonProperty("refresh_token")]
+            [JsonProperty(Parameters.RefreshToken)]
             public string RefreshToken { get; set; }
         }
 
@@ -101,11 +99,11 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
         private static Uri GetAuthenticationUri(string clientId)
         {
-            var queryStringBuilder = new QueryStringBuilder();
-            queryStringBuilder.Add("client_id", clientId);
-            queryStringBuilder.Add("scope", string.Join(" ", (new [] { Scope.Basic, Scope.OfflineAccess, Scope.Signin, Scope.OneDriveReadWrite }).Select(s => s.GetDescription())));
-            queryStringBuilder.Add("redirect_uri", LIVE_LOGIN_DESKTOP_URI);
-            queryStringBuilder.Add("response_type", "code");
+            var queryStringBuilder = new global::OneDrive.QueryStringBuilder();
+            queryStringBuilder.Add(Parameters.ClientId, clientId);
+            queryStringBuilder.Add(Parameters.Scope, string.Join(" ", (new [] { Scope.Basic, Scope.OfflineAccess, Scope.Signin, Scope.OneDriveReadWrite }).Select(s => s.GetDescription())));
+            queryStringBuilder.Add(Parameters.RedirectUri, LIVE_LOGIN_DESKTOP_URI);
+            queryStringBuilder.Add(Parameters.ResponseType, ResponseTypes.Code);
             queryStringBuilder.Add("display", "popup");
 
             return new UriBuilder(LIVE_LOGIN_AUTHORIZE_URI) { Query = queryStringBuilder.ToString() }.Uri;
@@ -113,40 +111,40 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
         private static async Task<AppTokenResponse> RedeemAccessTokenAsync(string clientId, string clientSecret, string code)
         {
-            var queryStringBuilder = new QueryStringBuilder();
-            queryStringBuilder.Add("client_id", clientId);
-            queryStringBuilder.Add("redirect_uri", LIVE_LOGIN_DESKTOP_URI);
-            queryStringBuilder.Add("client_secret", clientSecret);
-            queryStringBuilder.Add("code", code);
-            queryStringBuilder.Add("grant_type", "authorization_code");
+            var queryStringBuilder = new global::OneDrive.QueryStringBuilder();
+            queryStringBuilder.Add(Parameters.ClientId, clientId);
+            queryStringBuilder.Add(Parameters.ClientSecret, clientSecret);
+            queryStringBuilder.Add(Parameters.RedirectUri, LIVE_LOGIN_DESKTOP_URI);
+            queryStringBuilder.Add(Parameters.Code, code);
+            queryStringBuilder.Add(Parameters.GrantType, GrantTypes.AuthorizationCode);
 
-            string response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder);
+            string response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
 
         private static async Task<AppTokenResponse> RedeemRefreshTokenAsync(string clientId, string clientSecret, string refreshToken)
         {
-            var queryStringBuilder = new QueryStringBuilder();
-            queryStringBuilder.Add("client_id", clientId);
-            queryStringBuilder.Add("redirect_uri", LIVE_LOGIN_DESKTOP_URI);
-            queryStringBuilder.Add("client_secret", clientSecret);
-            queryStringBuilder.Add("refresh_token", refreshToken);
-            queryStringBuilder.Add("grant_type", "refresh_token");
+            var queryStringBuilder = new global::OneDrive.QueryStringBuilder();
+            queryStringBuilder.Add(Parameters.ClientId, clientId);
+            queryStringBuilder.Add(Parameters.ClientSecret, clientSecret);
+            queryStringBuilder.Add(Parameters.RedirectUri, LIVE_LOGIN_DESKTOP_URI);
+            queryStringBuilder.Add(Parameters.RefreshToken, refreshToken);
+            queryStringBuilder.Add(Parameters.GrantType, GrantTypes.RefreshToken);
 
-            string response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder);
+            string response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
 
-        private static async Task<string> PostQuery(string uriString, QueryStringBuilder queryStringBuilder)
+        private static async Task<string> PostQuery(string uriString, string queryString)
         {
-            HttpWebRequest httpWebRequest = WebRequest.CreateHttp(uriString);
+            var httpWebRequest = WebRequest.CreateHttp(uriString);
             httpWebRequest.Method = "POST";
             httpWebRequest.ContentType = "application/x-www-form-urlencoded";
             var stream = await httpWebRequest.GetRequestStreamAsync();
             using (var writer = new StreamWriter(stream)) {
-                await writer.WriteAsync(queryStringBuilder.ToString());
+                await writer.WriteAsync(queryString);
                 await writer.FlushAsync();
             }
 
@@ -166,7 +164,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
             if (logOn == null) {
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = e.Parameters.Get("code")?.TrimStart('M');
+                logOn.Authenticated += (s, e) => authCode = e.Parameters[Parameters.Code]?.TrimStart('M');
             }
 
             logOn.Show("OneDrive", account, authenticationUri, redirectUri);
@@ -179,7 +177,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            string refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account);
 
             AppTokenResponse response = null;
             if (!string.IsNullOrEmpty(refreshToken))
