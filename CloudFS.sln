@@ -46,8 +46,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{1B8C
 		Library\OneDriveSDK.pdb = Library\OneDriveSDK.pdb
 		Library\pCloud.NET SDK.dll = Library\pCloud.NET SDK.dll
 		Library\pCloud.NET SDK.pdb = Library\pCloud.NET SDK.pdb
-		Library\YandexDisk.Client.dll = Library\YandexDisk.Client.dll
-		Library\YandexDisk.Client.pdb = Library\YandexDisk.Client.pdb
+		Library\SwiftClient.dll = Library\SwiftClient.dll
+		Library\SwiftClient.pdb = Library\SwiftClient.pdb
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.hubiC", "CloudFS.Gateways.hubiC\CloudFS.Gateways.hubiC.csproj", "{1F74FD2D-9E69-4765-A997-3895097C213F}"
