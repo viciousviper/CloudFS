@@ -58,7 +58,7 @@ namespace IgorSoft.CloudFS.Gateways.File
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
-            if (parameters == null || !parameters.TryGetValue(PARAMETER_ROOT, out rootPath))
+            if (parameters?.TryGetValue(PARAMETER_ROOT, out rootPath) != true)
                 throw new ArgumentException($"Required {PARAMETER_ROOT} missing in {nameof(parameters)}".ToString(CultureInfo.CurrentCulture));
             if (string.IsNullOrEmpty(rootPath))
                 throw new ArgumentException($"{PARAMETER_ROOT} cannot be empty".ToString(CultureInfo.CurrentCulture));

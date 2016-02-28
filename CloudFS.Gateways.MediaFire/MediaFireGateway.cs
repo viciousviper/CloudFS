@@ -201,8 +201,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                 //return new DirectoryInfoContract(item.FolderInfo.FolderKey, item.FolderInfo.Name, item.FolderInfo.Created, item.FolderInfo.Created);
 
                 throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
-            }
-            else {
+            } else {
                 var copy = await context.Agent.GetAsync<ApiExtensions.MediaFireCopyFileResponse>(MediaFireApiFileMethods.Copy, new Dictionary<string, object>() {
                     { MediaFireApiParameters.QuickKey, source.Value },
                     { MediaFireApiParameters.FolderKey, destination.Value }

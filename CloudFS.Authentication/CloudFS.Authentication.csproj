@@ -62,6 +62,8 @@
     <Compile Include="LogOnBase.cs" />
     <Compile Include="DirectLogOn.cs" />
     <Compile Include="BrowserLogOn.cs" />
+    <Compile Include="OAuth\Constants.cs" />
+    <Compile Include="QueryStringBuilder.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
