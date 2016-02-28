@@ -149,9 +149,11 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
-if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\MediaFireSDK.dll cmd /c "$(SolutionDir)SignAssembly.cmd MediaFireSDK $(SolutionDir)packages\MediaFireSDK.1.0.0.2\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10 $(SolutionDir)SignedLibrary"
-if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
+if $(ConfigurationName) == Signed (
+    if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
+    if not exist $(SolutionDir)SignedLibrary\MediaFireSDK.dll cmd /c "$(SolutionDir)SignAssembly.cmd MediaFireSDK $(SolutionDir)packages\MediaFireSDK.1.0.0.2\lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10+MonoTouch10 $(SolutionDir)SignedLibrary"
+    if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
+)
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
