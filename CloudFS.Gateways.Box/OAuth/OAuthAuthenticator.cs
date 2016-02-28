@@ -122,7 +122,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
                 response = await client.Auth.AuthenticateAsync(code);
             }
 
-            SaveRefreshToken(account, response != null ? response.RefreshToken : null);
+            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken);
 
             return client;
         }

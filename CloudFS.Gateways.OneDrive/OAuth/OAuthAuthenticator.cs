@@ -194,7 +194,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                 response = await RedeemAccessTokenAsync(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, code);
             }
 
-            SaveRefreshToken(account, response != null ? response.RefreshToken : null);
+            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken);
 
             return response != null ? new ODConnection(ONEDRIVE_API_URI, response.AccessToken) : null;
         }

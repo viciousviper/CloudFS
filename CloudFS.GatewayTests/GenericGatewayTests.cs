@@ -88,11 +88,9 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void GetDrive_ReturnsResult()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                var parameters = fixture.GetParameters(config);
-
                 fixture.OnCondition(config, GatewayCapabilities.GetDrive, () =>
                 {
-                    var drive = gateway.GetDrive(rootName, config.ApiKey, parameters);
+                    var drive = gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     Assert.IsNotNull(drive, $"Drive is null ({config.Schema})".ToString(CultureInfo.CurrentCulture));
                     Assert.IsNotNull(drive.Id, $"Missing drive ID ({config.Schema})".ToString(CultureInfo.CurrentCulture));
