@@ -43,17 +43,36 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <Choose>
+    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
+      <ItemGroup>
+        <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\SemanticTypes.0.12.0\lib\net35\SemanticTypes.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="SwiftClient, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <SpecificVersion>False</SpecificVersion>
+          <HintPath>..\Library\SwiftClient.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+          <HintPath>..\SignedLibrary\SemanticTypes.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+        <Reference Include="SwiftClient, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+          <SpecificVersion>False</SpecificVersion>
+          <HintPath>..\SignedLibrary\SwiftClient.dll</HintPath>
+        </Reference>
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="SemanticTypes">
-      <HintPath>..\packages\SemanticTypes.0.12.0\lib\net35\SemanticTypes.dll</HintPath>
-    </Reference>
-    <Reference Include="SwiftClient, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SwiftClient\src\SwiftClient\bin\Debug\SwiftClient.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Composition.AttributedModel">
@@ -118,9 +137,12 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
-if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
-if $(ConfigurationName) == 'Signed' and not exist $(SolutionDir)SignedLibrary\SwiftClient.dll cmd /c "$(SolutionDir)SignAssembly.cmd SwiftClient $(SolutionDir)packages\SwiftClient.1.2.1\lib\net45 $(SolutionDir)SignedLibrary"</PreBuildEvent>
+if $(ConfigurationName) == Signed (
+    if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
+    if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
+    if not exist $(SolutionDir)SignedLibrary\SwiftClient.dll cmd /c "$(SolutionDir)SignAssembly.cmd SwiftClient $(SolutionDir)Library $(SolutionDir)SignedLibrary"
+)
+</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
