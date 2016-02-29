@@ -24,6 +24,7 @@ SOFTWARE.
 
 using System;
 using System.Configuration;
+using System.Globalization;
 
 namespace IgorSoft.CloudFS.GatewayTests.Config
 {
@@ -48,6 +49,6 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(TestSection)} libPath='{LibPath}'";
+        private string DebuggerDisplay() => $"{nameof(TestSection)} libPath='{LibPath}'".ToString(CultureInfo.CurrentCulture);
     }
 }

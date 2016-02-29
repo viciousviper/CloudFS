@@ -58,10 +58,10 @@ namespace IgorSoft.CloudFS.Gateways.File
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
-            if (parameters == null || !parameters.TryGetValue(PARAMETER_ROOT, out rootPath))
-                throw new ArgumentException($"Required {PARAMETER_ROOT} missing in {nameof(parameters)}");
+            if (parameters?.TryGetValue(PARAMETER_ROOT, out rootPath) != true)
+                throw new ArgumentException($"Required {PARAMETER_ROOT} missing in {nameof(parameters)}".ToString(CultureInfo.CurrentCulture));
             if (string.IsNullOrEmpty(rootPath))
-                throw new ArgumentException($"{PARAMETER_ROOT} cannot be empty");
+                throw new ArgumentException($"{PARAMETER_ROOT} cannot be empty".ToString(CultureInfo.CurrentCulture));
 
             var drive = new DriveInfo(Path.GetFullPath(rootPath));
             return new DriveInfoContract(root.Value, drive.AvailableFreeSpace, drive.TotalSize - drive.AvailableFreeSpace);
@@ -72,7 +72,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var directory = new DirectoryInfo(Path.GetFullPath(rootPath));
             return new RootDirectoryInfoContract(Path.DirectorySeparatorChar.ToString(), directory.CreationTime, directory.LastWriteTime);
@@ -100,7 +100,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, parent.Value);
 
@@ -119,7 +119,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, target.Value);
 
@@ -139,7 +139,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, source.Value);
 
@@ -159,7 +159,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, target.Value);
 
@@ -180,7 +180,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, source.Value);
             var destinationPath = destination.Value;
@@ -214,7 +214,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, source.Value);
             var destinationPath = destination.Value;
@@ -246,7 +246,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, Path.Combine(parent.Value, name));
 
@@ -268,7 +268,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, Path.Combine(parent.Value, name));
 
@@ -292,7 +292,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, target.Value);
 
@@ -320,7 +320,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (string.IsNullOrEmpty(newName))
                 throw new ArgumentNullException(nameof(newName));
             if (string.IsNullOrEmpty(rootPath))
-                throw new InvalidOperationException($"{nameof(rootPath)} not initialized");
+                throw new InvalidOperationException($"{nameof(rootPath)} not initialized".ToString(CultureInfo.CurrentCulture));
 
             var effectivePath = GetFullPath(rootPath, target.Value);
             var newPath = GetFullPath(rootPath, Path.Combine(Path.GetDirectoryName(target.Value), newName));
@@ -342,6 +342,6 @@ namespace IgorSoft.CloudFS.Gateways.File
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(FileGateway)} rootPath='{rootPath}'";
+        private string DebuggerDisplay() => $"{nameof(FileGateway)} rootPath='{rootPath}'".ToString(CultureInfo.CurrentCulture);
     }
 }

@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -71,6 +72,6 @@ namespace IgorSoft.CloudFS.Interface
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Used for DebuggerDisplay")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(RootName)} {Format(Schema, UserName, Root)}";
+        private string DebuggerDisplay() => $"{nameof(RootName)} {Format(Schema, UserName, Root)}".ToString(CultureInfo.CurrentCulture);
     }
 }

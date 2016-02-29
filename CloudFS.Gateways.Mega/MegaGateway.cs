@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using CG.Web.MegaApiClient;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
@@ -35,13 +36,13 @@ using IgorSoft.CloudFS.Gateways.Mega.Auth;
 
 namespace IgorSoft.CloudFS.Gateways.Mega
 {
-    [ExportAsCloudGateway("Mega")]
+    [ExportAsAsyncCloudGateway("Mega")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), MegaGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), MegaGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), MegaGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), MegaGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class MegaGateway : ICloudGateway
+    public sealed class MegaGateway : IAsyncCloudGateway
     {
         private const string SCHEMA = "mega";
 
@@ -78,7 +79,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             return result;
         }
 
-        public DriveInfoContract GetDrive(RootName root, string apiKey, IDictionary<string, string> parameters)
+        public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
@@ -86,100 +87,102 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             return new DriveInfoContract(root.Value, -1, -1);
         }
 
-        public RootDirectoryInfoContract GetRoot(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
         {
             var context = RequireContext(root, apiKey);
 
-            var nodes = context.Client.GetNodes();
+            var nodes = await context.Client.GetNodesAsync();
             var item = nodes.Single(n => n.Type == NodeType.Root);
 
             return new RootDirectoryInfoContract(item.Id, DateTimeOffset.MinValue, item.LastModificationDate);
         }
 
-        public IEnumerable<FileSystemInfoContract> GetChildItem(RootName root, DirectoryId parent)
+        public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
         {
             var context = RequireContext(root);
 
-            var nodes = context.Client.GetNodes();
+            var nodes = await context.Client.GetNodesAsync();
             var parentItem = nodes.Single(n => n.Id == parent.Value);
-            var items = context.Client.GetNodes(parentItem);
+            var items = await context.Client.GetNodesAsync(parentItem);
 
             return items.Select(i => i.ToFileSystemInfoContract());
         }
 
-        public void ClearContent(RootName root, FileId target)
+        public Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
             throw new NotSupportedException(Resources.SettingOfFileContentNotSupported);
         }
 
-        public Stream GetContent(RootName root, FileId source)
+        public async Task<Stream> GetContentAsync(RootName root, FileId source)
         {
             var context = RequireContext(root);
 
-            var nodes = context.Client.GetNodes();
+            var nodes = await context.Client.GetNodesAsync();
             var item = nodes.Single(n => n.Id == source.Value);
-            var stream = context.Client.Download(item);
+            var stream = await context.Client.DownloadAsync(item, new Progress<double>());
 
             return stream;
         }
 
-        public void SetContent(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress)
+        public Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
             throw new NotSupportedException(Resources.SettingOfFileContentNotSupported);
         }
 
-        public FileSystemInfoContract CopyItem(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
+        public Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
             throw new NotSupportedException(Resources.CopyingOfFilesNotSupported);
         }
 
-        public FileSystemInfoContract MoveItem(RootName root, FileSystemId source, string moveName, DirectoryId destination)
+        public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
         {
-
             var context = RequireContext(root);
 
-            var nodes = context.Client.GetNodes();
+            var nodes = await context.Client.GetNodesAsync();
             var sourceItem = nodes.Single(n => n.Id == source.Value);
             if (!string.IsNullOrEmpty(moveName) && moveName != sourceItem.Name)
                 throw new NotSupportedException(Resources.RenamingOfFilesNotSupported);
             var destinationParentItem = nodes.Single(n => n.Id == destination.Value);
-            var item = context.Client.Move(sourceItem, destinationParentItem);
+            var item = await context.Client.MoveAsync(sourceItem, destinationParentItem);
 
             return item.ToFileSystemInfoContract();
         }
 
-        public DirectoryInfoContract NewDirectoryItem(RootName root, DirectoryId parent, string name)
+        public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
         {
             var context = RequireContext(root);
 
-            var nodes = context.Client.GetNodes();
+            var nodes = await context.Client.GetNodesAsync();
             var parentItem = nodes.Single(n => n.Id == parent.Value);
-            var item = context.Client.CreateFolder(name, parentItem);
+            var item = await context.Client.CreateFolderAsync(name, parentItem);
 
             return new DirectoryInfoContract(item.Id, item.Name, DateTimeOffset.MinValue, item.LastModificationDate);
         }
 
-        public FileInfoContract NewFileItem(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
+        public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
         {
             var context = RequireContext(root);
 
-            var nodes = context.Client.GetNodes();
+            var nodes = await context.Client.GetNodesAsync();
             var parentItem = nodes.Single(n => n.Id == parent.Value);
-            var item = context.Client.Upload(new ProgressStream(content, progress), name, parentItem);
+            var contentLength = content.Length;
+            var item = await context.Client.UploadAsync(content, name, parentItem, new Progress<double>(d => progress.Report(new ProgressValue((int)(contentLength * d), (int)contentLength))));
 
             return new FileInfoContract(item.Id, item.Name, DateTimeOffset.MinValue, item.LastModificationDate, item.Size, null);
         }
 
-        public void RemoveItem(RootName root, FileSystemId target, bool recurse)
+        public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
         {
             var context = RequireContext(root);
 
-            var nodes = context.Client.GetNodes();
+            var nodes = await context.Client.GetNodesAsync();
             var item = nodes.Single(n => n.Id == target.Value);
-            context.Client.Delete(item);
+            await context.Client.DeleteAsync(item);
+
+            return true;
         }
 
-        public FileSystemInfoContract RenameItem(RootName root, FileSystemId target, string newName)
+        public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
             throw new NotSupportedException(Resources.RenamingOfFilesNotSupported);
         }

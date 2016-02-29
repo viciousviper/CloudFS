@@ -1,10 +1,12 @@
 # CloudFS
 The **CloudFS** library is a collection of .NET assemblies as gateways to various publicly accessible Cloud storage services.
 
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/viciousviper/CloudFS/blob/master/LICENSE.md)
+[![Release](https://img.shields.io/github/tag/viciousviper/CloudFS.svg)](https://github.com/viciousviper/CloudFS/releases)
 [![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/master?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs)
 [![Version](https://img.shields.io/nuget/v/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads](https://img.shields.io/nuget/dt/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
-[![NuGet downloads](https://img.shields.io/nuget/dt/CloudFS-Signed.svg)](https://www.nuget.org/packages/CloudFS-Signed)
+[![NuGet downloads (signed)](https://img.shields.io/nuget/dt/CloudFS-Signed.svg)](https://www.nuget.org/packages/CloudFS-Signed)
 
 ## Objective
 
@@ -26,8 +28,9 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)        | N/A         | async      | official  | stable<sup id="a1">[1](#f1)</sup> |
 | [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis](https://github.com/google/google-api-dotnet-client)       | 1.10.0.2040 | async      | official  | stable |
 | [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.6.2       | async      | official  | stable |
+| [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 1.2.1       | async      | 3<sup>rd</sup> party | experimental |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.2     | async      | 3<sup>rd</sup> party | experimental |
-| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.1.3       | sync       | 3<sup>rd</sup> party | stable |
+| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.2.0       | async      | 3<sup>rd</sup> party | stable |
 | [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A         | async      | 3<sup>rd</sup> party | stable |
 | [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.7       | async      | 3<sup>rd</sup> party | experimental |
 | **Obsolete services**                                            |
@@ -61,6 +64,7 @@ At the time of writing this Readme, the following URLs provided access to applic
 | Google Drive          | [Google Developers Console](https://console.developers.google.com) |
 | Box                   | [Box Developers Services](https://app.box.com/developers/services/edit/) |
 | Copy                  | [Copy Developers - Applications](https://developers.copy.com/applications) |
+| hubiC                 | [Develop hubiC applications](https://hubic.com/home/browser/developers/) |
 | MediaFire             | [MediaFire - Developers](https://www.mediafire.com/index.php#settings/applications) |
 | MEGA                  | [Mega Core SDK - Developers](https://mega.nz/#sdk)     |
 | pCloud                | *- no configuration required -*                        |

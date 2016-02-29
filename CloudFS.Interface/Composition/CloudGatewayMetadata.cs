@@ -24,6 +24,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -76,6 +77,6 @@ namespace IgorSoft.CloudFS.Interface.Composition
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(CloudGatewayMetadata)} '{CloudService}' Capabilities={Capabilities} ServiceUri='{ServiceUri}' ApiAssembly='{ApiAssembly}'";
+        private string DebuggerDisplay() => $"{nameof(CloudGatewayMetadata)} '{CloudService}' Capabilities={Capabilities} ServiceUri='{ServiceUri}' ApiAssembly='{ApiAssembly}'".ToString(CultureInfo.CurrentCulture);
     }
 }
