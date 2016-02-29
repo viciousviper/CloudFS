@@ -97,10 +97,10 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
                 if (parts.Length != 2)
                     throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
 
-                client.Login(parts[0], parts[1]);
+                refreshToken = MegaApiClient.GenerateAuthInfos(parts[0], parts[1]);
+                client.Login(refreshToken);
             }
 
-            refreshToken = (MegaApiClient.AuthInfos)typeof(MegaApiClient).GetField("_authInfos", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(client);
             SaveRefreshToken(account, refreshToken);
 
             return client;
