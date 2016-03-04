@@ -110,7 +110,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
-            throw new NotSupportedException(Resources.SettingOfFileContentNotSupported);
+            return Task.FromException<bool>(new NotSupportedException(Resources.SettingOfFileContentNotSupported));
         }
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
@@ -126,12 +126,12 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
-            throw new NotSupportedException(Resources.SettingOfFileContentNotSupported);
+            return Task.FromException<bool>(new NotSupportedException(Resources.SettingOfFileContentNotSupported));
         }
 
         public Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
-            throw new NotSupportedException(Resources.CopyingOfFilesNotSupported);
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.CopyingOfFilesNotSupported));
         }
 
         public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
@@ -184,7 +184,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
-            throw new NotSupportedException(Resources.RenamingOfFilesNotSupported);
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.RenamingOfFilesNotSupported));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

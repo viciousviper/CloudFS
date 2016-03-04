@@ -80,6 +80,17 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to hubiC does not support moving of files or directories..
+        /// </summary>
+        internal static string MovingOfFilesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("MovingOfFilesNotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to The object ID '{0}' does not match its containing directory '{1}'..
         /// </summary>
         internal static string ObjectNotInDirectory
@@ -87,6 +98,17 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             get
             {
                 return ResourceManager.GetString("ObjectNotInDirectory", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to hubiC does not support renaming of files or directories..
+        /// </summary>
+        internal static string RenamingOfFilesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("RenamingOfFilesNotSupported", resourceCulture);
             }
         }
 

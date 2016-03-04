@@ -176,9 +176,9 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             return new FileInfoContract(targetId, targetName, creationTime, creationTime, item.ContentLength, item.Headers["ETag"]);
         }
 
-        public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
+        public Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
         {
-            throw new NotSupportedException();
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.MovingOfFilesNotSupported));
         }
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
@@ -232,9 +232,9 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             return response.IsSuccess;
         }
 
-        public async Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
+        public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
-            throw new NotSupportedException();
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.RenamingOfFilesNotSupported));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
