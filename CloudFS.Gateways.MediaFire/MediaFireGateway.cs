@@ -99,7 +99,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
             var item = await context.Agent.GetAsync<MediaFireGetFolderInfoResponse>(MediaFireApiFolderMethods.GetInfo);
 
-            return new RootDirectoryInfoContract(item.FolderInfo.FolderKey, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+            return new RootDirectoryInfoContract(item.FolderInfo.FolderKey, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0));
         }
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
@@ -273,7 +273,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                 { MediaFireApiParameters.FolderName, name }
             });
 
-            return new DirectoryInfoContract(item.FolderKey, name, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+            return new DirectoryInfoContract(item.FolderKey, name, DateTimeOffset.Now, DateTimeOffset.Now);
         }
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)

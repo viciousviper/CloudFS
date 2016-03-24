@@ -96,7 +96,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.GetRootFolder(), RETRIES);
             var user = await AsyncFunc.Retry<User, ServerException>(async () => await context.Client.UserManager.GetUserAsync(), RETRIES);
 
-            return new RootDirectoryInfoContract(item.Id, new DateTimeOffset(user.CreatedTime, TimeSpan.Zero), new DateTimeOffset(item.ModifiedTime, TimeSpan.Zero));
+            return new RootDirectoryInfoContract(item.Id, DateTimeOffset.FromFileTime(Math.Max(0, user.CreatedTime)), DateTimeOffset.FromFileTime(Math.Max(0, item.ModifiedTime.Ticks)));
         }
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)

@@ -100,7 +100,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var item = await AsyncFunc.Retry<BoxFolder, BoxException>(async () => await context.Client.FoldersManager.GetInformationAsync("0", boxFolderFields), RETRIES);
 
-            return new RootDirectoryInfoContract(item.Id, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+            return new RootDirectoryInfoContract(item.Id, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0));
         }
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)

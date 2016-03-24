@@ -46,6 +46,10 @@ namespace IgorSoft.CloudFS.Interface.IO
                 throw new ArgumentNullException(nameof(id));
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
+            if (created < DateTimeOffset.FromFileTime(0))
+                throw new ArgumentOutOfRangeException(nameof(created));
+            if (updated < DateTimeOffset.FromFileTime(0))
+                throw new ArgumentOutOfRangeException(nameof(updated));
 
             Id = id;
             Name = name;
