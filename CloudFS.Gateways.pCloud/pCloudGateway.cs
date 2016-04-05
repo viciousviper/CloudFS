@@ -129,11 +129,13 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         public async Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var locator = locatorResolver();
-            var tokenSource = new CancellationTokenSource();
-            await context.Client.UploadFileAsync(new MemoryStream(), ToId(locator.ParentId), locator.Name, tokenSource.Token);
+            await context.Client.UploadFileAsync(Stream.Null, ToId(locator.ParentId), locator.Name, CancellationToken.None);
 
             return true;
         }
@@ -143,9 +145,8 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             var context = await RequireContext(root);
 
             var stream = new MemoryStream();
-            var tokenSource = new CancellationTokenSource();
             //await AsyncFunc.Retry<Stream, pCloudException>(async () => await context.Client.DownloadFileAsync(ToId(source), stream, tokenSource.Token), RETRIES);
-            await context.Client.DownloadFileAsync(ToId(source), stream, tokenSource.Token);
+            await context.Client.DownloadFileAsync(ToId(source), stream, CancellationToken.None);
             stream.Seek(0, SeekOrigin.Begin);
 
             return stream;
@@ -153,11 +154,14 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         public async Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var locator = locatorResolver();
-            var tokenSource = new CancellationTokenSource();
-            await context.Client.UploadFileAsync(content, ToId(locator.ParentId), locator.Name, tokenSource.Token);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            await context.Client.UploadFileAsync(stream, ToId(locator.ParentId), locator.Name, CancellationToken.None);
 
             return true;
         }
@@ -209,8 +213,8 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         {
             var context = await RequireContext(root);
 
-            var tokenSource = new CancellationTokenSource();
-            var item = await AsyncFunc.Retry<pCloudFile, pCloudException>(async () => await context.Client.UploadFileAsync(new ProgressStream(content, progress), ToId(parent), name, tokenSource.Token), RETRIES);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var item = await AsyncFunc.Retry<pCloudFile, pCloudException>(async () => await context.Client.UploadFileAsync(stream, ToId(parent), name, CancellationToken.None), RETRIES);
 
             return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
         }

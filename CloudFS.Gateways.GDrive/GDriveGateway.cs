@@ -126,7 +126,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
         {
             var context = await RequireContext(root);
 
-            await AsyncFunc.Retry<IUploadProgress, GoogleApiException>(async () => await context.Service.Files.Update(null, target.Value, new MemoryStream(), MIME_TYPE_FILE).UploadAsync(), RETRIES);
+            await AsyncFunc.Retry<IUploadProgress, GoogleApiException>(async () => await context.Service.Files.Update(null, target.Value, Stream.Null, MIME_TYPE_FILE).UploadAsync(), RETRIES);
 
             return true;
         }
@@ -148,7 +148,8 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
             var itemReference = await AsyncFunc.Retry<GoogleFile, GoogleApiException>(async () => await context.Service.Files.Get(target.Value).ExecuteAsync(), RETRIES);
             var update = context.Service.Files.Update(itemReference, target.Value, content, itemReference.MimeType);
-            update.ProgressChanged += p => progress.Report(new ProgressValue((int)p.BytesSent, (int)content.Length));
+            if (progress != null)
+                update.ProgressChanged += p => progress.Report(new ProgressValue((int)p.BytesSent, (int)content.Length));
             await AsyncFunc.Retry<IUploadProgress, GoogleApiException>(async () => await update.UploadAsync(), RETRIES);
 
             return true;
@@ -196,7 +197,8 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
             var file = new GoogleFile() { Title = name, MimeType = MIME_TYPE_FILE, Parents = new[] { new ParentReference() { Id = parent.Value } } };
             var insert = context.Service.Files.Insert(file, content, MIME_TYPE_FILE);
-            insert.ProgressChanged += p => progress.Report(new ProgressValue((int)p.BytesSent, (int)content.Length));
+            if (progress != null)
+                insert.ProgressChanged += p => progress.Report(new ProgressValue((int)p.BytesSent, (int)content.Length));
             var upload = await AsyncFunc.Retry<IUploadProgress, GoogleApiException>(async () => await insert.UploadAsync(), RETRIES);
             var item = insert.ResponseBody;
 

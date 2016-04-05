@@ -84,7 +84,8 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
-            return new DriveInfoContract(root.Value, -1, -1);
+            // TODO: Determine actual freeSpace and usedSpace from MEGA
+            return new DriveInfoContract(root.Value, 100000, 100000);
         }
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
@@ -166,7 +167,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             var nodes = await context.Client.GetNodesAsync();
             var parentItem = nodes.Single(n => n.Id == parent.Value);
             var contentLength = content.Length;
-            var item = await context.Client.UploadAsync(content, name, parentItem, new Progress<double>(d => progress.Report(new ProgressValue((int)(contentLength * d), (int)contentLength))));
+            var item = await context.Client.UploadAsync(content, name, parentItem, new Progress<double>(d => progress?.Report(new ProgressValue((int)(contentLength * d), (int)contentLength))));
 
             return new FileInfoContract(item.Id, item.Name, item.LastModificationDate, item.LastModificationDate, item.Size, null);
         }

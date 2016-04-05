@@ -148,7 +148,8 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         {
             var context = await RequireContext(root);
 
-            var item = await context.Client.PutObject(context.Container, target.Value, content);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var item = await context.Client.PutObject(context.Container, target.Value, stream);
 
             return item.IsSuccess;
         }
@@ -196,7 +197,8 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var objectId = parent.GetObjectId(name);
             var length = content.Length;
 
-            var item = await context.Client.PutObject(context.Container, objectId, content);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var item = await context.Client.PutObject(context.Container, objectId, stream);
             if (!item.IsSuccess)
                 throw new ApplicationException(item.Reason);
 

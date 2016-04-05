@@ -132,7 +132,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var context = await RequireContext(root);
 
             var link = await context.Client.Files.GetUploadLinkAsync(target.Value, true, CancellationToken.None);
-            await context.Client.Files.UploadAsync(link, new MemoryStream(), CancellationToken.None);
+            await context.Client.Files.UploadAsync(link, Stream.Null, CancellationToken.None);
 
             return true;
         }
@@ -152,7 +152,8 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var context = await RequireContext(root);
 
             var link = await context.Client.Files.GetUploadLinkAsync(target.Value, true, CancellationToken.None);
-            await context.Client.Files.UploadAsync(link, content, CancellationToken.None);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            await context.Client.Files.UploadAsync(link, stream, CancellationToken.None);
 
             return true;
         }
@@ -206,7 +207,8 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
             var request = new ResourceRequest() { Path = parent.Value.TrimEnd('/') + '/' + name };
             var link = await context.Client.Files.GetUploadLinkAsync(request.Path, false, CancellationToken.None);
-            await context.Client.Files.UploadAsync(link, content, CancellationToken.None);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            await context.Client.Files.UploadAsync(link, stream, CancellationToken.None);
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
             return new FileInfoContract(item.Path, item.Name, item.Created, item.Modified, item.Size, item.Md5);
