@@ -25,7 +25,6 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Composition;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -96,7 +95,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.GetRootFolder(), RETRIES);
             var user = await AsyncFunc.Retry<User, ServerException>(async () => await context.Client.UserManager.GetUserAsync(), RETRIES);
 
-            return new RootDirectoryInfoContract(item.Id, new DateTimeOffset(user.CreatedTime, TimeSpan.Zero), new DateTimeOffset(item.ModifiedTime, TimeSpan.Zero));
+            return new RootDirectoryInfoContract(item.Id, DateTimeOffset.FromFileTime(Math.Max(0, user.CreatedTime)), DateTimeOffset.FromFileTime(Math.Max(0, item.ModifiedTime.Ticks)));
         }
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
@@ -110,10 +109,13 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
         public async Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var locator = locatorResolver();
-            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, new MemoryStream(), true), RETRIES);
+            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, Stream.Null, true), RETRIES);
 
             return true;
         }
@@ -132,10 +134,14 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
         public async Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var locator = locatorResolver();
-            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, new ProgressStream(content, progress), true), RETRIES);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, stream, true), RETRIES);
 
             return true;
         }
@@ -175,7 +181,8 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         {
             var context = await RequireContext(root);
 
-            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(parent.Value, name, new ProgressStream(content, progress), true), RETRIES);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(parent.Value, name, stream, true), RETRIES);
 
             return new FileInfoContract(item.Id, item.Name, item.DateLastSynced, FileSystemExtensions.Later(item.DateLastSynced, item.ModifiedTime), item.Size, null);
         }

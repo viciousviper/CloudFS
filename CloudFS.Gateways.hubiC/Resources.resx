@@ -120,8 +120,14 @@
   <data name="CopyingOfDirectoriesNotSupported" xml:space="preserve">
     <value>hubiC does not support copying of directories.</value>
   </data>
+  <data name="MovingOfFilesNotSupported" xml:space="preserve">
+    <value>hubiC does not support moving of files or directories.</value>
+  </data>
   <data name="ObjectNotInDirectory" xml:space="preserve">
     <value>The object ID '{0}' does not match its containing directory '{1}'.</value>
+  </data>
+  <data name="RenamingOfFilesNotSupported" xml:space="preserve">
+    <value>hubiC does not support renaming of files or directories.</value>
   </data>
   <data name="RetrieveAuthenticationCodeFromUri" xml:space="preserve">
     <value>Please retrieve an authentication code from the following Uri: {0}</value>

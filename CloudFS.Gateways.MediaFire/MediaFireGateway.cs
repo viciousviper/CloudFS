@@ -99,7 +99,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
             var item = await context.Agent.GetAsync<MediaFireGetFolderInfoResponse>(MediaFireApiFolderMethods.GetInfo);
 
-            return new RootDirectoryInfoContract(item.FolderInfo.FolderKey, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+            return new RootDirectoryInfoContract(item.FolderInfo.FolderKey, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0));
         }
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
@@ -146,6 +146,9 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var locator = locatorResolver();
@@ -153,7 +156,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             config.Endpoint = config.Endpoint
                 .Remove(config.Endpoint.IndexOf($"&{MediaFireApiParameters.FolderKey}".ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCulture))
                 .Replace($"{MediaFireApiUploadMethods.Simple}?".ToString(CultureInfo.InvariantCulture), $"{MediaFireApiUploadMethods.Update}?{MediaFireApiParameters.QuickKey}={target.Value}&".ToString(CultureInfo.InvariantCulture));
-            var mediaFireProgress = new Progress<MediaFireOperationProgress>(p => progress.Report(new ProgressValue((int)p.CurrentSize, (int)p.TotalSize)));
+            var mediaFireProgress = progress != null ? new Progress<MediaFireOperationProgress>(p => progress.Report(new ProgressValue((int)p.CurrentSize, (int)p.TotalSize))) : null;
             var upload = await context.Agent.Upload.Simple(config, content, mediaFireProgress);
             //TODO: Fix code for direct execution of upload/update via PostStreamAsync<>()
             //var upload = (await context.Agent.PostStreamAsync<UploadResponse>(MediaFireApiUploadMethods.Update, content, new Dictionary<string, object>() {
@@ -273,7 +276,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                 { MediaFireApiParameters.FolderName, name }
             });
 
-            return new DirectoryInfoContract(item.FolderKey, name, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+            return new DirectoryInfoContract(item.FolderKey, name, DateTimeOffset.Now, DateTimeOffset.Now);
         }
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
@@ -281,7 +284,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             var context = await RequireContext(root);
 
             var config = await context.Agent.Upload.GetUploadConfiguration(name, content.Length, parent.Value, MediaFireActionOnDuplicate.Skip);
-            var mediaFireProgress = new Progress<MediaFireOperationProgress>(p => progress.Report(new ProgressValue((int)p.CurrentSize, (int)p.TotalSize)));
+            var mediaFireProgress = progress != null ? new Progress<MediaFireOperationProgress>(p => progress.Report(new ProgressValue((int)p.CurrentSize, (int)p.TotalSize))) : null;
             var upload = await context.Agent.Upload.Simple(config, content, mediaFireProgress);
 
             while (!(upload.IsComplete && upload.IsSuccess)) {

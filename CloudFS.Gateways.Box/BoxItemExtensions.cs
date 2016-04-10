@@ -32,7 +32,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
     internal static class BoxItemExtensions
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this BoxItem item) => item.Type == Constants.TypeFolder
-                ? new DirectoryInfoContract(item.Id, item.Name, item.CreatedAt ?? DateTimeOffset.MinValue, item.ModifiedAt ?? DateTimeOffset.MinValue) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, item.CreatedAt ?? DateTimeOffset.MinValue, item.ModifiedAt ?? DateTimeOffset.MinValue, item.Size.Value, ((BoxFile)item).Sha1.ToLowerInvariant()) as FileSystemInfoContract;
+                ? new DirectoryInfoContract(item.Id, item.Name, item.CreatedAt ?? DateTimeOffset.FromFileTime(0), item.ModifiedAt ?? DateTimeOffset.FromFileTime(0)) as FileSystemInfoContract
+                : new FileInfoContract(item.Id, item.Name, item.CreatedAt ?? DateTimeOffset.FromFileTime(0), item.ModifiedAt ?? DateTimeOffset.FromFileTime(0), item.Size.Value, ((BoxFile)item).Sha1.ToLowerInvariant()) as FileSystemInfoContract;
     }
 }

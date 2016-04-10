@@ -100,7 +100,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var item = await AsyncFunc.Retry<BoxFolder, BoxException>(async () => await context.Client.FoldersManager.GetInformationAsync("0", boxFolderFields), RETRIES);
 
-            return new RootDirectoryInfoContract(item.Id, DateTimeOffset.MinValue, DateTimeOffset.MinValue);
+            return new RootDirectoryInfoContract(item.Id, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0));
         }
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
@@ -114,10 +114,13 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         public async Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var locator = locatorResolver();
-            await AsyncFunc.Retry<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, new MemoryStream()), RETRIES);
+            await AsyncFunc.Retry<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, Stream.Null), RETRIES);
 
             return true;
         }
@@ -133,10 +136,14 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         public async Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var locator = locatorResolver();
-            var item = await AsyncFunc.Retry<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, new ProgressStream(content, progress)), RETRIES);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var item = await AsyncFunc.Retry<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, stream), RETRIES);
 
             return true;
         }
@@ -192,7 +199,8 @@ namespace IgorSoft.CloudFS.Gateways.Box
             var context = await RequireContext(root);
 
             var request = new BoxFileRequest() { Name = name, Parent = new BoxRequestEntity() { Id = parent.Value } };
-            var item = await AsyncFunc.Retry<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadAsync(request, new ProgressStream(content, progress), boxFileFields), RETRIES);
+            var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var item = await AsyncFunc.Retry<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadAsync(request, stream, boxFileFields), RETRIES);
 
             return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
         }
