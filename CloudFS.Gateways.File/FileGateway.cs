@@ -109,7 +109,7 @@ namespace IgorSoft.CloudFS.Gateways.File
                 return directory.EnumerateDirectories().Select(d => new DirectoryInfoContract(GetRelativePath(rootPath, d.FullName), d.Name, d.CreationTime, d.LastWriteTime)).Cast<FileSystemInfoContract>().Concat(
                     directory.EnumerateFiles().Select(f => new FileInfoContract(GetRelativePath(rootPath, f.FullName), f.Name, f.CreationTime, f.LastWriteTime, f.Length, null)).Cast<FileSystemInfoContract>());
             else
-                return new FileSystemInfoContract[] { };
+                return Array.Empty<FileSystemInfoContract>();
         }
 
         public void ClearContent(RootName root, FileId target)

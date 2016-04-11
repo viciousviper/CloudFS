@@ -33,7 +33,7 @@ namespace IgorSoft.CloudFS.Interface.Composition
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class CloudGatewayMetadata
     {
-        private IDictionary<string, object> values;
+        private readonly IDictionary<string, object> values;
 
         public string CloudService
         {

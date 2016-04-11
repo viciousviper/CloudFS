@@ -67,7 +67,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             Settings.Default.Save();
         }
 
-        private static System.Reflection.BindingFlags nonPublicInstance = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        private static readonly System.Reflection.BindingFlags nonPublicInstance = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
 
         private static async Task<string> RefreshSessionToken(IMediaFireAgent agent, string refreshToken)
         {

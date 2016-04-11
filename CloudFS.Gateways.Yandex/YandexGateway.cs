@@ -66,7 +66,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             }
         }
 
-        private IDictionary<RootName, YandexContext> contextCache = new Dictionary<RootName, YandexContext>();
+        private readonly IDictionary<RootName, YandexContext> contextCache = new Dictionary<RootName, YandexContext>();
 
         private async Task<YandexContext> RequireContext(RootName root, string apiKey = null)
         {

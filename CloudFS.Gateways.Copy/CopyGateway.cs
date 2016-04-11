@@ -64,7 +64,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             }
         }
 
-        private IDictionary<RootName, CopyContext> contextCache = new Dictionary<RootName, CopyContext>();
+        private readonly IDictionary<RootName, CopyContext> contextCache = new Dictionary<RootName, CopyContext>();
 
         private async Task<CopyContext> RequireContext(RootName root, string apiKey = null)
         {

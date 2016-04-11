@@ -118,7 +118,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             queryStringBuilder.Add(Parameters.Code, code);
             queryStringBuilder.Add(Parameters.GrantType, GrantTypes.AuthorizationCode);
 
-            string response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
+            var response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
@@ -132,7 +132,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             queryStringBuilder.Add(Parameters.RefreshToken, refreshToken);
             queryStringBuilder.Add(Parameters.GrantType, GrantTypes.RefreshToken);
 
-            string response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
+            var response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }

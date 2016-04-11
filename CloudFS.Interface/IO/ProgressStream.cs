@@ -33,13 +33,13 @@ namespace IgorSoft.CloudFS.Interface.IO
     {
         private const int REPORT_PERCENTAGE_THRESHOLD = 5;
 
-        private Stream attachedStream;
+        private readonly Stream attachedStream;
 
-        private IProgress<ProgressValue> progress;
+        private readonly IProgress<ProgressValue> progress;
+
+        private readonly int bytesTotal;
 
         private int bytesTransferred;
-
-        private int bytesTotal;
 
         private int reported;
 

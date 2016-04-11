@@ -113,6 +113,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="CopyGateway.cs" />
     <Compile Include="OAuth\OAuthAuthenticator.cs" />
     <Compile Include="OAuth\RefreshTokenSetting.cs" />

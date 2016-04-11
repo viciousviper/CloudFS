@@ -128,7 +128,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                 .AppendParameter(Parameters.RedirectUri, WebUtility.HtmlEncode(HUBIC_LOGIN_REDIRECT_URI))
                 .AppendParameter(Parameters.GrantType, GrantTypes.AuthorizationCode);
 
-            string response = await PostQuery(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
+            var response = await PostQuery(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
@@ -141,7 +141,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                 .AppendParameter(Parameters.RefreshToken, refreshToken)
                 .AppendParameter(Parameters.GrantType, GrantTypes.RefreshToken);
 
-            string response = await PostQuery(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
+            var response = await PostQuery(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }

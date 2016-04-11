@@ -96,7 +96,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            string refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account);
 
             var client = default(BoxClient);
             var config = new BoxConfig(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, new Uri(BOX_LOGIN_DESKTOP_URI));
@@ -113,7 +113,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
             if (response == null) {
                 client = new BoxClient(config, (OAuthSession)null);
                 if (string.IsNullOrEmpty(code)) {
-                    Uri authenticationUri = client.Config.AuthCodeUri;
+                    var authenticationUri = client.Config.AuthCodeUri;
                     code = GetAuthCode(account, authenticationUri, new Uri(BOX_LOGIN_DESKTOP_URI));
                     if (string.IsNullOrEmpty(code))
                         throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));

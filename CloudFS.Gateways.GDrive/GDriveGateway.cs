@@ -74,7 +74,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             }
         }
 
-        private IDictionary<RootName, GDriveContext> contextCache = new Dictionary<RootName, GDriveContext>();
+        private readonly IDictionary<RootName, GDriveContext> contextCache = new Dictionary<RootName, GDriveContext>();
 
         private async Task<GDriveContext> RequireContext(RootName root, string apiKey = null)
         {
