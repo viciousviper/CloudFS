@@ -25,7 +25,7 @@ SOFTWARE.
 using System;
 using System.IO;
 
-namespace IgorSoft.CloudFS.Gateways.File
+namespace IgorSoft.CloudFS.Gateways.CloudShare
 {
     internal static class DirectoryInfoExtensions
     {

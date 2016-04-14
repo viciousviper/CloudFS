@@ -32,16 +32,16 @@ using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
 
-namespace IgorSoft.CloudFS.Gateways.File
+namespace IgorSoft.CloudFS.Gateways.CloudShare
 {
-    [ExportAsCloudGateway("File")]
+    [ExportAsCloudGateway("CloudShare")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), FileGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), FileGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), FileGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class FileGateway : ICloudGateway
     {
-        private const string SCHEMA = "file";
+        private const string SCHEMA = "cloudshare";
 
         private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ItemId;
 
@@ -127,7 +127,8 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (!file.Exists)
                 throw new FileNotFoundException(string.Empty, target.Value);
 
-            using (var stream = file.Open(FileMode.Truncate, FileAccess.Write)) {
+            using (var stream = file.Open(FileMode.Truncate, FileAccess.Write))
+            {
                 stream.Flush();
             }
         }
@@ -164,7 +165,8 @@ namespace IgorSoft.CloudFS.Gateways.File
             var effectivePath = GetFullPath(rootPath, target.Value);
 
             var file = new FileInfo(effectivePath);
-            using (var stream = file.OpenWrite()) {
+            using (var stream = file.OpenWrite())
+            {
                 content.CopyTo(stream);
             }
         }
@@ -189,13 +191,15 @@ namespace IgorSoft.CloudFS.Gateways.File
             var effectiveCopyPath = GetFullPath(rootPath, Path.Combine(destinationPath, copyName));
 
             var directory = new DirectoryInfo(effectivePath);
-            if (directory.Exists) {
+            if (directory.Exists)
+            {
                 var directoryCopy = directory.CopyTo(effectiveCopyPath, recurse);
                 return new DirectoryInfoContract(GetRelativePath(rootPath, directoryCopy.FullName), directoryCopy.Name, directoryCopy.CreationTime, directoryCopy.LastWriteTime);
             }
 
             var file = new FileInfo(effectivePath);
-            if (file.Exists) {
+            if (file.Exists)
+            {
                 var fileCopy = file.CopyTo(effectiveCopyPath);
                 return new FileInfoContract(GetRelativePath(rootPath, fileCopy.FullName), fileCopy.Name, fileCopy.CreationTime, fileCopy.LastWriteTime, fileCopy.Length, null);
             }
@@ -223,13 +227,15 @@ namespace IgorSoft.CloudFS.Gateways.File
             var effectiveMovePath = GetFullPath(rootPath, Path.Combine(destinationPath, moveName));
 
             var directory = new DirectoryInfo(effectivePath);
-            if (directory.Exists) {
+            if (directory.Exists)
+            {
                 directory.MoveTo(effectiveMovePath);
                 return new DirectoryInfoContract(GetRelativePath(rootPath, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
             }
 
             var file = new FileInfo(effectivePath);
-            if (file.Exists) {
+            if (file.Exists)
+            {
                 file.MoveTo(effectiveMovePath);
                 return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
             }
@@ -276,7 +282,8 @@ namespace IgorSoft.CloudFS.Gateways.File
             if (file.Exists)
                 throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.DuplicatePath, parent.Value));
 
-            using (var fileStream = file.Create()) {
+            using (var fileStream = file.Create())
+            {
                 if (content != null)
                     content.CopyTo(fileStream);
             }
@@ -297,13 +304,15 @@ namespace IgorSoft.CloudFS.Gateways.File
             var effectivePath = GetFullPath(rootPath, target.Value);
 
             var directory = new DirectoryInfo(effectivePath);
-            if (directory.Exists) {
+            if (directory.Exists)
+            {
                 directory.Delete(recurse);
                 return;
             }
 
             var file = new FileInfo(effectivePath);
-            if (file.Exists) {
+            if (file.Exists)
+            {
                 file.Delete();
                 return;
             }
@@ -326,13 +335,15 @@ namespace IgorSoft.CloudFS.Gateways.File
             var newPath = GetFullPath(rootPath, Path.Combine(Path.GetDirectoryName(target.Value), newName));
 
             var directory = new DirectoryInfo(effectivePath);
-            if (directory.Exists) {
+            if (directory.Exists)
+            {
                 directory.MoveTo(newPath);
                 return new DirectoryInfoContract(GetRelativePath(rootPath, directory.FullName), directory.Name, directory.CreationTime, directory.LastWriteTime);
             }
 
             var file = new FileInfo(effectivePath);
-            if (file.Exists) {
+            if (file.Exists)
+            {
                 file.MoveTo(newPath);
                 return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
             }
