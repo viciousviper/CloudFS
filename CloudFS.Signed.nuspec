@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>CloudFS-Signed</id>
-    <version>1.0.3-alpha</version>
+    <version>1.0.4-alpha</version>
     <title>CloudFS-Signed</title>
     <authors>IgorSoft</authors>
     <owners>IgorSoft</owners>
@@ -15,12 +15,11 @@
     <dependencies>
         <group targetFramework="net46">
           <dependency id="Microsoft.Composition" version="[1.0.30,)" />
-          <dependency id="Newtonsoft.Json" version="[8.0.2,)" />
+          <dependency id="Newtonsoft.Json" version="[8.0.3,)" />
           <dependency id="System.Net.Http.Formatting" version="[5.2.3,)" />
           <dependency id="Box.V2" version="[2.6.2,)" />
-          <dependency id="Google.Apis.Drive.v2" version="1.10.0.1990" />
-          <dependency id="MediaFireSDK" version="[1.0.0.2,)" />
-          <dependency id="MegaApiClient" version="[1.1.3,)" />
+          <dependency id="Google.Apis.Drive.v2" version="1.12.0.455" />
+          <dependency id="MegaApiClient" version="[1.2.2,)" />
         </group>
     </dependencies>
   </metadata>
@@ -32,10 +31,12 @@
     <file src="CloudFS.GatewayTests\bin\Signed\Gateways\IgorSoft.CloudFS.Gateways.*.dll.config" target="lib\net46\Gateways" />
     <file src="SignedLibrary\bouncy_castle_hmac_sha_pcl.dll" target="lib\net46\Gateways\bouncy_castle_hmac_sha_pcl.dll" />
     <file src="SignedLibrary\CopyRestAPI.dll" target="lib\net46\Gateways\CopyRestAPI.dll" />
+    <file src="SignedLibrary\MediaFireSDK.dll" target="lib\net46\Gateways\MediaFireSDK.dll" />
     <file src="SignedLibrary\OneDriveSDK.dll" target="lib\net46\Gateways\OneDriveSDK.dll" />
     <file src="SignedLibrary\OneDriveSDK.LICENSE" target="lib\net46\Gateways\OneDriveSDK.LICENSE" />
     <file src="SignedLibrary\pCloud.NET SDK.dll" target="lib\net46\Gateways\pCloud.NET SDK.dll" />
     <file src="SignedLibrary\SemanticTypes.dll" target="lib\net46\Gateways\SemanticTypes.dll" />
+    <file src="SignedLibrary\SwiftClient.dll" target="lib\net46\Gateways\SwiftClient.dll" />
     <file src="SignedLibrary\YandexDisk.Client.dll" target="lib\net46\Gateways\YandexDisk.Client.dll" />
   </files>
 </package>
