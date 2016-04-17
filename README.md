@@ -25,11 +25,11 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | Cloud storage service                                            | API library                                                             | version    | sync/async | origin    | status |
 | :--------------------------------------------------------------- | :---------------------------------------------------------------------- | :--------: | :--------: | :-------: | :----: |
 | *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable |
-| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis](https://github.com/google/google-api-dotnet-client)       | 1.12.0.452 | async      | official  | stable |
+| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis](https://github.com/google/google-api-dotnet-client)       | 1.12.0.455 | async      | official  | stable |
 | [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.6.2      | async      | official  | stable |
 | [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 1.2.2      | async      | 3<sup>rd</sup> party | stable |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.2    | async      | 3<sup>rd</sup> party | experimental |
-| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.2.1      | async      | 3<sup>rd</sup> party | stable |
+| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.2.2      | async      | 3<sup>rd</sup> party | stable |
 | [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A        | async      | 3<sup>rd</sup> party | stable |
 | [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.7      | async      | 3<sup>rd</sup> party | stable |
 | **Degraded services**                                            |
@@ -37,7 +37,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | **Obsolete services**                                            |
 | *[Copy](https://www.copy.com/ "Copy")*<sup id="a3">[3](#f3)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* |
 
-> <sup><b id="f1">1</b></sup> Following Microsoft's November 2<sup>nd</sup>, 2015 announcement of its "[OneDrive storage plans change in pursuit of productivity and collaboration](https://blog.onedrive.com/onedrive_changes/)" the OneDrive cloud storage service will fail to meet the requirements for support in CloudFS as stated above after mid-July 2016.<br/> Despite this unprecedented and highly objectionable degradation of service quality OneDrive will continue to be supported by CloudFS for historical reasons. [^](#a1)<br/>
+> <sup><b id="f1">1</b></sup> Following Microsoft's November 2<sup>nd</sup>, 2015 announcement of its "[OneDrive storage plans change in pursuit of productivity and collaboration](https://blog.onedrive.com/onedrive_changes/)" the OneDrive cloud storage service will fail to meet the requirements for support in CloudFS as stated above after mid-July 2016.<br/> Despite this unprecedented and highly objectionable degradation of service quality, OneDrive will continue to be supported by CloudFS for historical reasons. [^](#a1)<br/>
 > <sup><b id="f2">2</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. The gateway will likely switch to [OneDrive SDK for C#](https://github.com/OneDrive/onedrive-sdk-csharp) at some point in the future. [^](#a2)<br/>
 > <sup><b id="f3">3</b></sup> The Copy cloud storage service is slated to be discontinued as of May 1<sup>st</sup> 2016 according to this [announcement](https://www.copy.com/page/home;cs_login:login;;section:plans).<br/>The Copy gateway will be retired from CloudFS at or shortly after this point in time. [^](#a3)<br/>
 
@@ -76,6 +76,7 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 | Date       | Version     | Comments                                                                       |
 | :--------- | :---------- | :----------------------------------------------------------------------------- |
+| 2016-04-17 | 1.0.4-alpha | - New gateway for hubiC/Swift added.<br/>- Version updates to API libraries for Google Drive, MEGA, and Yandex Disk.<br/>- Converted Mega gateway to Async operation mode.<br/>- Gateways now explicitely declare their capabilities in the ExportMetadata.<br/>- Improvements to login window handling if logins are requested for multiple drives.<br/>- Various bug fixes. |
 | 2016-02-01 | 1.0.3-alpha | - New gateways for MediaFire and Yandex Disk added.                            |
 | 2016-01-24 | 1.0.2-alpha | - Gateway configuration extended to accept custom parameters. This change **breaks compatibility** with earlier API versions.<br/>- File Gateway now configurable with target root directory |
 | 2016-01-19 | 1.0.1-alpha | - NuGet dependencies updated, schema of App.config in tests project refactored |
