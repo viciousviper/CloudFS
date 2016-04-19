@@ -94,6 +94,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ODItemExtensions.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="OAuth\OAuthAuthenticator.cs" />

@@ -42,7 +42,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
         private static CompositionHost InitializeHost(IEnumerable<Assembly> assemblies)
         {
-            ContainerConfiguration configuration = ConfigurationPreset ?? new ContainerConfiguration();
+            var configuration = ConfigurationPreset ?? new ContainerConfiguration();
 
             if (assemblies != null)
                 foreach (var assembly in assemblies) {

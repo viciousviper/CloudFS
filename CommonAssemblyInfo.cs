@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2015 IgorSoft
+Copyright(c) 2015-2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,23 +23,12 @@ SOFTWARE.
 */
 
 using System;
-using System.Text;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace IgorSoft.CloudFS.Authentication
-{
-    public sealed class QueryStringBuilder
-    {
-        private readonly StringBuilder builder = new StringBuilder();
+[assembly: AssemblyCompany("IgorSoft")]
+[assembly: AssemblyCopyright("Copyright © 2015-2016")]
+[assembly: AssemblyTrademark("")]
 
-        public QueryStringBuilder AppendParameter(string key, string value)
-        {
-            if (builder.Length != 0)
-                builder.Append("&");
-            builder.AppendFormat("{0}={1}", key, value);
-
-            return this;
-        }
-
-        public override string ToString() => builder.ToString();
-    }
-}
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.4.0")]

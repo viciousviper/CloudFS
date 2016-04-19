@@ -81,11 +81,11 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
-            if (root == null)
-                throw new ArgumentNullException(nameof(root));
+            var context = RequireContext(root, apiKey);
 
-            // TODO: Determine actual freeSpace and usedSpace from MEGA
-            return new DriveInfoContract(root.Value, 100000, 100000);
+            var accountInformation = await context.Client.GetAccountInformationAsync();
+
+            return new DriveInfoContract(root.Value, accountInformation.TotalQuota - accountInformation.UsedQuota, accountInformation.UsedQuota);
         }
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)

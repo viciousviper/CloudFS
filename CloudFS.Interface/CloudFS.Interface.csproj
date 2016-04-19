@@ -85,6 +85,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AsyncFunc.cs" />
     <Compile Include="Composition\ExportAsAsyncCloudGatewayAttribute.cs" />
     <Compile Include="Composition\ExportAsCloudGatewayAttribute.cs" />

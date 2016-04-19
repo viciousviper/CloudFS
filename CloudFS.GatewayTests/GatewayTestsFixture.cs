@@ -166,7 +166,12 @@ namespace IgorSoft.CloudFS.GatewayTests
 
         public void OnCondition(GatewayElement config, GatewayCapabilities capability, Action action)
         {
-            bool capabilityExcluded = config.Exclusions.HasFlag(capability);
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+            if (action == null)
+                throw new ArgumentNullException(nameof(action));
+
+            var capabilityExcluded = config.Exclusions.HasFlag(capability);
 
             try {
                 action();

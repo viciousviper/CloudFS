@@ -93,6 +93,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="OAuth\Authenticator.cs" />
     <Compile Include="OAuth\RefreshTokenSetting.cs" />
     <Compile Include="pCloudGateway.cs" />

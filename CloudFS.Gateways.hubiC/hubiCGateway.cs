@@ -72,7 +72,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             }
         }
 
-        private IDictionary<RootName, hubiCContext> contextCache = new Dictionary<RootName, hubiCContext>();
+        private readonly IDictionary<RootName, hubiCContext> contextCache = new Dictionary<RootName, hubiCContext>();
 
         private async Task<hubiCContext> RequireContext(RootName root, string apiKey = null, string container = DEFAULT_CONTAINER)
         {

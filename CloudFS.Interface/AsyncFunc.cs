@@ -58,6 +58,9 @@ namespace IgorSoft.CloudFS.Interface
         public static async Task<TResult> Retry<TResult, TException>(this Func<Task<TResult>> taskFactory, int retries)
             where TException : Exception
         {
+            if (taskFactory == null)
+                throw new ArgumentNullException(nameof(taskFactory));
+
             var exceptions = new List<TException>();
             do {
                 try {

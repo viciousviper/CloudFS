@@ -36,7 +36,7 @@ namespace IgorSoft.CloudFS.Interface
     {
         private const string rootNamePattern = @"^(?<Schema>[a-z]+)(@(?<UserName>[_a-zA-Z0-9]+))?(\|(?<Root>.+))?$";
 
-        private static Regex validationRegex = new Regex(rootNamePattern, RegexOptions.Compiled);
+        private static readonly Regex validationRegex = new Regex(rootNamePattern, RegexOptions.Compiled);
 
         public string Schema { get; }
 
@@ -44,12 +44,12 @@ namespace IgorSoft.CloudFS.Interface
 
         public string Root { get; }
 
-        public RootName(string name) : base(n => validationRegex.IsMatch(n), name)
+        public RootName(string name) : base(validationRegex.IsMatch, name)
         {
             var groups = validationRegex.Match(name).Groups;
-            Schema = groups["Schema"].Value;
-            UserName = groups["UserName"].Value;
-            Root = groups["Root"].Value;
+            Schema = groups[nameof(Schema)].Value;
+            UserName = groups[nameof(UserName)].Value;
+            Root = groups[nameof(Root)].Value;
         }
 
         public RootName(string schema, string userName, string root) : this(Format(schema, userName, root))

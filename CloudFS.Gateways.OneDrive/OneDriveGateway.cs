@@ -67,7 +67,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             }
         }
 
-        private IDictionary<RootName, OneDriveContext> contextCache = new Dictionary<RootName, OneDriveContext>();
+        private readonly IDictionary<RootName, OneDriveContext> contextCache = new Dictionary<RootName, OneDriveContext>();
 
         private async Task<OneDriveContext> RequireContext(RootName root, string apiKey = null)
         {

@@ -70,7 +70,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
             }
         }
 
-        private IDictionary<RootName, BoxContext> contextCache = new Dictionary<RootName, BoxContext>();
+        private readonly IDictionary<RootName, BoxContext> contextCache = new Dictionary<RootName, BoxContext>();
 
         private async Task<BoxContext> RequireContext(RootName root, string apiKey = null)
         {

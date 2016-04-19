@@ -68,7 +68,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             }
         }
 
-        private IDictionary<RootName, pCloudContext> contextCache = new Dictionary<RootName, pCloudContext>();
+        private readonly IDictionary<RootName, pCloudContext> contextCache = new Dictionary<RootName, pCloudContext>();
 
         private async Task<pCloudContext> RequireContext(RootName root, string apiKey = null)
         {
@@ -240,6 +240,9 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         public async Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
+            if (locatorResolver == null)
+                throw new ArgumentNullException(nameof(locatorResolver));
+
             var context = await RequireContext(root);
 
             var directoryTarget = target as DirectoryId;

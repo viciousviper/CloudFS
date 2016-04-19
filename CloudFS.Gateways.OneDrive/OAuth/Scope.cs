@@ -33,7 +33,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
         Basic,
         [Description("wl.offline_access")]
         OfflineAccess,
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "Signin")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = nameof(Signin))]
         [Description("wl.signin")]
         Signin,
         [Description("onedrive.readwrite")]

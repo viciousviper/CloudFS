@@ -117,6 +117,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="CompositionInitializer.cs" />
     <Compile Include="Config\ConfigStringExtensions.cs" />
     <Compile Include="Config\GatewayType.cs" />

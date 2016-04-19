@@ -36,11 +36,11 @@ namespace IgorSoft.CloudFS.Authentication
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         protected static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+        private readonly EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
 
         private Window window;
 
-        private SynchronizationContext synchonizationContext;
+        private readonly SynchronizationContext synchonizationContext;
 
         protected LogOnBase(SynchronizationContext synchonizationContext)
         {

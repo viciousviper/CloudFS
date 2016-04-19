@@ -73,6 +73,11 @@ artifacts/
 # Override for included library files
 !**/Library/*.dll
 !**/Library/*.pdb
+**/SignedLibrary/*.dll
+**/SignedLibrary/*.pdb
+
+# Override for distribution files
+**/Distribution/*
 
 # Chutzpah Test files
 _Chutzpah*
