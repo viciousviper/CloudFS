@@ -203,6 +203,9 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
         {
+            if (content.Length == 0)
+                return new ProxyFileInfoContract(name);
+
             var context = await RequireContext(root);
 
             var request = new ResourceRequest() { Path = parent.Value.TrimEnd('/') + '/' + name };

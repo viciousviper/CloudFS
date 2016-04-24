@@ -98,6 +98,7 @@
     <Compile Include="IO\DirectoryId.cs" />
     <Compile Include="IO\DriveId.cs" />
     <Compile Include="IO\FileId.cs" />
+    <Compile Include="IO\ProxyFileInfoContract.cs" />
     <Compile Include="IO\FileSystemId.cs" />
     <Compile Include="IO\FileSystemInfoLocator.cs" />
     <Compile Include="IO\ProgressStream.cs" />

@@ -28,31 +28,14 @@ using System.Globalization;
 namespace IgorSoft.CloudFS.Interface.IO
 {
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public class FileInfoContract : FileSystemInfoContract
+    public sealed class ProxyFileInfoContract : FileInfoContract
     {
-        public new FileId Id => (FileId)base.Id;
-
-        public DirectoryInfoContract Directory { get; set; }
-
-        public override string FullName => (Directory?.FullName ?? string.Empty) + Name;
-
-        public override string Mode => "-----";
-
-        public long Size { get; set; }
-
-        public string Hash { get; }
-
-        public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, long size, string hash) : base(new FileId(id), name, created, updated)
+        public ProxyFileInfoContract(string name) : base("PROXY", name, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0), 0, null)
         {
-            if (size < 0)
-                throw new ArgumentException(nameof(size));
-
-            Size = size;
-            Hash = hash;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(FileInfoContract)} {Id} ({Name})".ToString(CultureInfo.CurrentCulture);
+        private string DebuggerDisplay() => $"{nameof(ProxyFileInfoContract)} {Name}".ToString(CultureInfo.CurrentCulture);
     }
 }

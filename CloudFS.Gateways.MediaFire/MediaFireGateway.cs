@@ -281,6 +281,9 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
         {
+            if (content.Length == 0)
+                return new ProxyFileInfoContract(name);
+
             var context = await RequireContext(root);
 
             var config = await context.Agent.Upload.GetUploadConfiguration(name, content.Length, parent.Value, MediaFireActionOnDuplicate.Skip);

@@ -211,6 +211,9 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
         {
+            if (content.Length == 0)
+                return new ProxyFileInfoContract(name);
+
             var context = await RequireContext(root);
 
             var stream = progress != null ? new ProgressStream(content, progress) : content;

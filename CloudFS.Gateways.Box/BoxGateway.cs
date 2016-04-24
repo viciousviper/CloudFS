@@ -196,6 +196,9 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
         {
+            if (content.Length == 0)
+                return new ProxyFileInfoContract(name);
+
             var context = await RequireContext(root);
 
             var request = new BoxFileRequest() { Name = name, Parent = new BoxRequestEntity() { Id = parent.Value } };

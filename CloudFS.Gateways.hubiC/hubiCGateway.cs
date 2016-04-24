@@ -192,6 +192,9 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
         {
+            if (content.Length == 0)
+                return new ProxyFileInfoContract(name);
+
             var context = await RequireContext(root);
 
             var objectId = parent.GetObjectId(name);
