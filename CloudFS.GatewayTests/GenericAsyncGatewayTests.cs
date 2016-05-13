@@ -169,10 +169,10 @@ namespace IgorSoft.CloudFS.GatewayTests
                 using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
+                    var testFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
+
                     fixture.OnCondition(config, GatewayCapabilities.GetContent, () =>
                     {
-                        var testFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
-
                         using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
                             Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
                         }
@@ -193,10 +193,37 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.SetContent, () =>
                     {
-                        gateway.SetContentAsync(rootName, testFile.Id, new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
+                        gateway.SetContentAsync(rootName, testFile.Id, smallContent.ToStream(), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
 
                         using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
                             Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        }
+                    });
+                }
+            });
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void SetContentAsync_AfterGetContentAsync_ExecutesSet()
+        {
+            fixture.ExecuteByConfiguration((gateway, rootName, config) => {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                    gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
+
+                    var testFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
+                    testFile.Directory = testDirectory.ToContract();
+
+                    fixture.OnCondition(config, GatewayCapabilities.SetContent, () =>
+                    {
+                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
+                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched initial content");
+                        }
+
+                        var changedContent = new string(smallContent.Reverse().ToArray());
+                        gateway.SetContentAsync(rootName, testFile.Id, changedContent.ToStream(), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
+
+                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
+                            Assert.AreEqual(changedContent, new StreamReader(result).ReadToEnd(), "Mismatched updated content");
                         }
                     });
                 }
@@ -240,7 +267,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
                     var directoryOriginal = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Directory").Result;
-                    var fileOriginal = gateway.NewFileItemAsync(rootName, directoryOriginal.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, directoryOriginal.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
 
                     fixture.OnCondition(config, GatewayCapabilities.CopyDirectoryItem, () =>
                     {
@@ -268,7 +295,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
                     var directoryOriginal = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Directory").Result;
-                    var fileOriginal = gateway.NewFileItemAsync(rootName, directoryOriginal.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, directoryOriginal.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
                     var directoryTarget = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Target").Result;
 
                     fixture.OnCondition(config, GatewayCapabilities.CopyDirectoryItem, () =>
@@ -297,7 +324,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
-                    var fileOriginal = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
 
                     fixture.OnCondition(config, GatewayCapabilities.CopyFileItem, () =>
                     {
@@ -321,7 +348,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
-                    var fileOriginal = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
                     var directoryTarget = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Target").Result;
 
                     fixture.OnCondition(config, GatewayCapabilities.CopyFileItem, () =>
@@ -350,7 +377,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     var directoryOriginal = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Directory").Result;
                     directoryOriginal.Parent = testDirectory.ToContract();
                     var directoryTarget = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "DirectoryTarget").Result;
-                    var fileOriginal = gateway.NewFileItemAsync(rootName, directoryOriginal.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, directoryOriginal.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
 
                     fixture.OnCondition(config, GatewayCapabilities.MoveDirectoryItem, () =>
                     {
@@ -383,7 +410,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     var directoryTarget = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "DirectoryTarget").Result;
                     directoryTarget.Parent = testDirectory.ToContract();
-                    var fileOriginal = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var fileOriginal = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
 
                     fixture.OnCondition(config, GatewayCapabilities.MoveFileItem, () =>
                     {
@@ -431,7 +458,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
                     {
-                        var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                        var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
 
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                         Assert.AreEqual(1, items.Count(i => i.Name == "File.ext"), "Expected file is missing");
@@ -481,7 +508,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
                     var directory = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, "Directory").Result;
-                    gateway.NewFileItemAsync(rootName, directory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Wait();
+                    gateway.NewFileItemAsync(rootName, directory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Wait();
 
                     fixture.OnCondition(config, GatewayCapabilities.RemoveItem, () =>
                     {
@@ -501,7 +528,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
-                    var file = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var file = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
 
                     fixture.OnCondition(config, GatewayCapabilities.RemoveItem, () =>
                     {
@@ -543,7 +570,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
                     gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
 
-                    var file = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(Encoding.ASCII.GetBytes(smallContent)), fixture.GetProgressReporter()).Result;
+                    var file = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter()).Result;
                     file.Directory = testDirectory.ToContract();
 
                     fixture.OnCondition(config, GatewayCapabilities.RenameFileItem, () =>
