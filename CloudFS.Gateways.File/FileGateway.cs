@@ -164,9 +164,24 @@ namespace IgorSoft.CloudFS.Gateways.File
             var effectivePath = GetFullPath(rootPath, target.Value);
 
             var file = new FileInfo(effectivePath);
-            using (var stream = file.OpenWrite()) {
+            //using (var stream = file.OpenWrite()) {
+            //    content.CopyTo(stream);
+            //}
+
+            // HACK: Retry opening the FileStream once if an IOException with HResult == 0x80070020 is thrown.
+            //
+            var fileStream = default(FileStream);
+            try {
+                fileStream = file.OpenWrite();
+            } catch (IOException ex) when ((uint)ex.HResult == 0x80070020) {
+                System.Threading.Thread.Yield();
+            }
+
+            using (var stream = fileStream ?? file.OpenWrite()) {
                 content.CopyTo(stream);
             }
+            //
+            // END HACK
         }
 
         public FileSystemInfoContract CopyItem(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
