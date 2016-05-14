@@ -174,7 +174,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             try {
                 fileStream = file.OpenWrite();
             } catch (IOException ex) when ((uint)ex.HResult == 0x80070020) {
-                System.Threading.Thread.Yield();
+                System.Threading.Thread.Sleep(1);
             }
 
             using (var stream = fileStream ?? file.OpenWrite()) {
