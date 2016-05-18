@@ -30,7 +30,6 @@
     <file src="CloudFS.GatewayTests\bin\Signed\Gateways\IgorSoft.CloudFS.Gateways.*.dll" target="lib\net46\Gateways" />
     <file src="CloudFS.GatewayTests\bin\Signed\Gateways\IgorSoft.CloudFS.Gateways.*.dll.config" target="lib\net46\Gateways" />
     <file src="SignedLibrary\bouncy_castle_hmac_sha_pcl.dll" target="lib\net46\Gateways\bouncy_castle_hmac_sha_pcl.dll" />
-    <file src="SignedLibrary\CopyRestAPI.dll" target="lib\net46\Gateways\CopyRestAPI.dll" />
     <file src="SignedLibrary\MediaFireSDK.dll" target="lib\net46\Gateways\MediaFireSDK.dll" />
     <file src="SignedLibrary\OneDriveSDK.dll" target="lib\net46\Gateways\OneDriveSDK.dll" />
     <file src="SignedLibrary\OneDriveSDK.LICENSE" target="lib\net46\Gateways\OneDriveSDK.LICENSE" />
