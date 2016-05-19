@@ -75,15 +75,16 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 ## Release Notes
 
-| Date       | Version     | Comments                                                                       |
-| :--------- | :---------- | :----------------------------------------------------------------------------- |
-| 2016-05-18 | 1.0.5-alpha | - Retired gateway for Cloud<br/>- Version update to API library for Google Drive<br/>- Support for Windows Explorer new file creation sequence in MEGA<br/>- Improved online editing capability in non-encrypting File gateway
-| 2016-04-17 | 1.0.4-alpha | - New gateway for hubiC/Swift added.<br/>- Version updates to API libraries for Google Drive, MEGA, and Yandex Disk.<br/>- Converted Mega gateway to Async operation mode.<br/>- Gateways now explicitely declare their capabilities in the ExportMetadata.<br/>- Improvements to login window handling if logins are requested for multiple drives.<br/>- Various bug fixes. |
-| 2016-02-01 | 1.0.3-alpha | - New gateways for MediaFire and Yandex Disk added.                            |
-| 2016-01-24 | 1.0.2-alpha | - Gateway configuration extended to accept custom parameters. This change **breaks compatibility** with earlier API versions.<br/>- File Gateway now configurable with target root directory |
-| 2016-01-19 | 1.0.1-alpha | - NuGet dependencies updated, schema of App.config in tests project refactored |
-| 2016-01-08 | 1.0.0-alpha | - Initial release and NuGet registration                                       |
-| 2015-12-29 | 1.0.0.0     | - Initial commit                                                               |
+| Date       | Version       | Comments                                                                       |
+| :--------- | :------------ | :----------------------------------------------------------------------------- |
+| 2016-05-20 | 1.0.5.1-alpha | - Fixed broken package references in NuGet specs (present since 1.0.3-alpha)<br/>- Version update to API library for Box |
+| 2016-05-18 | 1.0.5-alpha   | - Retired gateway for Cloud<br/>- Version update to API library for Google Drive<br/>- Support for Windows Explorer new file creation sequence in MEGA<br/>- Improved online editing capability in non-encrypting File gateway
+| 2016-04-17 | 1.0.4-alpha   | - New gateway for hubiC/Swift added.<br/>- Version updates to API libraries for Google Drive, MEGA, and Yandex Disk.<br/>- Converted Mega gateway to Async operation mode.<br/>- Gateways now explicitely declare their capabilities in the ExportMetadata.<br/>- Improvements to login window handling if logins are requested for multiple drives.<br/>- Various bug fixes. |
+| 2016-02-01 | 1.0.3-alpha   | - New gateways for MediaFire and Yandex Disk added.                            |
+| 2016-01-24 | 1.0.2-alpha   | - Gateway configuration extended to accept custom parameters. This change **breaks compatibility** with earlier API versions.<br/>- File Gateway now configurable with target root directory |
+| 2016-01-19 | 1.0.1-alpha   | - NuGet dependencies updated, schema of App.config in tests project refactored |
+| 2016-01-08 | 1.0.0-alpha   | - Initial release and NuGet registration                                       |
+| 2015-12-29 | 1.0.0.0       | - Initial commit                                                               |
 
 ## Future plans
 

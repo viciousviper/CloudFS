@@ -2,22 +2,28 @@
 <package >
   <metadata>
     <id>CloudFS-Signed</id>
-    <version>1.0.5-alpha</version>
+    <version>1.0.5.1-alpha</version>
     <title>CloudFS-Signed</title>
     <authors>IgorSoft</authors>
     <owners>IgorSoft</owners>
     <projectUrl>https://github.com/viciousviper/CloudFS</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The CloudFS library is a collection of .NET assemblies as gateways to various publicly accessible Cloud storage services.</description>
-    <releaseNotes>Gateway configuration extended to accept custom parameters. File Gateway now configurable with target root directory</releaseNotes>
+    <releaseNotes>
+      - Fixed broken package references in NuGet specs (present since 1.0.3-alpha)
+      - Retired gateway for Cloud
+      - Version updates to API libraries for Box, Google Drive
+      - Support for Windows Explorer new file creation sequence in MEGA
+      - Improved online editing capability in non-encrypting File gateway
+    </releaseNotes>
     <copyright>Copyright © 2016</copyright>
-	<tags>Cloud Filesystem Box Copy GoogleDrive hubiC MediaFire Mega OneDrive pCloud Swift YandexDisk</tags>
+	<tags>Cloud Filesystem Box GoogleDrive hubiC MediaFire Mega OneDrive pCloud Swift YandexDisk</tags>
     <dependencies>
         <group targetFramework="net46">
           <dependency id="Microsoft.Composition" version="[1.0.30,)" />
+          <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.3,)" />
           <dependency id="Newtonsoft.Json" version="[8.0.3,)" />
-          <dependency id="System.Net.Http.Formatting" version="[5.2.3,)" />
-          <dependency id="Box.V2" version="[2.6.2,)" />
+          <dependency id="Box.V2" version="[2.7.0,)" />
           <dependency id="Google.Apis.Drive.v2" version="1.13.0.483" />
           <dependency id="MegaApiClient" version="[1.2.2,)" />
         </group>
