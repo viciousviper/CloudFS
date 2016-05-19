@@ -203,7 +203,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             });
         }
 
-        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        [TestMethod, TestCategory(nameof(TestCategories.Online)), Timeout(300000)]
         public void SetContent_WhereContentIsLarge_ExecutesSet()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
@@ -444,7 +444,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             });
         }
 
-        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        [TestMethod, TestCategory(nameof(TestCategories.Online)), Timeout(300000)]
         public void NewFileItem_WhereContentIsLarge_CreatesFile()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
