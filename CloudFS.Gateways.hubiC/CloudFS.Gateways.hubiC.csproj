@@ -42,6 +42,9 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
+    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
+    <AssemblyOriginatorKeyFile>..\..\..\IgorSoft\IgorSoft.OpenSource.snk.pfx</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <Choose>
     <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
