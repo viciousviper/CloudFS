@@ -64,24 +64,34 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             }
         }
 
-        private IDictionary<RootName, MegaContext> contextCache = new Dictionary<RootName, MegaContext>();
+        private readonly IDictionary<RootName, MegaContext> contextCache = new Dictionary<RootName, MegaContext>();
 
-        private MegaContext RequireContext(RootName root, string apiKey = null)
+        private async Task<MegaContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
             var result = default(MegaContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = Authenticator.Login(root.UserName, apiKey);
+                var client = await Authenticator.LoginAsync(root.UserName, apiKey);
                 contextCache.Add(root, result = new MegaContext(client));
             }
             return result;
         }
 
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        {
+            try {
+                await RequireContextAsync(root, apiKey);
+                return true;
+            } catch (Exception) {
+                return false;
+            }
+        }
+
         public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
-            var context = RequireContext(root, apiKey);
+            var context = await RequireContextAsync(root, apiKey);
 
             var accountInformation = await context.Client.GetAccountInformationAsync();
 
@@ -90,7 +100,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
         {
-            var context = RequireContext(root, apiKey);
+            var context = await RequireContextAsync(root, apiKey);
 
             var nodes = await context.Client.GetNodesAsync();
             var item = nodes.Single(n => n.Type == NodeType.Root);
@@ -100,7 +110,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
         {
-            var context = RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var nodes = await context.Client.GetNodesAsync();
             var parentItem = nodes.Single(n => n.Id == parent.Value);
@@ -116,7 +126,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
         {
-            var context = RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var nodes = await context.Client.GetNodesAsync();
             var item = nodes.Single(n => n.Id == source.Value);
@@ -137,7 +147,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var nodes = await context.Client.GetNodesAsync();
             var sourceItem = nodes.Single(n => n.Id == source.Value);
@@ -151,7 +161,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
         {
-            var context = RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var nodes = await context.Client.GetNodesAsync();
             var parentItem = nodes.Single(n => n.Id == parent.Value);
@@ -165,7 +175,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             if (content.Length == 0)
                 return new ProxyFileInfoContract(name);
 
-            var context = RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var nodes = await context.Client.GetNodesAsync();
             var parentItem = nodes.Single(n => n.Id == parent.Value);
@@ -177,7 +187,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
         {
-            var context = RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var nodes = await context.Client.GetNodesAsync();
             var item = nodes.Single(n => n.Id == target.Value);

@@ -30,7 +30,7 @@ using System.Windows;
 
 namespace IgorSoft.CloudFS.Authentication
 {
-    public abstract class LogOnBase
+    public abstract class LogOnBase : IDisposable
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -88,6 +88,12 @@ namespace IgorSoft.CloudFS.Authentication
         {
             var handler = Authenticated;
             synchonizationContext.Post(state => handler?.Invoke(this, (AuthenticatedEventArgs)state), new AuthenticatedEventArgs(parameters));
+        }
+
+        public void Dispose()
+        {
+            waitHandle.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public event EventHandler<AuthenticatedEventArgs> Authenticated;

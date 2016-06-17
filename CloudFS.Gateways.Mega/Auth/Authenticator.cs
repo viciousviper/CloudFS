@@ -26,6 +26,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 using CG.Web.MegaApiClient;
 using IgorSoft.CloudFS.Authentication;
 
@@ -43,7 +44,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
                     if (setting.Account == account)
                         return new MegaApiClient.AuthInfos(setting.EMail, setting.Hash, setting.PasswordAesKey);
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, MegaApiClient.AuthInfos refreshToken)
@@ -78,7 +79,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
             return authCode;
         }
 
-        public static MegaApiClient Login(string account, string code)
+        public static async Task<MegaApiClient> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
@@ -88,7 +89,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
             var refreshToken = LoadRefreshToken(account);
 
             if (refreshToken != null) {
-                client.Login(refreshToken);
+                await client.LoginAsync(refreshToken);
             } else {
                 if (string.IsNullOrEmpty(code))
                     code = GetAuthCode(account);

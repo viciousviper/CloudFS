@@ -68,26 +68,36 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             }
         }
 
-        private IDictionary<RootName, MediaFireContext> contextCache = new Dictionary<RootName, MediaFireContext>();
+        private readonly IDictionary<RootName, MediaFireContext> contextCache = new Dictionary<RootName, MediaFireContext>();
 
-        private async Task<MediaFireContext> RequireContext(RootName root, string apiKey = null)
+        private async Task<MediaFireContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
             var result = default(MediaFireContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var agent = await Authenticator.Login(root.UserName, apiKey);
+                var agent = await Authenticator.LoginAsync(root.UserName, apiKey);
                 contextCache.Add(root, result = new MediaFireContext(agent));
             }
             return result;
         }
 
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        {
+            try {
+                await RequireContextAsync(root, apiKey);
+                return true;
+            } catch (Exception) {
+                return false;
+            }
+        }
+
         public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
-            var context = await RequireContext(root, apiKey);
+            var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.Retry<MediaFireGetUserInfoResponse, MediaFireApiException>(async ()
+            var item = await AsyncFunc.RetryAsync<MediaFireGetUserInfoResponse, MediaFireApiException>(async ()
                 => await context.Agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo), RETRIES);
 
             return new DriveInfoContract(item.UserDetails.Email, item.UserDetails.StorageLimit - item.UserDetails.UsedStorageSize, item.UserDetails.UsedStorageSize);
@@ -95,7 +105,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var item = await context.Agent.GetAsync<MediaFireGetFolderInfoResponse>(MediaFireApiFolderMethods.GetInfo);
 
@@ -104,7 +114,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var foldersItem = await context.Agent.GetAsync<MediaFireGetContentResponse>(MediaFireApiFolderMethods.GetContent, new Dictionary<string, object>() {
                 { MediaFireApiParameters.FolderKey, parent.Value },
@@ -126,7 +136,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var links = await context.Agent.GetAsync<MediaFireGetLinksResponse>(MediaFireApiFileMethods.GetLinks, new Dictionary<string, object>() {
                 { MediaFireApiParameters.QuickKey, source.Value },
@@ -149,7 +159,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             if (locatorResolver == null)
                 throw new ArgumentNullException(nameof(locatorResolver));
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var locator = locatorResolver();
             var config = await context.Agent.Upload.GetUploadConfiguration(locator.Name, content.Length, locator.ParentId.Value, MediaFireActionOnDuplicate.Skip);
@@ -180,7 +190,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             if (source is DirectoryId) {
                 //TODO: Fix code for copying of directories
@@ -228,7 +238,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             if (source is DirectoryId) {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Move, new Dictionary<string, object>() {
@@ -269,7 +279,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var item = await context.Agent.GetAsync<MediaFireCreateFolderResponse>(MediaFireApiFolderMethods.Create, new Dictionary<string, object>() {
                 { MediaFireApiParameters.ParentKey, parent.Value },
@@ -284,7 +294,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             if (content.Length == 0)
                 return new ProxyFileInfoContract(name);
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var config = await context.Agent.Upload.GetUploadConfiguration(name, content.Length, parent.Value, MediaFireActionOnDuplicate.Skip);
             var mediaFireProgress = progress != null ? new Progress<MediaFireOperationProgress>(p => progress.Report(new ProgressValue((int)p.CurrentSize, (int)p.TotalSize))) : null;
@@ -303,7 +313,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             if (target is DirectoryId) {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Delete, new Dictionary<string, object>() {
@@ -320,7 +330,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public async Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             if (target is DirectoryId) {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Update, new Dictionary<string, object>() {

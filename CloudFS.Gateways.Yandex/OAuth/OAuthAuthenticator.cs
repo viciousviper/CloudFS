@@ -50,7 +50,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
                     if (setting.Account == account)
                         return setting.Token;
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, string refreshToken)
@@ -95,7 +95,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
             return oauth_token;
         }
 
-        public static Task<IDiskApi> Login(string account, string code)
+        public static Task<IDiskApi> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));

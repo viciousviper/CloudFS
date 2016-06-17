@@ -74,17 +74,27 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         private readonly IDictionary<RootName, hubiCContext> contextCache = new Dictionary<RootName, hubiCContext>();
 
-        private async Task<hubiCContext> RequireContext(RootName root, string apiKey = null, string container = DEFAULT_CONTAINER)
+        private async Task<hubiCContext> RequireContextAsync(RootName root, string apiKey = null, string container = DEFAULT_CONTAINER)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
             var result = default(hubiCContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await OAuthAuthenticator.Login(root.UserName, apiKey);
+                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
                 contextCache.Add(root, result = new hubiCContext(client, container));
             }
             return result;
+        }
+
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        {
+            try {
+                await RequireContextAsync(root, apiKey);
+                return true;
+            } catch (Exception) {
+                return false;
+            }
         }
 
         public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
@@ -92,7 +102,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var container = default(string);
             parameters?.TryGetValue(PARAMETER_CONTAINER, out container);
 
-            var context = await RequireContext(root, apiKey, container);
+            var context = await RequireContextAsync(root, apiKey, container);
 
             var item = await context.Client.GetAccount();
 
@@ -103,7 +113,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
         {
-            var context = await RequireContext(root, apiKey);
+            var context = await RequireContextAsync(root, apiKey);
 
             var accessToken = context.Client.RetryManager.AuthManager.Credentials.Password;
             var item = hubiCInfo.QueryData<hubiCAccount>(hubiCInfo.AccountUri, accessToken);
@@ -113,7 +123,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var queryParameters = new Dictionary<string, string>();
             if (parent.Value != "/")
@@ -128,7 +138,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var response = await context.Client.PutObject(context.Container, target.Value, Array.Empty<byte>());
 
@@ -137,7 +147,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var item = await context.Client.GetObject(context.Container, source.Value);
 
@@ -146,7 +156,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var stream = progress != null ? new ProgressStream(content, progress) : content;
             var item = await context.Client.PutObject(context.Container, target.Value, stream);
@@ -156,7 +166,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             if (source is DirectoryId)
                 throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
@@ -178,7 +188,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var objectId = parent.GetObjectId(name);
 
@@ -195,7 +205,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             if (content.Length == 0)
                 return new ProxyFileInfoContract(name);
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var objectId = parent.GetObjectId(name);
             var length = content.Length;
@@ -211,7 +221,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var response = default(SwiftResponse);
             if (target is DirectoryId && recurse) {

@@ -44,7 +44,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
                     if (setting.Account == account)
                         return setting.RefreshToken;
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, string refreshToken)
@@ -79,7 +79,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
             return authCode;
         }
 
-        public static async Task<pCloudClient> Login(string account, string code)
+        public static async Task<pCloudClient> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));

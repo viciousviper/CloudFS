@@ -76,7 +76,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                     if (setting.Account == account)
                         return setting.RefreshToken;
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, string refreshToken)
@@ -118,7 +118,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             queryStringBuilder.Add(Parameters.Code, code);
             queryStringBuilder.Add(Parameters.GrantType, GrantTypes.AuthorizationCode);
 
-            var response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
+            var response = await PostQueryAsync(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
@@ -132,12 +132,12 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             queryStringBuilder.Add(Parameters.RefreshToken, refreshToken);
             queryStringBuilder.Add(Parameters.GrantType, GrantTypes.RefreshToken);
 
-            var response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
+            var response = await PostQueryAsync(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
 
-        private static async Task<string> PostQuery(string uriString, string queryString)
+        private static async Task<string> PostQueryAsync(string uriString, string queryString)
         {
             var httpWebRequest = WebRequest.CreateHttp(uriString);
             httpWebRequest.Method = "POST";
@@ -172,7 +172,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             return authCode;
         }
 
-        public static async Task<ODConnection> Login(string account, string code)
+        public static async Task<ODConnection> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));

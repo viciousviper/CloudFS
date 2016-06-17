@@ -47,7 +47,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
                     if (setting.Account == account)
                         return new Tuple<string, string>(setting.Token, setting.TokenSecret);
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, Tuple<string, string> refreshToken)
@@ -95,7 +95,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
             return new Tuple<string, string>(parts[0], parts.Length == 2 ? parts[1] : string.Empty);
         }
 
-        public static async Task<CopyClient> Login(string account, string code)
+        public static async Task<CopyClient> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));

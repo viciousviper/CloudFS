@@ -46,7 +46,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                     if (setting.Account == account)
                         return setting.RefreshToken;
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, string refreshToken)
@@ -69,7 +69,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
         private static readonly System.Reflection.BindingFlags nonPublicInstance = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
 
-        private static async Task<string> RefreshSessionToken(IMediaFireAgent agent, string refreshToken)
+        private static async Task<string> RefreshSessionTokenAsync(IMediaFireAgent agent, string refreshToken)
         {
             // Workaround for non-public token refresh functionality in MediaFireSDK
 
@@ -104,7 +104,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             return authCode;
         }
 
-        public static async Task<MediaFireAgent> Login(string account, string code)
+        public static async Task<MediaFireAgent> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
@@ -114,7 +114,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             var refreshToken = LoadRefreshToken(account);
 
             if (refreshToken != null)
-                refreshToken = await RefreshSessionToken(agent, refreshToken);
+                refreshToken = await RefreshSessionTokenAsync(agent, refreshToken);
 
             if (refreshToken == null) {
                 if (string.IsNullOrEmpty(code))
