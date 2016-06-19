@@ -23,20 +23,13 @@ SOFTWARE.
 */
 
 using System;
-using System.ComponentModel;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
+namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 {
-    public enum Scope
+    internal static class Secrets
     {
-        [Description("wl.basic")]
-        Basic,
-        [Description("wl.offline_access")]
-        OfflineAccess,
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = nameof(Signin))]
-        [Description("wl.signin")]
-        Signin,
-        [Description("onedrive.readwrite")]
-        OneDriveReadWrite
+        public const string CLIENT_ID = "<Insert client ID here>";
+
+        public const string CLIENT_SECRET = "<Insert client secret here>";
     }
 }

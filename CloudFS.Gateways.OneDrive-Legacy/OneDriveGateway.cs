@@ -32,9 +32,9 @@ using OneDrive;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.Gateways.OneDrive.OAuth;
+using IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive
+namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 {
     [ExportAsAsyncCloudGateway("OneDrive")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), OneDriveGateway.SCHEMA)]

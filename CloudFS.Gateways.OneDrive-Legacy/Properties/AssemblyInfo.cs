@@ -23,13 +23,15 @@ SOFTWARE.
 */
 
 using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive
-{
-    internal static class Secrets
-    {
-        public const string CLIENT_ID = "<Insert client ID here>";
+[assembly: AssemblyTitle("CloudFS.OneDrive-Legacy")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyProduct("CloudFS.OneDrive-Legacy")]
+[assembly: AssemblyCulture("")]
 
-        public const string CLIENT_SECRET = "<Insert client secret here>";
-    }
-}
+[assembly: ComVisible(false)]
+
+[assembly: CLSCompliant(true)]

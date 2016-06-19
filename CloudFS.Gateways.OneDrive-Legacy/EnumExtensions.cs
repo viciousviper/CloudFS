@@ -23,13 +23,21 @@ SOFTWARE.
 */
 
 using System;
+using System.Linq;
+using System.ComponentModel;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
+namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 {
-    public class RefreshTokenSetting
+    internal static class EnumExtensions
     {
-        public string Account { get; set; }
+        public static string GetDescription(this Enum value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
 
-        public string RefreshToken { get; set; }
+            var fi = value.GetType().GetField(value.ToString());
+            var attribute = (DescriptionAttribute)fi.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault();
+            return attribute != null ? attribute.Description : value.ToString();
+        }
     }
 }

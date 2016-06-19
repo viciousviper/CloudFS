@@ -35,7 +35,7 @@ using static IgorSoft.CloudFS.Authentication.OAuth.Constants;
 using Newtonsoft.Json;
 using OneDrive;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
+namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth
 {
     internal static class OAuthAuthenticator
     {

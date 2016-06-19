@@ -23,15 +23,20 @@ SOFTWARE.
 */
 
 using System;
-using OneDrive;
-using IgorSoft.CloudFS.Interface.IO;
+using System.ComponentModel;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive
+namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth
 {
-    internal static class ODItemExtensions
+    public enum Scope
     {
-        public static FileSystemInfoContract ToFileSystemInfoContract(this ODItem item) => item.CanHaveChildren()
-                ? new DirectoryInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime, item.Size, item.File.Hashes.Sha1.ToLowerInvariant()) as FileSystemInfoContract;
+        [Description("wl.basic")]
+        Basic,
+        [Description("wl.offline_access")]
+        OfflineAccess,
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = nameof(Signin))]
+        [Description("wl.signin")]
+        Signin,
+        [Description("onedrive.readwrite")]
+        OneDriveReadWrite
     }
 }
