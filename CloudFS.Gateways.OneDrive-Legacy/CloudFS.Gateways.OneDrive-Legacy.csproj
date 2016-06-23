@@ -52,9 +52,8 @@
   <Choose>
     <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
       <ItemGroup>
-        <Reference Include="OneDriveSDK, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <SpecificVersion>False</SpecificVersion>
-          <HintPath>..\Library\OneDriveSDK.dll</HintPath>
+        <Reference Include="OneDriveSDK-Legacy">
+          <HintPath>..\Library\OneDriveSDK-Legacy.dll</HintPath>
         </Reference>
         <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>..\packages\SemanticTypes.0.12.0\lib\net35\SemanticTypes.dll</HintPath>
@@ -127,7 +126,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -144,14 +145,14 @@
   <PropertyGroup>
     <PostBuildEvent>
 if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll OneDriveSDK.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
+for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll OneDriveSDK-Legacy.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
 if $(ConfigurationName) == Signed (
     if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-    if not exist $(SolutionDir)SignedLibrary\OneDriveSDK.dll cmd /c "$(SolutionDir)SignAssembly.cmd OneDriveSDK $(SolutionDir)Library $(SolutionDir)SignedLibrary"
+    if not exist $(SolutionDir)SignedLibrary\OneDriveSDK-Legacy.dll cmd /c "$(SolutionDir)SignAssembly.cmd OneDriveSDK $(SolutionDir)Library $(SolutionDir)SignedLibrary\OneDriveSDK-Legacy.dll"
     if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
 )
 </PreBuildEvent>

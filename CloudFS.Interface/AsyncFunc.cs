@@ -43,7 +43,9 @@ namespace IgorSoft.CloudFS.Interface
             var exceptions = new List<TException>();
             do {
                 try {
-                    taskFactory().Wait();
+                    var result = taskFactory();
+                    result.Wait();
+                    return result;
                 } catch (TException ex) {
                     exceptions.Add(ex);
                     Thread.Sleep((1 << (exceptions.Count - 1)) * 100);

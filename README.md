@@ -33,12 +33,13 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A        | async      | 3<sup>rd</sup> party | stable |
 | [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.7      | async      | 3<sup>rd</sup> party | stable |
 | **Degraded services**                                            |
-| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")<sup id="a1">[1](#f1)</sup> | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a2">[2](#f2)</sup> | N/A        | async      | official  | stable |
+| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 1.1.47     | async      | official  | stable |
+| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive-Legacy")<sup id="a1">[1](#f1)</sup> | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a2">[2](#f2)</sup> | N/A        | async      | inofficial  | obsolete |
 | **Obsolete services**                                            |
 | *[Copy](https://www.copy.com/ "Copy")*<sup id="a3">[3](#f3)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* |
 
 > <sup><b id="f1">1</b></sup> Following Microsoft's November 2<sup>nd</sup>, 2015 announcement of its "[OneDrive storage plans change in pursuit of productivity and collaboration](https://blog.onedrive.com/onedrive_changes/)" the OneDrive cloud storage service will fail to meet the requirements for support in CloudFS as stated above after mid-July 2016.<br/> Despite this unprecedented and highly objectionable degradation of service quality, OneDrive will continue to be supported by CloudFS for historical reasons. [^](#a1)<br/>
-> <sup><b id="f2">2</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. The gateway will likely switch to [OneDrive SDK for C#](https://github.com/OneDrive/onedrive-sdk-csharp) at some point in the future. [^](#a2)<br/>
+> <sup><b id="f2">2</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. [^](#a2)<br/>
 > <sup><b id="f3">3</b></sup> The Copy cloud storage service was discontinued as of May 1<sup>st</sup> 2016 according to this [announcement](https://www.copy.com/page/home;cs_login:login;;section:plans).<br/>The Copy gateway has therefore been retired from CloudFS. [^](#a3)<br/>
 
 

@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy {
+namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties {
     using System;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
@@ -42,7 +42,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive_Legacy.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -56,15 +56,6 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to OneDrive does not support empty files..
-        /// </summary>
-        internal static string EmptyFilesNotSupported {
-            get {
-                return ResourceManager.GetString("EmptyFilesNotSupported", resourceCulture);
             }
         }
 
