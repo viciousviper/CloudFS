@@ -47,7 +47,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
     {
         private const string SCHEMA = "onedrive";
 
-        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ClearContent;
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All;
 
         private const string URL = "https://onedrive.live.com";
 
