@@ -23,15 +23,13 @@ SOFTWARE.
 */
 
 using System;
-using Google.Apis.Drive.v3.Data;
-using IgorSoft.CloudFS.Interface.IO;
 
-namespace IgorSoft.CloudFS.Gateways.GDrive
+namespace IgorSoft.CloudFS.Gateways.GDrive_V2
 {
-    internal static class FileExtensions
+    internal static class Secrets
     {
-        public static FileSystemInfoContract ToFileSystemInfoContract(this File item) => !item.Size.HasValue
-                ? new DirectoryInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value)) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), item.Size.Value, item.Md5Checksum) as FileSystemInfoContract;
+        public const string CLIENT_ID = "<Insert client ID here>";
+
+        public const string CLIENT_SECRET = "<Insert client secret here>";
     }
 }

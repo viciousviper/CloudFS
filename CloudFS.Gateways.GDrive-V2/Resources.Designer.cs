@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.GDrive
+namespace IgorSoft.CloudFS.Gateways.GDrive_V2
 {
     using System;
 

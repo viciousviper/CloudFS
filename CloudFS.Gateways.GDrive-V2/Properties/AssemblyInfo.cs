@@ -23,15 +23,15 @@ SOFTWARE.
 */
 
 using System;
-using Google.Apis.Drive.v3.Data;
-using IgorSoft.CloudFS.Interface.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace IgorSoft.CloudFS.Gateways.GDrive
-{
-    internal static class FileExtensions
-    {
-        public static FileSystemInfoContract ToFileSystemInfoContract(this File item) => !item.Size.HasValue
-                ? new DirectoryInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value)) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), item.Size.Value, item.Md5Checksum) as FileSystemInfoContract;
-    }
-}
+[assembly: AssemblyTitle("CloudFS.GDrive-V2")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyProduct("CloudFS.GDrive-V2")]
+[assembly: AssemblyCulture("")]
+
+[assembly: ComVisible(false)]
+
+[assembly: CLSCompliant(true)]
