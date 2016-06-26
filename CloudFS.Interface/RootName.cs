@@ -34,7 +34,7 @@ namespace IgorSoft.CloudFS.Interface
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class RootName : SemanticType<string>
     {
-        private const string rootNamePattern = @"^(?<Schema>[_a-z]+)(@(?<UserName>[_a-zA-Z0-9]+))?(\|(?<Root>.+))?$";
+        private const string rootNamePattern = @"^(?<Schema>[a-z][_a-z0-9]*)(@(?<UserName>[_a-zA-Z0-9]+))?(\|(?<Root>.+))?$";
 
         private static readonly Regex validationRegex = new Regex(rootNamePattern, RegexOptions.Compiled);
 

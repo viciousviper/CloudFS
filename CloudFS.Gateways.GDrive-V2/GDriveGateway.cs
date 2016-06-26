@@ -42,7 +42,7 @@ using GoogleFile = Google.Apis.Drive.v2.Data.File;
 
 namespace IgorSoft.CloudFS.Gateways.GDrive_V2
 {
-    [ExportAsAsyncCloudGateway("GDrive")]
+    [ExportAsAsyncCloudGateway("GDrive-V2")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), GDriveGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), GDriveGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), GDriveGateway.URL)]
@@ -50,7 +50,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive_V2
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class GDriveGateway : IAsyncCloudGateway
     {
-        private const string SCHEMA = "gdrive";
+        private const string SCHEMA = "gdrive_v2";
 
         private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.CopyDirectoryItem;
 
