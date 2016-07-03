@@ -85,12 +85,15 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
         {
             string oauth_token = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => oauth_token = e.Parameters[Parameters.AccessToken];
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => oauth_token = e.Parameters[Parameters.AccessToken];
+            logOn.Authenticated += callback;
 
             logOn.Show("Yandex", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return oauth_token;
         }

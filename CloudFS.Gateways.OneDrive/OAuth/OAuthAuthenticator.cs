@@ -52,15 +52,17 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                 var result = new Dictionary<string, string>();
 
                 if (logOn == null)
-                {
                     logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                    logOn.Authenticated += (s, e) => {
-                        for (int i = 0; i < e.Parameters.Count; ++i)
-                            result.Add(e.Parameters.Keys[i], e.Parameters[i]);
-                    };
-                }
+
+                EventHandler<AuthenticatedEventArgs> callback = (s, e) => {
+                    for (int i = 0; i < e.Parameters.Count; ++i)
+                        result.Add(e.Parameters.Keys[i], e.Parameters[i]);
+                };
+                logOn.Authenticated += callback;
 
                 logOn.Show("OneDrive", account, requestUri, callbackUri);
+
+                logOn.Authenticated -= callback;
 
                 return result;
             }

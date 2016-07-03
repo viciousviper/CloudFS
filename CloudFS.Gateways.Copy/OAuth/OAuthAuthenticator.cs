@@ -72,16 +72,18 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
         {
             string oauth_token = null, oauth_verifier = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) =>
-                {
-                    oauth_token = e.Parameters["oauth_token"];
-                    oauth_verifier = e.Parameters["oauth_verifier"];
-                };
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => {
+                oauth_token = e.Parameters["oauth_token"];
+                oauth_verifier = e.Parameters["oauth_verifier"];
+            };
+            logOn.Authenticated += callback;
 
             logOn.Show("Copy", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return new Tuple<string, string>(oauth_token, oauth_verifier);
         }

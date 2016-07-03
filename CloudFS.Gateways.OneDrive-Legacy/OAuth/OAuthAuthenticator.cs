@@ -162,12 +162,15 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth
         {
             string authCode = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = e.Parameters[Parameters.Code]?.TrimStart('M');
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => authCode = e.Parameters[Parameters.Code]?.TrimStart('M');
+            logOn.Authenticated += callback;
 
             logOn.Show("OneDrive-Legacy", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return authCode;
         }

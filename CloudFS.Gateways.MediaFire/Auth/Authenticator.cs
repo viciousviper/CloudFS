@@ -25,11 +25,13 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using MediaFireSDK;
+using MediaFireSDK.Core;
 using MediaFireSDK.Model;
+using MediaFireSDK.Model.Errors;
+using MediaFireSDK.Model.Responses;
 using IgorSoft.CloudFS.Authentication;
 
 namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
@@ -38,18 +40,21 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
     {
         private static DirectLogOn logOn;
 
-        private static string LoadRefreshToken(string account)
+        private static AuthenticationContext LoadRefreshToken(string account)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return setting.RefreshToken;
+{
+    Console.WriteLine($"{DateTime.Now}:\t{nameof(LoadRefreshToken)} -> SecretKey={setting.SecretKey}");
+                        return new AuthenticationContext(setting.SessionToken, setting.SecretKey, setting.Time);
+}
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, string refreshToken)
+        private static void SaveRefreshToken(string account, AuthenticationContext refreshToken)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
@@ -62,30 +67,24 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                 refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken });
+
+    Console.WriteLine($"{DateTime.Now}:\t{nameof(SaveRefreshToken)} <- SecretKey={refreshToken.SecretKey}");
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, SessionToken = refreshToken.SessionToken, SecretKey = refreshToken.SecretKey, Time = refreshToken.Time });
 
             Settings.Default.Save();
         }
 
         private static readonly System.Reflection.BindingFlags nonPublicInstance = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
 
-        private static async Task<string> RefreshSessionTokenAsync(IMediaFireAgent agent, string refreshToken)
+        private static async Task<AuthenticationContext> RefreshSessionTokenAsync(IMediaFireAgent agent, AuthenticationContext refreshToken)
         {
-            // Workaround for non-public token refresh functionality in MediaFireSDK
-
-            var mediaFireUserApiType = agent.User.GetType();
-            var requestController = mediaFireUserApiType.GetProperty("RequestController", nonPublicInstance).GetValue(agent.User);
-            var cryptoService = mediaFireUserApiType.GetField("_cryptoService", nonPublicInstance).GetValue(agent.User);
-
-            var sessionBroker = mediaFireUserApiType.Assembly.GetTypes().Single(t => t.Name == "MediaFireSessionBroker").GetConstructors().Single().Invoke(new[] {
-                cryptoService, agent.Configuration, null, null, requestController
-            });
-            requestController.GetType().GetProperty("SessionBroker", nonPublicInstance).SetValue(requestController, sessionBroker);
-            sessionBroker.GetType().GetProperty("CurrentSessionToken", nonPublicInstance).SetValue(sessionBroker, refreshToken);
+            agent.User.SetAuthenticationContext(refreshToken);
 
             try {
-                return await ((Task<string>)sessionBroker.GetType().GetMethod("RenewSessionTokenInternal", nonPublicInstance).Invoke(sessionBroker, Array.Empty<object>()));
-            } catch (MediaFireSDK.Model.Errors.MediaFireApiException) {
+                var userInfo = await agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo);
+
+                return agent.User.GetAuthenticationContext();
+            } catch (MediaFireApiException) {
                 return null;
             }
         }
@@ -94,12 +93,15 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
         {
             var authCode = string.Empty;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new DirectLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
+            logOn.Authenticated += callback;
 
             logOn.Show("Mediafire", account);
+
+            logOn.Authenticated -= callback;
 
             return authCode;
         }
@@ -109,7 +111,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            var agent = new MediaFireAgent(new MediaFireApiConfiguration(Secrets.API_KEY, Secrets.APP_ID, periodicallyRenewToken: true, useHttpV1: true));
+            var agent = new MediaFireAgent(new MediaFireApiConfiguration(Secrets.API_KEY, Secrets.APP_ID, useHttpV1: true, automaticallyRenewToken: false));
 
             var refreshToken = LoadRefreshToken(account);
 
@@ -124,10 +126,18 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                 if (parts.Length != 2)
                     throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
 
-                refreshToken = await agent.User.GetSessionToken(parts[0], parts[1]);
+                await agent.User.GetSessionToken(parts[0], parts[1], TokenVersion.V2);
+
+                refreshToken = agent.User.GetAuthenticationContext();
             }
 
             SaveRefreshToken(account, refreshToken);
+
+            agent.User.AuthenticationContextChanged += (s, e) => {
+Console.WriteLine($"{DateTime.Now}:\t{nameof(IMediaFireUserApi.AuthenticationContextChanged)}");
+                var context = agent.User.GetAuthenticationContext();
+                Task.Run(() => SaveRefreshToken(account, context));
+            };
 
             return agent;
         }

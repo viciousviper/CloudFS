@@ -69,12 +69,15 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
         {
             string authCode = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new DirectLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
+            logOn.Authenticated += callback;
 
             logOn.Show("Mega", account);
+
+            logOn.Authenticated -= callback;
 
             return authCode;
         }

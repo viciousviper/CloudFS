@@ -186,12 +186,15 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
         {
             string oauth_token = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => oauth_token = e.Parameters[Parameters.Code];
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => oauth_token = e.Parameters[Parameters.Code];
+            logOn.Authenticated += callback;
 
             logOn.Show("hubiC", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return oauth_token;
         }

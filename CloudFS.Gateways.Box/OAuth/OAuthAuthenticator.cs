@@ -81,12 +81,15 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
         {
             string authCode = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = e.Parameters[Parameters.Code];
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => authCode = e.Parameters[Parameters.Code];
+            logOn.Authenticated += callback;
 
             logOn.Show("Box", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return authCode;
         }

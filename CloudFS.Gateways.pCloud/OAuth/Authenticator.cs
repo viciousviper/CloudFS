@@ -69,12 +69,15 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
         {
             string authCode = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new DirectLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => authCode = string.Join(",", e.Parameters.Get("account"), e.Parameters.Get("password"));
+            logOn.Authenticated += callback;
 
             logOn.Show("pCloud", account);
+
+            logOn.Authenticated -= callback;
 
             return authCode;
         }
