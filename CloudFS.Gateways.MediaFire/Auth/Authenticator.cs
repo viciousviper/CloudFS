@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Security.Authentication;
@@ -38,7 +39,55 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 {
     internal static class Authenticator
     {
+        private class SynchronizationContext
+        {
+            private IList<IMediaFireUserApi> contextHolders = new List<IMediaFireUserApi>();
+
+            public AuthenticationContext LatestContext { get; private set; }
+
+            public bool ContextUpdated { get; private set; }
+
+            public SynchronizationContext(IMediaFireUserApi contextHolder)
+            {
+                contextHolders.Add(contextHolder);
+                LatestContext = contextHolder.GetAuthenticationContext();
+                contextHolder.AuthenticationContextChanged += UpdateContexts;
+            }
+
+            public void UpdateContexts(object source, EventArgs eventArgs)
+            {
+                LatestContext = ((IMediaFireUserApi)source).GetAuthenticationContext();
+                ContextUpdated = true;
+                foreach (var contextHolder in contextHolders)
+                    if (source != contextHolder)
+                        contextHolder.SetAuthenticationContext(LatestContext);
+            }
+
+            public void AttachContextHolder(IMediaFireUserApi contextHolder)
+            {
+                contextHolder.SetAuthenticationContext(LatestContext);
+                contextHolders.Add(contextHolder);
+                contextHolder.AuthenticationContextChanged += UpdateContexts;
+            }
+        }
+
         private static DirectLogOn logOn;
+
+        private static IDictionary<string, SynchronizationContext> contextDirectory = new Dictionary<string, SynchronizationContext>();
+
+        static Authenticator()
+        {
+            AppDomain.CurrentDomain.DomainUnload += ShutdownHandler<EventArgs>;
+            AppDomain.CurrentDomain.UnhandledException += ShutdownHandler<UnhandledExceptionEventArgs>;
+        }
+
+        private static void ShutdownHandler<T>(object sender, T eventArgs)
+            where T : EventArgs
+        {
+            foreach (var item in contextDirectory)
+                if (item.Value.ContextUpdated)
+                    SaveRefreshToken(item.Key, item.Value.LatestContext);
+        }
 
         private static AuthenticationContext LoadRefreshToken(string account)
         {
@@ -46,15 +95,12 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-{
-    Console.WriteLine($"{DateTime.Now}:\t{nameof(LoadRefreshToken)} -> SecretKey={setting.SecretKey}");
                         return new AuthenticationContext(setting.SessionToken, setting.SecretKey, setting.Time);
-}
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, AuthenticationContext refreshToken)
+        internal static void SaveRefreshToken(string account, AuthenticationContext refreshToken)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
@@ -67,19 +113,13 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                 refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-
-    Console.WriteLine($"{DateTime.Now}:\t{nameof(SaveRefreshToken)} <- SecretKey={refreshToken.SecretKey}");
             refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, SessionToken = refreshToken.SessionToken, SecretKey = refreshToken.SecretKey, Time = refreshToken.Time });
 
             Settings.Default.Save();
         }
 
-        private static readonly System.Reflection.BindingFlags nonPublicInstance = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
-
-        private static async Task<AuthenticationContext> RefreshSessionTokenAsync(IMediaFireAgent agent, AuthenticationContext refreshToken)
+        private static async Task<AuthenticationContext> RefreshSessionTokenAsync(IMediaFireAgent agent)
         {
-            agent.User.SetAuthenticationContext(refreshToken);
-
             try {
                 var userInfo = await agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo);
 
@@ -113,31 +153,32 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
             var agent = new MediaFireAgent(new MediaFireApiConfiguration(Secrets.API_KEY, Secrets.APP_ID, useHttpV1: true, automaticallyRenewToken: false));
 
-            var refreshToken = LoadRefreshToken(account);
+            var synchronizationContext = default(SynchronizationContext);
+            if (contextDirectory.TryGetValue(account, out synchronizationContext)) {
+                synchronizationContext.AttachContextHolder(agent.User);
+            } else {
+                var refreshToken = LoadRefreshToken(account);
 
-            if (refreshToken != null)
-                refreshToken = await RefreshSessionTokenAsync(agent, refreshToken);
+                agent.User.SetAuthenticationContext(refreshToken);
+                contextDirectory.Add(account, synchronizationContext = new SynchronizationContext(agent.User));
 
-            if (refreshToken == null) {
-                if (string.IsNullOrEmpty(code))
-                    code = GetAuthCode(account);
+                if (refreshToken != null) {
+                    refreshToken = await RefreshSessionTokenAsync(agent);
+                }
 
-                var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
-                if (parts.Length != 2)
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+                if (refreshToken == null) {
+                    if (string.IsNullOrEmpty(code))
+                        code = GetAuthCode(account);
 
-                await agent.User.GetSessionToken(parts[0], parts[1], TokenVersion.V2);
+                    var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
+                    if (parts.Length != 2)
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
 
-                refreshToken = agent.User.GetAuthenticationContext();
+                    await agent.User.GetSessionToken(parts[0], parts[1], TokenVersion.V2);
+
+                    synchronizationContext.UpdateContexts(agent.User, EventArgs.Empty);
+                }
             }
-
-            SaveRefreshToken(account, refreshToken);
-
-            agent.User.AuthenticationContextChanged += (s, e) => {
-Console.WriteLine($"{DateTime.Now}:\t{nameof(IMediaFireUserApi.AuthenticationContextChanged)}");
-                var context = agent.User.GetAuthenticationContext();
-                Task.Run(() => SaveRefreshToken(account, context));
-            };
 
             return agent;
         }

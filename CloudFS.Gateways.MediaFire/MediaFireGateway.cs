@@ -48,7 +48,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), MediaFireGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(MediaFireSDK))]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class MediaFireGateway : IAsyncCloudGateway
+    public sealed class MediaFireGateway : IAsyncCloudGateway, IDisposable
     {
         private const string SCHEMA = "mediafire";
 
@@ -353,6 +353,13 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
                 return new FileInfoContract(item.FileInfo.QuickKey, item.FileInfo.Name, item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
             }
+        }
+
+        public void Dispose()
+        {
+            foreach (var context in contextCache)
+                Authenticator.SaveRefreshToken(context.Key.UserName, context.Value.Agent.User.GetAuthenticationContext());
+            contextCache.Clear();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
