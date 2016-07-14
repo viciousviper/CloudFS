@@ -41,7 +41,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
     {
         private class SynchronizationContext
         {
-            private IList<IMediaFireUserApi> contextHolders = new List<IMediaFireUserApi>();
+            private readonly IList<IMediaFireUserApi> contextHolders = new List<IMediaFireUserApi>();
 
             public AuthenticationContext LatestContext { get; private set; }
 
@@ -73,8 +73,9 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
         private static DirectLogOn logOn;
 
-        private static IDictionary<string, SynchronizationContext> contextDirectory = new Dictionary<string, SynchronizationContext>();
+        private static readonly IDictionary<string, SynchronizationContext> contextDirectory = new Dictionary<string, SynchronizationContext>();
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
         static Authenticator()
         {
             AppDomain.CurrentDomain.DomainUnload += ShutdownHandler<EventArgs>;

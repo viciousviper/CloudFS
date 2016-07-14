@@ -52,7 +52,7 @@
   <Choose>
     <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
       <ItemGroup>
-        <Reference Include="OneDriveSDK-Legacy">
+        <Reference Include="OneDriveSDK-Legacy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>..\Library\OneDriveSDK-Legacy.dll</HintPath>
         </Reference>
         <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -63,9 +63,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="OneDriveSDK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+        <Reference Include="OneDriveSDK-Legacy, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
           <SpecificVersion>False</SpecificVersion>
-          <HintPath>..\SignedLibrary\OneDriveSDK.dll</HintPath>
+          <HintPath>..\SignedLibrary\OneDriveSDK-Legacy.dll</HintPath>
         </Reference>
         <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
           <HintPath>..\SignedLibrary\SemanticTypes.dll</HintPath>
@@ -152,7 +152,7 @@ for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll O
     <PreBuildEvent>
 if $(ConfigurationName) == Signed (
     if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-    if not exist $(SolutionDir)SignedLibrary\OneDriveSDK-Legacy.dll cmd /c "$(SolutionDir)SignAssembly.cmd OneDriveSDK $(SolutionDir)Library $(SolutionDir)SignedLibrary\OneDriveSDK-Legacy.dll"
+    if not exist $(SolutionDir)SignedLibrary\OneDriveSDK-Legacy.dll cmd /c "$(SolutionDir)SignAssembly.cmd OneDriveSDK-Legacy $(SolutionDir)Library $(SolutionDir)SignedLibrary"
     if not exist $(SolutionDir)SignedLibrary\SemanticTypes.dll cmd /c "$(SolutionDir)SignAssembly.cmd SemanticTypes $(SolutionDir)packages\SemanticTypes.0.12.0\lib\net35 $(SolutionDir)SignedLibrary"
 )
 </PreBuildEvent>

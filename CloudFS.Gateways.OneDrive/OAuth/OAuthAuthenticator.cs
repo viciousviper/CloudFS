@@ -40,7 +40,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
         {
             private static BrowserLogOn logOn;
 
-            private string account;
+            private readonly string account;
 
             public WebAuthenticationUi(string account)
             {
@@ -72,7 +72,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
         private const string LIVE_LOGIN_AUTHORIZE_URI = "https://login.live.com/oauth20_authorize.srf";
 
-        private static string[] scopes = { "wl.basic", "wl.offline_access", "wl.signin", "onedrive.readwrite" };
+        private static readonly string[] scopes = { "wl.basic", "wl.offline_access", "wl.signin", "onedrive.readwrite" };
 
         private static string LoadRefreshToken(string account)
         {

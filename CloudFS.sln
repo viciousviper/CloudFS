@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Authentication", "CloudFS.Authentication\CloudFS.Authentication.csproj", "{F4B1D5E1-04BB-4B01-9079-FC2685E71434}"
 EndProject
@@ -131,8 +131,8 @@ Global
 		{576EB7DA-EF14-481C-9529-185684B40594}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{576EB7DA-EF14-481C-9529-185684B40594}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{576EB7DA-EF14-481C-9529-185684B40594}.Release|Any CPU.Build.0 = Release|Any CPU
-		{576EB7DA-EF14-481C-9529-185684B40594}.Signed|Any CPU.ActiveCfg = Release|Any CPU
-		{576EB7DA-EF14-481C-9529-185684B40594}.Signed|Any CPU.Build.0 = Release|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Signed|Any CPU.Build.0 = Signed|Any CPU
 		{168B2288-7C68-4D61-81AB-5A687F4DB3DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{168B2288-7C68-4D61-81AB-5A687F4DB3DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{168B2288-7C68-4D61-81AB-5A687F4DB3DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -161,8 +161,8 @@ Global
 		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Signed|Any CPU.ActiveCfg = Release|Any CPU
-		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Signed|Any CPU.Build.0 = Release|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Signed|Any CPU.Build.0 = Signed|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
