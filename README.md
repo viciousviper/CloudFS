@@ -25,8 +25,8 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | Cloud storage service                                            | API library                                                             | version    | sync/async | origin    | status |
 | :--------------------------------------------------------------- | :---------------------------------------------------------------------- | :--------: | :--------: | :-------: | :----: |
 | *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable |
-| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.14.0.543 | async      | official  | stable |
-| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.8.0      | async      | official  | stable |
+| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.14.0.554 | async      | official  | stable |
+| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.9.0      | async      | official  | stable |
 | [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 1.2.2      | async      | 3<sup>rd</sup> party | stable |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.3    | async      | 3<sup>rd</sup> party / local build | experimental |
 | [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.2.2      | async      | 3<sup>rd</sup> party | stable |
@@ -36,7 +36,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 1.1.47     | async      | official  | stable |
 | **Superseded services**                                            |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive-Legacy")<sup id="a1">[1](#f1)</sup> | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a2">[2](#f2)</sup> | N/A        | async      | inofficial  | obsolete |
-| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.14.0.543 | async      | official  | stable |
+| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.14.0.554 | async      | official  | stable |
 | **Obsolete services**                                            |
 | *[Copy](https://www.copy.com/ "Copy")*<sup id="a3">[3](#f3)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* |
 
