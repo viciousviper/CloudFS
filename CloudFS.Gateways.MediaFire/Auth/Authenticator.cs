@@ -160,10 +160,9 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             } else {
                 var refreshToken = LoadRefreshToken(account);
 
-                agent.User.SetAuthenticationContext(refreshToken);
-                contextDirectory.Add(account, synchronizationContext = new SynchronizationContext(agent.User));
-
                 if (refreshToken != null) {
+                    agent.User.SetAuthenticationContext(refreshToken);
+
                     refreshToken = await RefreshSessionTokenAsync(agent);
                 }
 
@@ -176,9 +175,9 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                         throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
 
                     await agent.User.GetSessionToken(parts[0], parts[1], TokenVersion.V2);
-
-                    synchronizationContext.UpdateContexts(agent.User, EventArgs.Empty);
                 }
+
+                contextDirectory.Add(account, synchronizationContext = new SynchronizationContext(agent.User));
             }
 
             return agent;
