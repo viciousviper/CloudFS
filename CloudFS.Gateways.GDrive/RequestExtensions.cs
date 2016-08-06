@@ -44,35 +44,30 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
         public static FilesResource.CreateRequest AsDirectory(this FilesResource.CreateRequest request)
         {
-
             request.Fields = "id,name,createdTime,modifiedTime";
             return request;
         }
 
         public static FilesResource.CreateMediaUpload AsFile(this FilesResource.CreateMediaUpload request)
         {
-
             request.Fields = "id,name,createdTime,modifiedTime,size,md5Checksum";
             return request;
         }
 
         public static FilesResource.GetRequest AsRootDirectory(this FilesResource.GetRequest request)
         {
-
             request.Fields = "id,createdTime,modifiedTime";
             return request;
         }
 
         public static FilesResource.GetRequest AsFileSystem(this FilesResource.GetRequest request)
         {
-
             request.Fields = "id,name,createdTime,modifiedTime,size,md5Checksum";
             return request;
         }
 
         public static FilesResource.GetRequest WithParents(this FilesResource.GetRequest request)
         {
-
             request.Fields = "parents";
             return request;
         }
