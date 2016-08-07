@@ -44,8 +44,8 @@
     <file src="CloudFS.GatewayTests\bin\Release\Gateways\IgorSoft.CloudFS.Gateways.*.dll" target="lib\net46\Gateways" />
     <file src="CloudFS.GatewayTests\bin\Release\Gateways\IgorSoft.CloudFS.Gateways.*.dll.config" target="lib\net46\Gateways" />
     <file src="Library\MediaFireSDK.dll" target="lib\net46\Gateways\MediaFireSDK.dll" />
-    <file src="Library\OneDriveSDK.dll" target="lib\net46\Gateways\OneDriveSDK.dll" />
-    <file src="Library\OneDriveSDK.LICENSE" target="lib\net46\Gateways\OneDriveSDK.LICENSE" />
+    <file src="Library\OneDriveSDK-Legacy.dll" target="lib\net46\Gateways\OneDriveSDK-Legacy.dll" />
+    <file src="Library\OneDriveSDK-Legacy.LICENSE" target="lib\net46\Gateways\OneDriveSDK-Legacy.LICENSE" />
     <file src="Library\pCloud.NET SDK.dll" target="lib\net46\Gateways\pCloud.NET SDK.dll" />
   </files>
 </package>
