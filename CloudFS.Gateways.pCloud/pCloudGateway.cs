@@ -70,14 +70,14 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         private readonly IDictionary<RootName, pCloudContext> contextCache = new Dictionary<RootName, pCloudContext>();
 
-        private async Task<pCloudContext> RequireContext(RootName root, string apiKey = null)
+        private async Task<pCloudContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
             var result = default(pCloudContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await Authenticator.Login(root.UserName, apiKey);
+                var client = await Authenticator.LoginAsync(root.UserName, apiKey);
                 contextCache.Add(root, result = new pCloudContext(client));
             }
             return result;
@@ -99,29 +99,39 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             return long.Parse(fileId.Value.Substring(1), NumberStyles.Number);
         }
 
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        {
+            try {
+                await RequireContextAsync(root, apiKey);
+                return true;
+            } catch (Exception) {
+                return false;
+            }
+        }
+
         public async Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
-            var context = await RequireContext(root, apiKey);
+            var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.Retry<UserInfo, pCloudException>(async () => await context.Client.GetUserInfoAsync(), RETRIES);
+            var item = await AsyncFunc.RetryAsync<UserInfo, pCloudException>(async () => await context.Client.GetUserInfoAsync(), RETRIES);
 
             return new DriveInfoContract(item.UserId, item.Quota - item.UsedQuota, item.UsedQuota);
         }
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
         {
-            var context = await RequireContext(root, apiKey);
+            var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.Retry<ListedFolder, pCloudException>(async () => await context.Client.ListFolderAsync(0), RETRIES);
+            var item = await AsyncFunc.RetryAsync<ListedFolder, pCloudException>(async () => await context.Client.ListFolderAsync(0), RETRIES);
 
             return new RootDirectoryInfoContract(item.Id, item.Created, item.Modified);
         }
 
         public async Task<IEnumerable<FileSystemInfoContract>> GetChildItemAsync(RootName root, DirectoryId parent)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.Retry<ListedFolder, pCloudException>(async () => await context.Client.ListFolderAsync(ToId(parent)), RETRIES);
+            var item = await AsyncFunc.RetryAsync<ListedFolder, pCloudException>(async () => await context.Client.ListFolderAsync(ToId(parent)), RETRIES);
             var items = item.Contents;
 
             return items.Select(i => i.ToFileSystemInfoContract());
@@ -132,7 +142,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             if (locatorResolver == null)
                 throw new ArgumentNullException(nameof(locatorResolver));
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var locator = locatorResolver();
             await context.Client.UploadFileAsync(Stream.Null, ToId(locator.ParentId), locator.Name, CancellationToken.None);
@@ -142,7 +152,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var stream = new MemoryStream();
             //await AsyncFunc.Retry<Stream, pCloudException>(async () => await context.Client.DownloadFileAsync(ToId(source), stream, tokenSource.Token), RETRIES);
@@ -157,7 +167,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             if (locatorResolver == null)
                 throw new ArgumentNullException(nameof(locatorResolver));
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var locator = locatorResolver();
             var stream = progress != null ? new ProgressStream(content, progress) : content;
@@ -172,16 +182,16 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             if (fileSource == null)
                  throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.Retry<pCloudFile, pCloudException>(async () => await context.Client.CopyFileAsync(ToId(fileSource), ToId(destination), copyName), RETRIES);
+            var item = await AsyncFunc.RetryAsync<pCloudFile, pCloudException>(async () => await context.Client.CopyFileAsync(ToId(fileSource), ToId(destination), copyName), RETRIES);
 
             return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
         }
 
         public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var directorySource = source as DirectoryId;
             if (directorySource != null) {
@@ -202,9 +212,9 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.Retry<Folder, pCloudException>(async () => await context.Client.CreateFolderAsync(ToId(parent), name), RETRIES);
+            var item = await AsyncFunc.RetryAsync<Folder, pCloudException>(async () => await context.Client.CreateFolderAsync(ToId(parent), name), RETRIES);
 
             return new DirectoryInfoContract(item.Id, item.Name, item.Created, item.Modified);
         }
@@ -214,17 +224,17 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             if (content.Length == 0)
                 return new ProxyFileInfoContract(name);
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.Retry<pCloudFile, pCloudException>(async () => await context.Client.UploadFileAsync(stream, ToId(parent), name, CancellationToken.None), RETRIES);
+            var item = await AsyncFunc.RetryAsync<pCloudFile, pCloudException>(async () => await context.Client.UploadFileAsync(stream, ToId(parent), name, CancellationToken.None), RETRIES);
 
             return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
         {
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var directoryTarget = target as DirectoryId;
             if (directoryTarget != null) {
@@ -246,7 +256,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             if (locatorResolver == null)
                 throw new ArgumentNullException(nameof(locatorResolver));
 
-            var context = await RequireContext(root);
+            var context = await RequireContextAsync(root);
 
             var directoryTarget = target as DirectoryId;
             if (directoryTarget != null) {

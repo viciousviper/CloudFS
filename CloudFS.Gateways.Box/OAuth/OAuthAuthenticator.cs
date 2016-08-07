@@ -56,7 +56,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
                     if (setting.Account == account)
                         return setting.RefreshToken;
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, string refreshToken)
@@ -81,17 +81,20 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
         {
             string authCode = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = e.Parameters[Parameters.Code];
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => authCode = e.Parameters[Parameters.Code];
+            logOn.Authenticated += callback;
 
             logOn.Show("Box", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return authCode;
         }
 
-        public static async Task<BoxClient> Login(string account, string code)
+        public static async Task<BoxClient> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));

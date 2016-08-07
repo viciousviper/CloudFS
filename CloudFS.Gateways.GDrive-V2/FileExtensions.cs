@@ -23,21 +23,15 @@ SOFTWARE.
 */
 
 using System;
-using System.Linq;
-using System.ComponentModel;
+using Google.Apis.Drive.v2.Data;
+using IgorSoft.CloudFS.Interface.IO;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive
+namespace IgorSoft.CloudFS.Gateways.GDrive_V2
 {
-    internal static class EnumExtensions
+    internal static class FileExtensions
     {
-        public static string GetDescription(this Enum value)
-        {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
-            var fi = value.GetType().GetField(value.ToString());
-            var attribute = (DescriptionAttribute)fi.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault();
-            return attribute != null ? attribute.Description : value.ToString();
-        }
+        public static FileSystemInfoContract ToFileSystemInfoContract(this File item) => !item.FileSize.HasValue
+                ? new DirectoryInfoContract(item.Id, item.Title, new DateTimeOffset(item.CreatedDate.Value), new DateTimeOffset(item.ModifiedDate.Value)) as FileSystemInfoContract
+                : new FileInfoContract(item.Id, item.Title, new DateTimeOffset(item.CreatedDate.Value), new DateTimeOffset(item.ModifiedDate.Value), item.FileSize.Value, item.Md5Checksum) as FileSystemInfoContract;
     }
 }

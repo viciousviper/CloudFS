@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Authentication", "CloudFS.Authentication\CloudFS.Authentication.csproj", "{F4B1D5E1-04BB-4B01-9079-FC2685E71434}"
 EndProject
@@ -13,13 +13,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.Copy", "Cl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.File", "CloudFS.Gateways.File\CloudFS.Gateways.File.csproj", "{675982E8-6638-4DC2-8C63-A32AF732C213}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.GDrive", "CloudFS.Gateways.GDrive\CloudFS.Gateways.GDrive.csproj", "{5E4CAF3B-045A-4A2A-B6B1-6F57984E4B8A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.GDrive-V2", "CloudFS.Gateways.GDrive-V2\CloudFS.Gateways.GDrive-V2.csproj", "{5E4CAF3B-045A-4A2A-B6B1-6F57984E4B8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.hubiC", "CloudFS.Gateways.hubiC\CloudFS.Gateways.hubiC.csproj", "{1F74FD2D-9E69-4765-A997-3895097C213F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.MediaFire", "CloudFS.Gateways.MediaFire\CloudFS.Gateways.MediaFire.csproj", "{3E864B59-FDC5-4035-92C6-68EFD38EE6F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.Mega", "CloudFS.Gateways.Mega\CloudFS.Gateways.Mega.csproj", "{9C51FF80-3252-4844-B356-88776A007739}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.OneDrive", "CloudFS.Gateways.OneDrive\CloudFS.Gateways.OneDrive.csproj", "{168B2288-7C68-4D61-81AB-5A687F4DB3DE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.OneDrive", "CloudFS.Gateways.OneDrive\CloudFS.Gateways.OneDrive.csproj", "{576EB7DA-EF14-481C-9529-185684B40594}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.OneDrive-Legacy", "CloudFS.Gateways.OneDrive-Legacy\CloudFS.Gateways.OneDrive-Legacy.csproj", "{168B2288-7C68-4D61-81AB-5A687F4DB3DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.pCloud", "CloudFS.Gateways.pCloud\CloudFS.Gateways.pCloud.csproj", "{EFEBFBF4-158D-4AC4-B802-67B2F15B3FB1}"
 EndProject
@@ -53,14 +57,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{1B8C
 	ProjectSection(SolutionItems) = preProject
 		Library\IgorSoft.AppDomainResolver.dll = Library\IgorSoft.AppDomainResolver.dll
 		Library\IgorSoft.AppDomainResolver.pdb = Library\IgorSoft.AppDomainResolver.pdb
-		Library\OneDriveSDK.dll = Library\OneDriveSDK.dll
-		Library\OneDriveSDK.LICENSE = Library\OneDriveSDK.LICENSE
-		Library\OneDriveSDK.pdb = Library\OneDriveSDK.pdb
+		Library\OneDriveSDK-Legacy.dll = Library\OneDriveSDK-Legacy.dll
+		Library\OneDriveSDK-Legacy.LICENSE = Library\OneDriveSDK-Legacy.LICENSE
+		Library\OneDriveSDK-Legacy.pdb = Library\OneDriveSDK-Legacy.pdb
 		Library\pCloud.NET SDK.dll = Library\pCloud.NET SDK.dll
 		Library\pCloud.NET SDK.pdb = Library\pCloud.NET SDK.pdb
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.hubiC", "CloudFS.Gateways.hubiC\CloudFS.Gateways.hubiC.csproj", "{1F74FD2D-9E69-4765-A997-3895097C213F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.GDrive", "CloudFS.Gateways.GDrive\CloudFS.Gateways.GDrive.csproj", "{CDF43233-42A3-4D67-800D-5E7647327CF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,6 +109,12 @@ Global
 		{5E4CAF3B-045A-4A2A-B6B1-6F57984E4B8A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E4CAF3B-045A-4A2A-B6B1-6F57984E4B8A}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
 		{5E4CAF3B-045A-4A2A-B6B1-6F57984E4B8A}.Signed|Any CPU.Build.0 = Signed|Any CPU
+		{1F74FD2D-9E69-4765-A997-3895097C213F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F74FD2D-9E69-4765-A997-3895097C213F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F74FD2D-9E69-4765-A997-3895097C213F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F74FD2D-9E69-4765-A997-3895097C213F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F74FD2D-9E69-4765-A997-3895097C213F}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{1F74FD2D-9E69-4765-A997-3895097C213F}.Signed|Any CPU.Build.0 = Signed|Any CPU
 		{3E864B59-FDC5-4035-92C6-68EFD38EE6F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3E864B59-FDC5-4035-92C6-68EFD38EE6F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E864B59-FDC5-4035-92C6-68EFD38EE6F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -117,6 +127,12 @@ Global
 		{9C51FF80-3252-4844-B356-88776A007739}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C51FF80-3252-4844-B356-88776A007739}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
 		{9C51FF80-3252-4844-B356-88776A007739}.Signed|Any CPU.Build.0 = Signed|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Release|Any CPU.Build.0 = Release|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{576EB7DA-EF14-481C-9529-185684B40594}.Signed|Any CPU.Build.0 = Signed|Any CPU
 		{168B2288-7C68-4D61-81AB-5A687F4DB3DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{168B2288-7C68-4D61-81AB-5A687F4DB3DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{168B2288-7C68-4D61-81AB-5A687F4DB3DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -141,12 +157,12 @@ Global
 		{080956F5-0A71-4A71-B16D-05502B2C9DC1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{080956F5-0A71-4A71-B16D-05502B2C9DC1}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
 		{080956F5-0A71-4A71-B16D-05502B2C9DC1}.Signed|Any CPU.Build.0 = Signed|Any CPU
-		{1F74FD2D-9E69-4765-A997-3895097C213F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F74FD2D-9E69-4765-A997-3895097C213F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F74FD2D-9E69-4765-A997-3895097C213F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F74FD2D-9E69-4765-A997-3895097C213F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1F74FD2D-9E69-4765-A997-3895097C213F}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
-		{1F74FD2D-9E69-4765-A997-3895097C213F}.Signed|Any CPU.Build.0 = Signed|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{CDF43233-42A3-4D67-800D-5E7647327CF6}.Signed|Any CPU.Build.0 = Signed|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

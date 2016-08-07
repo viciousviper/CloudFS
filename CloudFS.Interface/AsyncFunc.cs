@@ -34,7 +34,7 @@ namespace IgorSoft.CloudFS.Interface
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public static Task Retry<TException>(this Func<Task> taskFactory, int retries)
+        public static Task RetryAsync<TException>(this Func<Task> taskFactory, int retries)
             where TException : Exception
         {
             if (taskFactory == null)
@@ -43,7 +43,9 @@ namespace IgorSoft.CloudFS.Interface
             var exceptions = new List<TException>();
             do {
                 try {
-                    taskFactory().Wait();
+                    var result = taskFactory();
+                    result.Wait();
+                    return result;
                 } catch (TException ex) {
                     exceptions.Add(ex);
                     Thread.Sleep((1 << (exceptions.Count - 1)) * 100);
@@ -55,7 +57,7 @@ namespace IgorSoft.CloudFS.Interface
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        public static async Task<TResult> Retry<TResult, TException>(this Func<Task<TResult>> taskFactory, int retries)
+        public static async Task<TResult> RetryAsync<TResult, TException>(this Func<Task<TResult>> taskFactory, int retries)
             where TException : Exception
         {
             if (taskFactory == null)

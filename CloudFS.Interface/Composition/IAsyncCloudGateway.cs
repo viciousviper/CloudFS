@@ -32,6 +32,8 @@ namespace IgorSoft.CloudFS.Interface.Composition
 {
     public interface IAsyncCloudGateway
     {
+        Task<bool> TryAuthenticateAsync(RootName root, string apiKey);
+
         Task<DriveInfoContract> GetDriveAsync(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey);

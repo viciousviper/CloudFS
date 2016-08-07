@@ -35,18 +35,18 @@ namespace IgorSoft.CloudFS.Authentication
         public static Dispatcher GetDispatcher()
         {
             if (dispatcher == null) {
-                var waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+                using (var waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset)) {
+                    var uiThread = new Thread(() =>
+                    {
+                        dispatcher = Dispatcher.CurrentDispatcher;
+                        waitHandle.Set();
+                        Dispatcher.Run();
+                    }) { Name = "UI-Thread" };
+                    uiThread.SetApartmentState(ApartmentState.STA);
+                    uiThread.Start();
 
-                var uiThread = new Thread(() =>
-                {
-                    dispatcher = Dispatcher.CurrentDispatcher;
-                    waitHandle.Set();
-                    Dispatcher.Run();
-                }) { Name = "UI-Thread" };
-                uiThread.SetApartmentState(ApartmentState.STA);
-                uiThread.Start();
-
-                waitHandle.WaitOne();
+                    waitHandle.WaitOne();
+                }
             }
 
             return dispatcher;

@@ -54,6 +54,11 @@ namespace IgorSoft.CloudFS.Gateways.File
 
         private string rootPath;
 
+        public bool TryAuthenticate(RootName root, string apiKey)
+        {
+            return true;
+        }
+
         public DriveInfoContract GetDrive(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             if (root == null)

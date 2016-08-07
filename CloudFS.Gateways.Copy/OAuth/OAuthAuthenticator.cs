@@ -47,7 +47,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
                     if (setting.Account == account)
                         return new Tuple<string, string>(setting.Token, setting.TokenSecret);
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, Tuple<string, string> refreshToken)
@@ -72,16 +72,18 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
         {
             string oauth_token = null, oauth_verifier = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) =>
-                {
-                    oauth_token = e.Parameters["oauth_token"];
-                    oauth_verifier = e.Parameters["oauth_verifier"];
-                };
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => {
+                oauth_token = e.Parameters["oauth_token"];
+                oauth_verifier = e.Parameters["oauth_verifier"];
+            };
+            logOn.Authenticated += callback;
 
             logOn.Show("Copy", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return new Tuple<string, string>(oauth_token, oauth_verifier);
         }
@@ -95,7 +97,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
             return new Tuple<string, string>(parts[0], parts.Length == 2 ? parts[1] : string.Empty);
         }
 
-        public static async Task<CopyClient> Login(string account, string code)
+        public static async Task<CopyClient> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));

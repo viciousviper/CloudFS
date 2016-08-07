@@ -87,7 +87,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                     if (setting.Account == account)
                         return setting.Token;
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, string refreshToken)
@@ -128,7 +128,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                 .AppendParameter(Parameters.RedirectUri, WebUtility.HtmlEncode(HUBIC_LOGIN_REDIRECT_URI))
                 .AppendParameter(Parameters.GrantType, GrantTypes.AuthorizationCode);
 
-            var response = await PostQuery(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
+            var response = await PostQueryAsync(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
@@ -141,7 +141,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                 .AppendParameter(Parameters.RefreshToken, refreshToken)
                 .AppendParameter(Parameters.GrantType, GrantTypes.RefreshToken);
 
-            var response = await PostQuery(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
+            var response = await PostQueryAsync(HUBIC_AUTH_TOKEN_URI, queryBuilder.ToString());
 
             return JsonConvert.DeserializeObject<AppTokenResponse>(response);
         }
@@ -161,7 +161,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
             return null;
         }
 
-        private static async Task<string> PostQuery(string uri, string query)
+        private static async Task<string> PostQueryAsync(string uri, string query)
         {
             var httpWebRequest = WebRequest.CreateHttp(uri);
             httpWebRequest.Method = "POST";
@@ -186,17 +186,20 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
         {
             string oauth_token = null;
 
-            if (logOn == null) {
+            if (logOn == null)
                 logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => oauth_token = e.Parameters[Parameters.Code];
-            }
+
+            EventHandler<AuthenticatedEventArgs> callback = (s, e) => oauth_token = e.Parameters[Parameters.Code];
+            logOn.Authenticated += callback;
 
             logOn.Show("hubiC", account, authenticationUri, redirectUri);
+
+            logOn.Authenticated -= callback;
 
             return oauth_token;
         }
 
-        public static async Task<Client> Login(string account, string code)
+        public static async Task<Client> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));

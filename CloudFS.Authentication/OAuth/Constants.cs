@@ -28,6 +28,7 @@ namespace IgorSoft.CloudFS.Authentication.OAuth
 {
     public static class Constants
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public static class Parameters
         {
             public const string ResponseType = "response_type";
@@ -51,12 +52,14 @@ namespace IgorSoft.CloudFS.Authentication.OAuth
             public const string ResponseMode = "response_mode";
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public static class ResponseTypes
         {
             public const string Code = "code";
             public const string Token = "token";
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public static class GrantTypes
         {
             public const string AuthorizationCode = "authorization_code";
@@ -65,11 +68,13 @@ namespace IgorSoft.CloudFS.Authentication.OAuth
             public const string Password = "password";
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public static class TokenTypes
         {
             public const string Bearer = "bearer";
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public static class Errors
         {
             public const string InvalidRequest = "invalid_request";
@@ -80,12 +85,14 @@ namespace IgorSoft.CloudFS.Authentication.OAuth
             public const string UnauthorizedClient = "unauthorized_client";
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public static class Extra
         {
             public const string ClientId = "client_id";
             public const string RedirectUri = "redirect_uri";
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]
         public static class ResponseModes
         {
             public const string FormPost = "form_post";

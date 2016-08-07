@@ -23,20 +23,15 @@ SOFTWARE.
 */
 
 using System;
-using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
-{
-    public enum Scope
-    {
-        [Description("wl.basic")]
-        Basic,
-        [Description("wl.offline_access")]
-        OfflineAccess,
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = nameof(Signin))]
-        [Description("wl.signin")]
-        Signin,
-        [Description("onedrive.readwrite")]
-        OneDriveReadWrite
-    }
-}
+[assembly: AssemblyTitle("CloudFS.OneDrive-Legacy")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyProduct("CloudFS.OneDrive-Legacy")]
+[assembly: AssemblyCulture("")]
+
+[assembly: ComVisible(false)]
+
+[assembly: CLSCompliant(true)]

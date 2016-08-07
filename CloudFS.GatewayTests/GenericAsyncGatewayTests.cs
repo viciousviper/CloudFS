@@ -26,7 +26,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IgorSoft.CloudFS.Authentication;
 using IgorSoft.CloudFS.GatewayTests.Config;
@@ -82,6 +81,15 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var importedGateway = importedGateways.Single(g => g.Metadata.CloudService == configuredGateway.Schema);
                 Assert.AreEqual(GatewayCapabilities.All ^ configuredGateway.Exclusions, importedGateway.Metadata.Capabilities, $"Gateway capabilities for '{configuredGateway.Schema}' differ".ToString(CultureInfo.CurrentCulture));
             }
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void TryAuthenticateAsync_Succeeds()
+        {
+            fixture.ExecuteByConfiguration((gateway, rootName, config) =>
+            {
+                Assert.IsTrue(gateway.TryAuthenticateAsync(rootName, config.ApiKey).Result);
+            });
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
@@ -173,8 +181,9 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.GetContent, () =>
                     {
-                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                     });
                 }
@@ -195,8 +204,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                     {
                         gateway.SetContentAsync(rootName, testFile.Id, smallContent.ToStream(), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
 
-                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                     });
                 }
@@ -215,15 +225,17 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.SetContent, () =>
                     {
-                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched initial content");
+                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched initial content");
                         }
 
                         var changedContent = new string(smallContent.Reverse().ToArray());
                         gateway.SetContentAsync(rootName, testFile.Id, changedContent.ToStream(), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
 
-                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
-                            Assert.AreEqual(changedContent, new StreamReader(result).ReadToEnd(), "Mismatched updated content");
+                        using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(changedContent, streamReader.ReadToEnd(), "Mismatched updated content");
                         }
                     });
                 }
@@ -278,8 +290,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.IsNotNull(items.SingleOrDefault(i => i.Name == "Directory"), "Original directory is missing");
                         var copiedFile = (FileInfoContract)gateway.GetChildItemAsync(rootName, directoryCopy.Id).Result.SingleOrDefault(i => i.Name == "File.ext");
                         Assert.IsTrue(copiedFile != null, "Expected copied file is missing");
-                        using (var result = gateway.GetContentAsync(rootName, copiedFile.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, copiedFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                         Assert.AreNotEqual(fileOriginal.Id, copiedFile.Id, "Duplicate copied file Id");
                     });
@@ -308,8 +321,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.IsNotNull(items.SingleOrDefault(i => i.Name == "Directory"), "Original directory is missing");
                         var copiedFile = (FileInfoContract)gateway.GetChildItemAsync(rootName, directoryCopy.Id).Result.SingleOrDefault(i => i.Name == "File.ext");
                         Assert.IsTrue(copiedFile != null, "Expected copied file is missing");
-                        using (var result = gateway.GetContentAsync(rootName, copiedFile.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, copiedFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                         Assert.AreNotEqual(fileOriginal.Id, copiedFile.Id, "Duplicate copied file Id");
                     });
@@ -333,8 +347,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                         Assert.AreEqual(items.Single(i => i.Name == "File-Copy.ext").Id, fileCopy.Id, "Mismatched copied file Id");
                         Assert.IsNotNull(items.SingleOrDefault(i => i.Name == "File.ext"), "Original file is missing");
-                        using (var result = gateway.GetContentAsync(rootName, fileCopy.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, fileCopy.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                     });
                 }
@@ -359,8 +374,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                         var targetItems = gateway.GetChildItemAsync(rootName, directoryTarget.Id).Result;
                         Assert.AreEqual(targetItems.Single(i => i.Name == "File-Copy.ext").Id, fileCopy.Id, "Mismatched copied file Id");
                         Assert.IsNotNull(items.SingleOrDefault(i => i.Name == "File.ext"), "Original file is missing");
-                        using (var result = gateway.GetContentAsync(rootName, fileCopy.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, fileCopy.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                     });
                 }
@@ -389,8 +405,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.IsNull(originalItems.SingleOrDefault(i => i.Name == "Directory"), "Original directory remains");
                         var fileMoved = (FileInfoContract)gateway.GetChildItemAsync(rootName, directoryMoved.Id).Result.SingleOrDefault(i => i.Name == "File.ext");
                         Assert.IsTrue(fileMoved != null, "Expected moved file is missing");
-                        using (var result = gateway.GetContentAsync(rootName, fileMoved.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, fileMoved.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                         if (!config.Exclusions.HasFlag(GatewayCapabilities.ItemId)) {
                             Assert.AreEqual(directoryOriginal.Id, directoryMoved.Id, "Mismatched moved directory Id");
@@ -420,8 +437,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.AreEqual(targetItems.Single(i => i.Name == "File.ext").Id, fileMoved.Id, "Mismatched moved file Id");
                         var originalItems = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                         Assert.IsNull(originalItems.SingleOrDefault(i => i.Name == "File.ext"), "Original file remains");
-                        using (var result = gateway.GetContentAsync(rootName, fileMoved.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, fileMoved.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                         if (!config.Exclusions.HasFlag(GatewayCapabilities.ItemId))
                             Assert.AreEqual(fileOriginal.Id, fileMoved.Id, "Mismatched moved file Id");
@@ -463,8 +481,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                         Assert.AreEqual(1, items.Count(i => i.Name == "File.ext"), "Expected file is missing");
                         Assert.AreEqual(items.Single(i => i.Name == "File.ext").Id, newFile.Id, "Mismatched file Id");
-                        using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                     });
                 }
@@ -579,8 +598,9 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                         Assert.IsTrue(items.Any(i => i.Name == "File-Renamed.ext"), "Expected renamed file is missing");
-                        using (var result = gateway.GetContentAsync(rootName, ((FileInfoContract)items.Single(i => i.Name == "File-Renamed.ext")).Id).Result) {
-                            Assert.AreEqual(smallContent, new StreamReader(result).ReadToEnd(), "Mismatched content");
+                        using (var result = gateway.GetContentAsync(rootName, ((FileInfoContract)items.Single(i => i.Name == "File-Renamed.ext")).Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
                         }
                         Assert.IsFalse(items.Any(i => i.Name == "File.ext"), "Excessive file found");
                     });

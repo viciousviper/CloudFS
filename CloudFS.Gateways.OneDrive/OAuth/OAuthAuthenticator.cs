@@ -23,50 +23,56 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Microsoft.OneDrive.Sdk;
 using IgorSoft.CloudFS.Authentication;
-using static IgorSoft.CloudFS.Authentication.OAuth.Constants;
-using Newtonsoft.Json;
-using OneDrive;
+using IgorSoft.CloudFS.Gateways.OneDrive.Properties;
 
 namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 {
     internal static class OAuthAuthenticator
     {
+        private class WebAuthenticationUi : IWebAuthenticationUi
+        {
+            private static BrowserLogOn logOn;
+
+            private readonly string account;
+
+            public WebAuthenticationUi(string account)
+            {
+                this.account = account;
+            }
+
+            public async Task<IDictionary<string, string>> AuthenticateAsync(Uri requestUri, Uri callbackUri)
+            {
+                var result = new Dictionary<string, string>();
+
+                if (logOn == null)
+                    logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
+
+                EventHandler<AuthenticatedEventArgs> callback = (s, e) => {
+                    for (int i = 0; i < e.Parameters.Count; ++i)
+                        result.Add(e.Parameters.Keys[i], e.Parameters[i]);
+                };
+                logOn.Authenticated += callback;
+
+                logOn.Show("OneDrive", account, requestUri, callbackUri);
+
+                logOn.Authenticated -= callback;
+
+                return result;
+            }
+        }
+
         private const string LIVE_LOGIN_DESKTOP_URI = "https://login.live.com/oauth20_desktop.srf";
 
         private const string LIVE_LOGIN_AUTHORIZE_URI = "https://login.live.com/oauth20_authorize.srf";
 
-        private const string LIVE_LOGIN_TOKEN_URI = "https://login.live.com/oauth20_token.srf";
-
-        private const string ONEDRIVE_API_URI = "https://api.onedrive.com/v1.0";
-
-        private static BrowserLogOn logOn;
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used for JSON deserialization")]
-        private class AppTokenResponse
-        {
-            [JsonProperty(Parameters.TokenType)]
-            public string TokenType { get; set; }
-
-            [JsonProperty(Parameters.Scope)]
-            public string Scope { get; set; }
-
-            [JsonProperty(Parameters.AccessToken)]
-            public string AccessToken { get; set; }
-
-            [JsonProperty(Parameters.ExpiresIn)]
-            public int AccessTokenExpirationDuration { get; set; }
-
-            [JsonProperty(Parameters.RefreshToken)]
-            public string RefreshToken { get; set; }
-        }
+        private static readonly string[] scopes = { "wl.basic", "wl.offline_access", "wl.signin", "onedrive.readwrite" };
 
         private static string LoadRefreshToken(string account)
         {
@@ -76,7 +82,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                     if (setting.Account == account)
                         return setting.RefreshToken;
 
-            return  null;
+            return null;
         }
 
         private static void SaveRefreshToken(string account, string refreshToken)
@@ -97,106 +103,33 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
             Settings.Default.Save();
         }
 
-        private static Uri GetAuthenticationUri(string clientId)
-        {
-            var queryStringBuilder = new global::OneDrive.QueryStringBuilder();
-            queryStringBuilder.Add(Parameters.ClientId, clientId);
-            queryStringBuilder.Add(Parameters.Scope, string.Join(" ", (new [] { Scope.Basic, Scope.OfflineAccess, Scope.Signin, Scope.OneDriveReadWrite }).Select(s => s.GetDescription())));
-            queryStringBuilder.Add(Parameters.RedirectUri, LIVE_LOGIN_DESKTOP_URI);
-            queryStringBuilder.Add(Parameters.ResponseType, ResponseTypes.Code);
-            queryStringBuilder.Add("display", "popup");
-
-            return new UriBuilder(LIVE_LOGIN_AUTHORIZE_URI) { Query = queryStringBuilder.ToString() }.Uri;
-        }
-
-        private static async Task<AppTokenResponse> RedeemAccessTokenAsync(string clientId, string clientSecret, string code)
-        {
-            var queryStringBuilder = new global::OneDrive.QueryStringBuilder();
-            queryStringBuilder.Add(Parameters.ClientId, clientId);
-            queryStringBuilder.Add(Parameters.ClientSecret, clientSecret);
-            queryStringBuilder.Add(Parameters.RedirectUri, LIVE_LOGIN_DESKTOP_URI);
-            queryStringBuilder.Add(Parameters.Code, code);
-            queryStringBuilder.Add(Parameters.GrantType, GrantTypes.AuthorizationCode);
-
-            var response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
-
-            return JsonConvert.DeserializeObject<AppTokenResponse>(response);
-        }
-
-        private static async Task<AppTokenResponse> RedeemRefreshTokenAsync(string clientId, string clientSecret, string refreshToken)
-        {
-            var queryStringBuilder = new global::OneDrive.QueryStringBuilder();
-            queryStringBuilder.Add(Parameters.ClientId, clientId);
-            queryStringBuilder.Add(Parameters.ClientSecret, clientSecret);
-            queryStringBuilder.Add(Parameters.RedirectUri, LIVE_LOGIN_DESKTOP_URI);
-            queryStringBuilder.Add(Parameters.RefreshToken, refreshToken);
-            queryStringBuilder.Add(Parameters.GrantType, GrantTypes.RefreshToken);
-
-            var response = await PostQuery(LIVE_LOGIN_TOKEN_URI, queryStringBuilder.ToString());
-
-            return JsonConvert.DeserializeObject<AppTokenResponse>(response);
-        }
-
-        private static async Task<string> PostQuery(string uriString, string queryString)
-        {
-            var httpWebRequest = WebRequest.CreateHttp(uriString);
-            httpWebRequest.Method = "POST";
-            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
-            var stream = await httpWebRequest.GetRequestStreamAsync();
-            using (var writer = new StreamWriter(stream)) {
-                await writer.WriteAsync(queryString);
-                await writer.FlushAsync();
-            }
-
-            var response = await httpWebRequest.GetResponseAsync() as HttpWebResponse;
-            if (response != null && response.StatusCode == HttpStatusCode.OK) {
-                using (var reader = new StreamReader(response.GetResponseStream())) {
-                    return await reader.ReadToEndAsync();
-                }
-            }
-
-            return null;
-        }
-
-        private static string GetAuthCode(string account, Uri authenticationUri, Uri redirectUri)
-        {
-            string authCode = null;
-
-            if (logOn == null) {
-                logOn = new BrowserLogOn(AsyncOperationManager.SynchronizationContext);
-                logOn.Authenticated += (s, e) => authCode = e.Parameters[Parameters.Code]?.TrimStart('M');
-            }
-
-            logOn.Show("OneDrive", account, authenticationUri, redirectUri);
-
-            return authCode;
-        }
-
-        public static async Task<ODConnection> Login(string account, string code)
+        public static async Task<IOneDriveClient> LoginAsync(string account, string code)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
             var refreshToken = LoadRefreshToken(account);
 
-            AppTokenResponse response = null;
-            if (!string.IsNullOrEmpty(refreshToken))
-                response = await RedeemRefreshTokenAsync(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, refreshToken);
-
-            if (response == null) {
+            var client = default(IOneDriveClient);
+            if (!string.IsNullOrEmpty(refreshToken)) {
+                client = await OneDriveClient.GetSilentlyAuthenticatedMicrosoftAccountClient(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, Secrets.CLIENT_SECRET, refreshToken);
+            } else {
                 if (string.IsNullOrEmpty(code)) {
-                    var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
-                    code = GetAuthCode(account, authenticationUri, new Uri(LIVE_LOGIN_DESKTOP_URI));
-                    if (string.IsNullOrEmpty(code))
-                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                    client = await OneDriveClient.GetAuthenticatedMicrosoftAccountClient(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, Secrets.CLIENT_SECRET, new WebAuthenticationUi(account));
+                } else {
+                    client = OneDriveClient.GetMicrosoftAccountClient(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, Secrets.CLIENT_SECRET);
+                    client.AuthenticationProvider.CurrentAccountSession = new AccountSession() { AccessToken = code };
                 }
 
-                response = await RedeemAccessTokenAsync(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, code);
+                await client.AuthenticateAsync();
+
+                if (!client.IsAuthenticated)
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, LIVE_LOGIN_AUTHORIZE_URI));
             }
 
-            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken);
+            SaveRefreshToken(account, client.AuthenticationProvider.CurrentAccountSession.RefreshToken);
 
-            return response != null ? new ODConnection(ONEDRIVE_API_URI, response.AccessToken) : null;
+            return client;
         }
     }
 }
