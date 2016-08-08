@@ -28,14 +28,27 @@ using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.Composition
 {
+    /// <summary>
+    /// Exports an <see cref="IAsyncCloudGateway"/> for MEF-composition.
+    /// </summary>
+    /// <seealso cref="ExportAttribute" />
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     [CLSCompliant(false)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class ExportAsAsyncCloudGatewayAttribute : ExportAttribute
     {
+        /// <summary>
+        /// Gets the gateway name.
+        /// </summary>
+        /// <value>The gateway name.</value>
         public string Name { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExportAsAsyncCloudGatewayAttribute"/> class.
+        /// </summary>
+        /// <param name="name">The gateway name.</param>
+        /// <exception cref="ArgumentNullException">The name is <c>null</c>.</exception>
         public ExportAsAsyncCloudGatewayAttribute(string name) : base(typeof(IAsyncCloudGateway))
         {
             if (string.IsNullOrEmpty(name))

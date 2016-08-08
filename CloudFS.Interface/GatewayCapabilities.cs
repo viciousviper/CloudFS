@@ -26,6 +26,9 @@ using System;
 
 namespace IgorSoft.CloudFS.Interface
 {
+    /// <summary>
+    /// Capabilities supported by a cloud service.
+    /// </summary>
     [Flags]
     public enum GatewayCapabilities
     {

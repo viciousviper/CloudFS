@@ -31,6 +31,10 @@ using SemanticTypes;
 
 namespace IgorSoft.CloudFS.Interface
 {
+    /// <summary>
+    /// The root of a cloud file system.
+    /// </summary>
+    /// <seealso cref="SemanticType{string}" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class RootName : SemanticType<string>
     {
@@ -38,12 +42,28 @@ namespace IgorSoft.CloudFS.Interface
 
         private static readonly Regex validationRegex = new Regex(rootNamePattern, RegexOptions.Compiled);
 
+        /// <summary>
+        /// Gets the schema of cloud service providing the storage space.
+        /// </summary>
+        /// <value>The schema.</value>
         public string Schema { get; }
 
+        /// <summary>
+        /// Gets the user name of the the storage account.
+        /// </summary>
+        /// <value>The user name.</value>
         public string UserName { get; }
 
+        /// <summary>
+        /// Gets the root volume for the mounted cloud file system.
+        /// </summary>
+        /// <value>The root volume.</value>
         public string Root { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RootName"/> class from a formatted string.
+        /// </summary>
+        /// <param name="name">The formatted root name.</param>
         public RootName(string name) : base(validationRegex.IsMatch, name)
         {
             var groups = validationRegex.Match(name).Groups;
@@ -52,6 +72,12 @@ namespace IgorSoft.CloudFS.Interface
             Root = groups[nameof(Root)].Value;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RootName"/> class.
+        /// </summary>
+        /// <param name="schema">The cloud service schema.</param>
+        /// <param name="userName">The user name.</param>
+        /// <param name="root">The root volume.</param>
         public RootName(string schema, string userName, string root) : this(Format(schema, userName, root))
         {
         }

@@ -30,11 +30,18 @@ using System.Reflection;
 
 namespace IgorSoft.CloudFS.Interface.Composition
 {
+    /// <summary>
+    /// Describes a cloud service.
+    /// </summary>
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class CloudGatewayMetadata
     {
         private readonly IDictionary<string, object> values;
 
+        /// <summary>
+        /// Gets the cloud service.
+        /// </summary>
+        /// <value>A <see cref="string"/> representing the cloud service.</value>
         public string CloudService
         {
             get {
@@ -43,6 +50,10 @@ namespace IgorSoft.CloudFS.Interface.Composition
             }
         }
 
+        /// <summary>
+        /// Gets the cloud service capabilities.
+        /// </summary>
+        /// <value>The cloud service capabilities.</value>
         public GatewayCapabilities Capabilities
         {
             get {
@@ -51,6 +62,10 @@ namespace IgorSoft.CloudFS.Interface.Composition
             }
         }
 
+        /// <summary>
+        /// Gets the cloud service URI.
+        /// </summary>
+        /// <value>The cloud service URI.</value>
         public Uri ServiceUri
         {
             get {
@@ -59,6 +74,10 @@ namespace IgorSoft.CloudFS.Interface.Composition
             }
         }
 
+        /// <summary>
+        /// Gets the name of the cloud service API assembly.
+        /// </summary>
+        /// <value>The name of the API assembly.</value>
         public AssemblyName ApiAssembly
         {
             get {
@@ -67,6 +86,12 @@ namespace IgorSoft.CloudFS.Interface.Composition
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CloudGatewayMetadata"/> class.
+        /// </summary>
+        /// <param name="values">The initialization values.</param>
+        /// <exception cref="ArgumentNullException">values is <c>null</c>.</exception>
+        /// <remarks>Supported keys in <paramref name="values"/> are: <see cref="CloudService"/>, <see cref="Capabilities"/>, <see cref="ServiceUri"/>, or <see cref="ApiAssembly"/>.</remarks>
         public CloudGatewayMetadata(IDictionary<string, object> values)
         {
             if (values == null)

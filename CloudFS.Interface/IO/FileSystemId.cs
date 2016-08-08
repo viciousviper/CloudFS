@@ -27,8 +27,16 @@ using SemanticTypes;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The unique identifier of a cloud file system object.
+    /// </summary>
+    /// <seealso cref="SemanticType{string}" />
     public abstract class FileSystemId : SemanticType<string>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileSystemId"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
         protected FileSystemId(string id) : base(i => !string.IsNullOrEmpty(i), id)
         {
         }

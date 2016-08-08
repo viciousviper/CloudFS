@@ -27,21 +27,59 @@ using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The descriptor of a cloud file.
+    /// </summary>
+    /// <seealso cref="FileSystemInfoContract" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public class FileInfoContract : FileSystemInfoContract
     {
+        /// <summary>
+        /// Gets the unique file identifier.
+        /// </summary>
+        /// <value>The unique file identifier.</value>
         public new FileId Id => (FileId)base.Id;
 
+        /// <summary>
+        /// Gets an instance of the parent directory.
+        /// </summary>
+        /// <value>A <see cref="DirectoryInfoContract"/> object representing the parent directory of this file.</value>
         public DirectoryInfoContract Directory { get; set; }
 
+        /// <summary>
+        /// Gets the full path of the file.
+        /// </summary>
+        /// <value>A <see cref="string"/> containing the full path.</value>
         public override string FullName => (Directory?.FullName ?? string.Empty) + Name;
 
+        /// <summary>
+        /// Gets the mode of the file.
+        /// </summary>
+        /// <value>The <see cref="string" /> containing the mode.</value>
         public override string Mode => "-----";
 
+        /// <summary>
+        /// Gets or sets the size, in bytes, of the current file.
+        /// </summary>
+        /// <value>The size of the current file in bytes.</value>
         public long Size { get; set; }
 
+        /// <summary>
+        /// Gets the cryptographic hash of the current file.
+        /// </summary>
+        /// <value>A <see cref="string" /> containing the cryptographic hash of the current file.</value>
         public string Hash { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileInfoContract"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="created">The creation time.</param>
+        /// <param name="updated">The time when the current <see cref="FileInfoContract"/> was last written.</param>
+        /// <param name="size">The file size in bytes.</param>
+        /// <param name="hash">The cryptographic hash.</param>
+        /// <exception cref="ArgumentException">The size is negative.</exception>
         public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, long size, string hash) : base(new FileId(id), name, created, updated)
         {
             if (size < 0)

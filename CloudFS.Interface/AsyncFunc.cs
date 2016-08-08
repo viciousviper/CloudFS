@@ -30,8 +30,20 @@ using System.Threading.Tasks;
 
 namespace IgorSoft.CloudFS.Interface
 {
+    /// <summary>
+    /// Provides error compensation for asynchronous functions by bounded retries.
+    /// </summary>
     public static class AsyncFunc
     {
+        /// <summary>
+        /// Executes an asynchronous function and retries if an <see cref="Exception"/> of type <typeparamref name="TException"/> is thrown.
+        /// </summary>
+        /// <typeparam name="TException">The type of the compensated <see cref="Exception"/>.</typeparam>
+        /// <param name="taskFactory">A factory method for the <see cref="Task"/> to be executed.</param>
+        /// <param name="retries">The maximum number of retries.</param>
+        /// <returns>A <see cref="Task"/> representing the completed operation.</returns>
+        /// <exception cref="ArgumentNullException">The taskFactory is <c>null</c>.</exception>
+        /// <exception cref="AggregateException">The specified <typeparamref name="TException"/> was thrown more than <paramref name="retries"/> times.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static Task RetryAsync<TException>(this Func<Task> taskFactory, int retries)
@@ -55,6 +67,16 @@ namespace IgorSoft.CloudFS.Interface
             throw new AggregateException(string.Join(", ", exceptions.Select(e => e.Message)), exceptions);
         }
 
+        /// <summary>
+        /// Executes an asynchronous function and retries if an <see cref="Exception"/> of type <typeparamref name="TException"/> is thrown.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result.</typeparam>
+        /// <typeparam name="TException">The type of the compensated <see cref="Exception"/>.</typeparam>
+        /// <param name="taskFactory">A factory method for the <see cref="Task{TResult}"/> to be executed.</param>
+        /// <param name="retries">The maximum number of retries.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the completed operation result.</returns>
+        /// <exception cref="ArgumentNullException">The taskFactory is <c>null</c>.</exception>
+        /// <exception cref="AggregateException">The specified <typeparamref name="TException"/> was thrown more than <paramref name="retries"/> times.</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static async Task<TResult> RetryAsync<TResult, TException>(this Func<Task<TResult>> taskFactory, int retries)

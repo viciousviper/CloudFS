@@ -27,15 +27,36 @@ using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// An association of a file system object ID with its name.
+    /// </summary>
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class FileSystemInfoLocator
     {
+        /// <summary>
+        /// Gets the unique file system object identifier.
+        /// </summary>
+        /// <value>The unique file system object identifier.</value>
         public FileSystemId Id { get; }
 
+        /// <summary>
+        /// For files, gets the name of the file. For directories, gets the name of the last directory in the hierarchy if a hierarchy exists.
+        /// Otherwise, the <paramref name="Name"/ > property gets the name of the directory.
+        /// </summary>
+        /// <value>A <see cref="string" /> that is the name of the parent directory, the name of the last directory in the hierarchy, or the name of a file, including the file name extension.</value>
         public string Name { get; }
 
+        /// <summary>
+        /// Gets the parent directory ID.
+        /// </summary>
+        /// <value>The parent directory ID.</value>
         public DirectoryId ParentId { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileSystemInfoLocator"/> class.
+        /// </summary>
+        /// <param name="fileSystem">The file system info object.</param>
+        /// <exception cref="ArgumentNullException">The filesystem is <c>null</c>.</exception>
         public FileSystemInfoLocator(FileSystemInfoContract fileSystem)
         {
             if (fileSystem == null)

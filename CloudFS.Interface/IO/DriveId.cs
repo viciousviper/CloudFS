@@ -28,9 +28,17 @@ using SemanticTypes;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The unique identifier of a cloud drive.
+    /// </summary>
+    /// <seealso cref="SemanticTypes.SemanticType{System.String}" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class DriveId : SemanticType<string>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DriveId"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
         public DriveId(string id) : base(i => !string.IsNullOrEmpty(i), id)
         {
         }

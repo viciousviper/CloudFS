@@ -27,9 +27,17 @@ using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The unique identifier of a cloud file.
+    /// </summary>
+    /// <seealso cref="IgorSoft.CloudFS.Interface.IO.FileSystemId" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class FileId : FileSystemId
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileId"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
         public FileId(string id) : base(id)
         {
         }

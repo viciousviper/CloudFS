@@ -26,20 +26,57 @@ using System;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The descriptor of a cloud file system object.
+    /// </summary>
     public abstract class FileSystemInfoContract
     {
+        /// <summary>
+        /// Gets the unique file system object identifier.
+        /// </summary>
+        /// <value>The unique file system object identifier.</value>
         public FileSystemId Id { get; }
 
+        /// <summary>
+        /// For files, gets the name of the file. For directories, gets the name of the last directory in the hierarchy if a hierarchy exists.
+        /// Otherwise, the <paramref name="Name"/ > property gets the name of the directory.
+        /// </summary>
+        /// <value>A <see cref="string" /> that is the name of the parent directory, the name of the last directory in the hierarchy, or the name of a file, including the file name extension.</value>
         public string Name { get; }
 
+        /// <summary>
+        /// Gets the full path of the directory or file.
+        /// </summary>
+        /// <value>A <see cref="string" /> containing the full path.</value>
         public abstract string FullName { get; }
 
+        /// <summary>
+        /// Gets the mode of the directory or file.
+        /// </summary>
+        /// <value>The <see cref="string" /> containing the mode.</value>
         public abstract string Mode { get; }
 
+        /// <summary>
+        /// Gets the creation time of the current file or directory.
+        /// </summary>
+        /// <value>The creation <see cref="DateTimeOffset" /> of the current <see cref="FileSystemInfoContract"/> object.</value>
         public DateTimeOffset Created { get; }
 
+        /// <summary>
+        /// Gets the time when the current file or directory was last written to.
+        /// </summary>
+        /// <value>The <see cref="DateTimeOffset" /> the current file or directory was last written.</value>
         public DateTimeOffset Updated { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileSystemInfoContract"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="created">The creation time.</param>
+        /// <param name="updated">The time when the current <see cref="FileSystemInfoContract"/> was last written.</param>
+        /// <exception cref="ArgumentNullException">The name or id is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Created or updated is less than the minimum file time.</exception>
         protected FileSystemInfoContract(FileSystemId id, string name, DateTimeOffset created, DateTimeOffset updated)
         {
             if (id == null)
@@ -57,6 +94,10 @@ namespace IgorSoft.CloudFS.Interface.IO
             Updated = updated;
         }
 
+        /// <summary>
+        /// Returns a <see cref="string"/> that represents this instance.
+        /// </summary>
+        /// <returns>A <see cref="string"/> that represents this instance.</returns>
         public override string ToString() => FullName;
     }
 }

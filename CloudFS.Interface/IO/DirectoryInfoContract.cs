@@ -28,17 +28,44 @@ using System.IO;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The descriptor of a cloud directory.
+    /// </summary>
+    /// <seealso cref="FileSystemInfoContract" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public class DirectoryInfoContract : FileSystemInfoContract
     {
+        /// <summary>
+        /// Gets the unique directory identifier.
+        /// </summary>
+        /// <value>The unique directory identifier.</value>
         public new DirectoryId Id => (DirectoryId)base.Id;
 
+        /// <summary>
+        /// Gets or sets the parent directory of a specified subdirectory.
+        /// </summary>
+        /// <value>The parent directory, or <c>null</c> if the path is null or if the file path denotes a root.</value>
         public DirectoryInfoContract Parent { get; set; }
 
+        /// <summary>
+        /// Gets the full path of the directory.
+        /// </summary>
+        /// <value>A <see cref="string" /> containing the full path.</value>
         public override string FullName => (Parent?.FullName ?? string.Empty) + Name + Path.DirectorySeparatorChar;
 
+        /// <summary>
+        /// Gets the mode of the directory.
+        /// </summary>
+        /// <value>The <see cref="string" /> containing the mode.</value>
         public override string Mode => "d----";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DirectoryInfoContract"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
+        /// <param name="name">The name.</param>
+        /// <param name="created">The creation time.</param>
+        /// <param name="updated">The time when the current <see cref="DirectoryInfoContract"/> was last written.</param>
         public DirectoryInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated) : base(new DirectoryId(id), name, created, updated)
         {
         }

@@ -27,9 +27,17 @@ using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The placeholder for a cloud file that is being initialized.
+    /// </summary>
+    /// <seealso cref="FileInfoContract" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class ProxyFileInfoContract : FileInfoContract
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyFileInfoContract"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
         public ProxyFileInfoContract(string name) : base("PROXY", name, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0), 0, null)
         {
         }

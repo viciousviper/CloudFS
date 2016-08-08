@@ -27,9 +27,17 @@ using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The unique identifier of a cloud directory.
+    /// </summary>
+    /// <seealso cref="FileSystemId" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class DirectoryId : FileSystemId
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DirectoryId"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
         public DirectoryId(string id) : base(id)
         {
         }

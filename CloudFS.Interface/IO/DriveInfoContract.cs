@@ -27,17 +27,51 @@ using System.Globalization;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
+    /// <summary>
+    /// The descriptor of a cloud drive.
+    /// </summary>
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class DriveInfoContract
     {
+        /// <summary>
+        /// Gets the drive identifier.
+        /// </summary>
+        /// <value>
+        /// The drive identifier.
+        /// </value>
         public DriveId Id { get; }
 
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Gets the free space in bytes.
+        /// </summary>
+        /// <value>
+        /// The free space in bytes, or <c>null</c> if unknown.
+        /// </value>
         public long? FreeSpace { get; }
 
+        /// <summary>
+        /// Gets the used space in bytes.
+        /// </summary>
+        /// <value>
+        /// The used space in bytes, or <c>null</c> if unknown.
+        /// </value>
         public long? UsedSpace { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DriveInfoContract"/> class.
+        /// </summary>
+        /// <param name="id">The unique drive identifier.</param>
+        /// <param name="freeSpace">The free space in bytes, or <c>null</c> if unknown.</param>
+        /// <param name="usedSpace">The used space in bytes, or <c>null</c> if unknown.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public DriveInfoContract(string id, long? freeSpace, long? usedSpace)
         {
             if (string.IsNullOrEmpty(id))
