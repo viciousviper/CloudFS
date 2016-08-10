@@ -83,7 +83,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, long size, string hash) : base(new FileId(id), name, created, updated)
         {
             if (size < 0)
-                throw new ArgumentException(nameof(size));
+                throw new ArgumentException($"{nameof(size)} is < 0", nameof(size));
 
             Size = size;
             Hash = hash;
