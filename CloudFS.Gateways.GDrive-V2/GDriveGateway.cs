@@ -107,7 +107,9 @@ namespace IgorSoft.CloudFS.Gateways.GDrive_V2
 
             var item = await AsyncFunc.RetryAsync<About, GoogleApiException>(async () => await context.Service.About.Get().ExecuteAsync(), RETRIES);
 
-            var usedSpace = item.QuotaBytesUsed.HasValue ? item.QuotaBytesUsed ?? 0 + item.QuotaBytesUsedInTrash ?? 0 : (long?)null;
+            var usedSpace = item.QuotaBytesUsed.HasValue || item.QuotaBytesUsedInTrash.HasValue
+                ? (item.QuotaBytesUsed ?? 0) + (item.QuotaBytesUsedInTrash ?? 0)
+                : (long?)null;
             var freeSpace = item.QuotaBytesTotal.HasValue ? item.QuotaBytesTotal.Value - usedSpace : (long?)null;
             return new DriveInfoContract(item.Name, freeSpace, usedSpace);
         }

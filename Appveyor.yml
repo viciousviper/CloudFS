@@ -1,9 +1,9 @@
-version: 1.0.3-alpha {build}
+version: 1.0.7-alpha {build}
 
 branches:
   only:
-  - master
   - develop
+  - master
 
 skip_tags: true
 
@@ -21,13 +21,11 @@ environment:
 
 cache: packages -> **\packages.config
 
-before_build:
-- cmd: nuget restore
+build_script:
+- cmd: >-
+    nuget restore
 
-build:
-  project: CloudFS.sln
-  verbosity: normal
-
+    cov-build --dir cov-int msbuild CloudFS.sln /p:UseSharedCompilation=false /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 test:
   categories:
     except:
@@ -35,12 +33,12 @@ test:
 
 after_test:
 - cmd: >-
-    IF %CONFIGURATION% NEQ Debug EXIT
-    cov-build --dir cov-int msbuild CloudFS.sln /t:Rebuild /v:quiet /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-    7z a -r coverity.tar cov-int
-    7z a coverity.tar.gz coverity.tar
-    curl --form token=%COVERITY_TOKEN% --form email=%COVERITY_EMAIL% --form file=@coverity.tar.gz --form version="1.0.3-alpha" https://scan.coverity.com/builds?project=viciousviper/CloudFS
+    IF %APPVEYOR_REPO_BRANCH% NEQ master OR %CONFIGURATION% NEQ Debug EXIT
+
+    7z a -r coverity.zip cov-int
+
+    curl --form token=%COVERITY_TOKEN% --form email=%COVERITY_EMAIL% --form file=@coverity.zip --form version="1.0.7-alpha" https://scan.coverity.com/builds?project=%APPVEYOR_REPO_NAME%
 
 artifacts:
-- path: cov-int\build-log.txt
-  name: Coverity-Build-Log
+- path: coverity.zip
+  name: Coverity-Upload

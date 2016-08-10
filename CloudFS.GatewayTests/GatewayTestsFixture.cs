@@ -74,7 +74,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
         public static IEnumerable<GatewayElement> GetGatewayConfigurations(GatewayType type, GatewayCapabilities capability)
         {
-            return testSection.Gateways.Where(g => g.Type == type && (capability == GatewayCapabilities.None || !g.Exclusions.HasFlag(capability)));
+            return testSection.Gateways?.Where(g => g.Type == type && (capability == GatewayCapabilities.None || !g.Exclusions.HasFlag(capability))) ?? Enumerable.Empty<GatewayElement>();
         }
 
         public IAsyncCloudGateway GetAsyncGateway(GatewayElement config)
@@ -100,11 +100,12 @@ namespace IgorSoft.CloudFS.GatewayTests
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            if (string.IsNullOrEmpty(config.Parameters))
+            var parameters = config.Parameters;
+            if (string.IsNullOrEmpty(parameters))
                 return null;
 
             var result = new Dictionary<string, string>();
-            foreach (var parameter in config.Parameters.Split('|')) {
+            foreach (var parameter in parameters.Split('|')) {
                 var components = parameter.Split(new[] { '=' }, 2);
                 result.Add(components[0], components.Length == 2 ? components[1] : null);
             }

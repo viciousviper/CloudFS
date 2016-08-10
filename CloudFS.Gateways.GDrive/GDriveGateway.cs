@@ -112,8 +112,11 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var request = context.Service.About.Get().AsDrive();
             var item = await AsyncFunc.RetryAsync<About, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
 
-            var usedSpace = item.StorageQuota.UsageInDrive.HasValue ? item.StorageQuota.UsageInDrive ?? 0 + item.StorageQuota.UsageInDriveTrash ?? 0 : (long?)null;
-            var freeSpace = item.StorageQuota.Limit.HasValue ? item.StorageQuota.Limit.Value - usedSpace : (long?)null;
+            var storageQuota = item.StorageQuota;
+            var usedSpace = storageQuota.UsageInDrive.HasValue || storageQuota.UsageInDriveTrash.HasValue
+                ? (storageQuota.UsageInDrive ?? 0) + (storageQuota.UsageInDriveTrash ?? 0)
+                : (long?)null;
+            var freeSpace = storageQuota.Limit.HasValue ? storageQuota.Limit.Value - usedSpace : (long?)null;
             return new DriveInfoContract(item.User.DisplayName, freeSpace, usedSpace);
         }
 
