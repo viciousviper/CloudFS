@@ -72,6 +72,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="StringCipher.cs" />
     <Compile Include="UIThread.cs" />
     <Compile Include="LogOnWindow.xaml.cs">
       <DependentUpon>LogOnWindow.xaml</DependentUpon>
