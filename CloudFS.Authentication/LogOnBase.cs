@@ -30,6 +30,10 @@ using System.Windows;
 
 namespace IgorSoft.CloudFS.Authentication
 {
+    /// <summary>
+    /// Base class for interactive user logOn.
+    /// </summary>
+    /// <seealso cref="System.IDisposable" />
     public abstract class LogOnBase : IDisposable
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
@@ -76,6 +80,10 @@ namespace IgorSoft.CloudFS.Authentication
             waitHandle.WaitOne();
         }
 
+        /// <summary>
+        /// Closes the logOn window.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The window has not been initialized.</exception>
         public void Close()
         {
             if (window == null)
@@ -90,12 +98,18 @@ namespace IgorSoft.CloudFS.Authentication
             synchonizationContext.Post(state => handler?.Invoke(this, (AuthenticatedEventArgs)state), new AuthenticatedEventArgs(parameters));
         }
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             waitHandle.Dispose();
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Occurs when the user has been authenticated.
+        /// </summary>
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
     }
 }

@@ -33,7 +33,8 @@ test:
 
 after_test:
 - cmd: >-
-    IF %APPVEYOR_REPO_BRANCH% NEQ master OR %CONFIGURATION% NEQ Debug EXIT
+    IF %APPVEYOR_REPO_BRANCH% NEQ master
+    IF %CONFIGURATION% NEQ Debug EXIT
 
     7z a -r coverity.zip cov-int
 

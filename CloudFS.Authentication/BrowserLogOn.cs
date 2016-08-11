@@ -31,14 +31,30 @@ using System.Windows.Interop;
 
 namespace IgorSoft.CloudFS.Authentication
 {
+    /// <summary>
+    /// Allows interactive user logOn in a web browser.
+    /// </summary>
+    /// <seealso cref="LogOnBase" />
     public sealed class BrowserLogOn : LogOnBase
     {
         private WebBrowser browser;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BrowserLogOn"/> class.
+        /// </summary>
+        /// <param name="synchonizationContext">The synchonization context.</param>
         public BrowserLogOn(SynchronizationContext synchonizationContext) : base(synchonizationContext)
         {
         }
 
+        /// <summary>
+        /// Shows the logOn web browser.
+        /// </summary>
+        /// <param name="serviceName">Name of the authenticating cloud service.</param>
+        /// <param name="account">The usser account.</param>
+        /// <param name="authenticationUri">The authentication URI.</param>
+        /// <param name="redirectUri">The redirect URI.</param>
+        /// <remarks>Please see the authentication protocol documentation of the respective cloud service for details on the correct choice of <paramref name="authenticationUri"/> and <paramref name="redirectUri"/>.</remarks>
         public void Show(string serviceName, string account, Uri authenticationUri, Uri redirectUri)
         {
             base.Show(serviceName, account,

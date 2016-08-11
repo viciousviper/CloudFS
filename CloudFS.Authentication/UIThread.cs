@@ -28,10 +28,17 @@ using System.Windows.Threading;
 
 namespace IgorSoft.CloudFS.Authentication
 {
+    /// <summary>
+    /// Provides a dedicated <see cref="Thread"/> for UI elements.
+    /// </summary>
     public static class UIThread
     {
         private static Dispatcher dispatcher;
 
+        /// <summary>
+        /// Runs a <see cref="Dispatcher"/> instance on a dedicated new <see cref="Thread"/>.
+        /// </summary>
+        /// <returns>The dispatcher.</returns>
         public static Dispatcher GetDispatcher()
         {
             if (dispatcher == null) {
@@ -52,6 +59,9 @@ namespace IgorSoft.CloudFS.Authentication
             return dispatcher;
         }
 
+        /// <summary>
+        /// Shutdowns the dispatcher instance.
+        /// </summary>
         public static void Shutdown()
         {
             dispatcher?.InvokeShutdown();

@@ -28,12 +28,25 @@ using System.Threading;
 
 namespace IgorSoft.CloudFS.Authentication
 {
+    /// <summary>
+    /// Allows interactive user logOn in a form.
+    /// </summary>
+    /// <seealso cref="LogOnBase" />
     public sealed class DirectLogOn : LogOnBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DirectLogOn"/> class.
+        /// </summary>
+        /// <param name="synchonizationContext">The synchonization context.</param>
         public DirectLogOn(SynchronizationContext synchonizationContext) : base(synchonizationContext)
         {
         }
 
+        /// <summary>
+        /// Shows the logOn form.
+        /// </summary>
+        /// <param name="serviceName">Name of the authenticating cloud service.</param>
+        /// <param name="account">The user account.</param>
         public void Show(string serviceName, string account)
         {
             base.Show(serviceName, account,

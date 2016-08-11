@@ -26,6 +26,9 @@ using System;
 
 namespace IgorSoft.CloudFS.Authentication.OAuth
 {
+    /// <summary>
+    /// Declares various <see cref="string"/> constants for use in the implementation of an OAuth flow.
+    /// </summary>
     public static class Constants
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1034:NestedTypesShouldNotBeVisible")]

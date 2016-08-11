@@ -45,7 +45,9 @@ namespace IgorSoft.CloudFS.Authentication
         // This constant determines the number of iterations for the password bytes generation function.
         private const int DerivationIterations = 1000;
 
-        /// <summary>Encrypts the specified plain text.</summary>
+        /// <summary>
+        /// Encrypts the specified plain text.
+        /// </summary>
         /// <param name="plainText">The plain text.</param>
         /// <param name="passPhrase">The pass phrase.</param>
         /// <returns>The cipher text.</returns>
@@ -79,7 +81,9 @@ namespace IgorSoft.CloudFS.Authentication
             }
         }
 
-        /// <summary>Decrypts the specified cipher text.</summary>
+        /// <summary>
+        /// Decrypts the specified cipher text.
+        /// </summary>
         /// <param name="cipherText">The cipher text.</param>
         /// <param name="passPhrase">The pass phrase.</param>
         /// <returns>The plain text.</returns>

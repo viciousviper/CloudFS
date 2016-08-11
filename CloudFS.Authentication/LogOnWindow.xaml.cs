@@ -33,6 +33,9 @@ namespace IgorSoft.CloudFS.Authentication
     /// </summary>
     public partial class LogOnWindow : Window
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogOnWindow"/> class.
+        /// </summary>
         public LogOnWindow()
         {
             InitializeComponent();

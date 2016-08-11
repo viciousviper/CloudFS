@@ -27,10 +27,19 @@ using System.Text;
 
 namespace IgorSoft.CloudFS.Authentication
 {
+    /// <summary>
+    /// Facilitates construction of regular Uri query parameters.
+    /// </summary>
     public sealed class QueryStringBuilder
     {
         private readonly StringBuilder builder = new StringBuilder();
 
+        /// <summary>
+        /// Appends a query parameter.
+        /// </summary>
+        /// <param name="key">The parameter key.</param>
+        /// <param name="value">The parameter value.</param>
+        /// <returns>The <see cref="QueryStringBuilder"/> instance with the added query parameter.</returns>
         public QueryStringBuilder AppendParameter(string key, string value)
         {
             if (builder.Length != 0)
@@ -40,6 +49,10 @@ namespace IgorSoft.CloudFS.Authentication
             return this;
         }
 
+        /// <summary>
+        /// Returns a <see cref="string" /> that represents this instance.
+        /// </summary>
+        /// <returns>A <see cref="string" /> that represents this instance.</returns>
         public override string ToString() => builder.ToString();
     }
 }
