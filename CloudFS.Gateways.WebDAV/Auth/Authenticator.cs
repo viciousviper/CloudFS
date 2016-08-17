@@ -38,6 +38,35 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
     {
         private static DirectLogOn logOn;
 
+        private static NetworkCredential LoadCredential(string account)
+        {
+            var credentials = Settings.Default.Credentials;
+            if (credentials != null)
+                foreach (CredentialsSetting setting in credentials)
+                    if (setting.Account == account)
+                        return new NetworkCredential(setting.UserName, setting.Password);
+
+            return null;
+        }
+
+        private static void SaveCredential(string account, NetworkCredential credential)
+        {
+            var credentials = Settings.Default.Credentials;
+            if (credentials != null) {
+                foreach (CredentialsSetting setting in credentials)
+                    if (setting.Account == account) {
+                        credentials.Remove(setting);
+                        break;
+                    }
+            } else {
+                credentials = Settings.Default.Credentials = new System.Collections.ObjectModel.Collection<CredentialsSetting>();
+            }
+
+            credentials.Insert(0, new CredentialsSetting() { Account = account, UserName = credential.UserName, Password = credential.Password });
+
+            Settings.Default.Save();
+        }
+
         public static string GetAuthCode(string account)
         {
             string authCode = null;
@@ -62,16 +91,24 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
             if (baseAddress == null)
                 throw new ArgumentNullException(nameof(baseAddress));
 
-            if (string.IsNullOrEmpty(code))
-                code = GetAuthCode(account);
+            var credential = LoadCredential(account);
 
-            var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
-            if (parts.Length != 2)
-                throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+            if (credential == null) {
+                if (string.IsNullOrEmpty(code))
+                    code = GetAuthCode(account);
+
+                var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
+                if (parts.Length != 2)
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+
+                credential = new NetworkCredential(parts[0], parts[1]);
+            }
+
+            SaveCredential(account, credential);
 
             var clientParams = new WebDavClientParams() {
                 BaseAddress = baseAddress,
-                Credentials = new NetworkCredential(parts[0], parts[1]),
+                Credentials = credential,
                 UseDefaultCredentials = false
             };
             return new WebDavClient(clientParams);
