@@ -80,7 +80,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             return result;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -99,7 +99,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             return new DriveInfoContract(item.Id, item.Quota.Remaining, item.Quota.Used);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 

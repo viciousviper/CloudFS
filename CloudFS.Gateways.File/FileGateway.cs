@@ -54,7 +54,7 @@ namespace IgorSoft.CloudFS.Gateways.File
 
         private string rootPath;
 
-        public bool TryAuthenticate(RootName root, string apiKey)
+        public bool TryAuthenticate(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             return true;
         }
@@ -72,7 +72,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             return new DriveInfoContract(root.Value, drive.AvailableFreeSpace, drive.TotalSize - drive.AvailableFreeSpace);
         }
 
-        public RootDirectoryInfoContract GetRoot(RootName root, string apiKey)
+        public RootDirectoryInfoContract GetRoot(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));

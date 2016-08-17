@@ -99,7 +99,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             return long.Parse(fileId.Value.Substring(1), NumberStyles.Number);
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -118,7 +118,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             return new DriveInfoContract(item.UserId, item.Quota - item.UsedQuota, item.UsedQuota);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 

@@ -95,7 +95,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             return true;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -115,7 +115,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             return new DriveInfoContract(root.Value, item.TotalSpace - item.UsedSpace - item.TrashSize, item.UsedSpace);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 

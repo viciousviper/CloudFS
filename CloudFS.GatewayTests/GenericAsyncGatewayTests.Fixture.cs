@@ -49,7 +49,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 this.gateway = gateway;
                 this.root = root;
 
-                var rootDirectory = gateway.GetRootAsync(root, apiKey).Result;
+                var rootDirectory = gateway.GetRootAsync(root, apiKey, parameters).Result;
 
                 var residualDirectory = gateway.GetChildItemAsync(root, rootDirectory.Id).Result.SingleOrDefault(f => f.Name == path) as DirectoryInfoContract;
                 if (residualDirectory != null)

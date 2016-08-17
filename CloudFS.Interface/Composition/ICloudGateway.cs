@@ -39,9 +39,10 @@ namespace IgorSoft.CloudFS.Interface.Composition
         /// </summary>
         /// <param name="root">The root name identifying a cloud file system instance.</param>
         /// <param name="apiKey">An optional API key authenticating the user.</param>
+        /// <param name="parameters">Additional parameters for drive configuration.</param>
         /// <returns><c>true</c> if the authentication succeeded; otherwise <c>false</c>.</returns>
         /// <remarks>If no <paramref name="apiKey"/> is specified, this method will load a stored authentication token, if present, or else prompt the user for credentials.</remarks>
-        bool TryAuthenticate(RootName root, string apiKey);
+        bool TryAuthenticate(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         /// <summary>
         /// Gets the drive associated with a cloud file system.
@@ -58,9 +59,10 @@ namespace IgorSoft.CloudFS.Interface.Composition
         /// </summary>
         /// <param name="root">The root name identifying a cloud file system instance.</param>
         /// <param name="apiKey">An optional API key authenticating the user.</param>
+        /// <param name="parameters">Additional parameters for drive configuration.</param>
         /// <returns>A <see cref="RootDirectoryInfoContract"/> representing the root directory.</returns>
         /// <remarks>If no <paramref name="apiKey"/> is specified, this method will load a stored authentication token, if present, or else prompt the user for credentials.</remarks>
-        RootDirectoryInfoContract GetRoot(RootName root, string apiKey);
+        RootDirectoryInfoContract GetRoot(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         /// <summary>
         /// Gets the child items of the specified parent directory.

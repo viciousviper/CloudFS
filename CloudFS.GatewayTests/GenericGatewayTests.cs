@@ -88,7 +88,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) =>
             {
-                Assert.IsTrue(gateway.TryAuthenticate(rootName, config.ApiKey));
+                Assert.IsTrue(gateway.TryAuthenticate(rootName, config.ApiKey, fixture.GetParameters(config)));
             });
         }
 
@@ -116,7 +116,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                 fixture.OnCondition(config, GatewayCapabilities.GetRoot, () =>
                 {
-                    var root = gateway.GetRoot(rootName, config.ApiKey);
+                    var root = gateway.GetRoot(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     Assert.IsNotNull(root, "Root is null");
                     Assert.AreEqual(Path.DirectorySeparatorChar.ToString(), root.Name, "Unexpected root name");

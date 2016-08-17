@@ -79,7 +79,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             return result;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -98,7 +98,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             return new DriveInfoContract(root.Value, accountInformation.TotalQuota - accountInformation.UsedQuota, accountInformation.UsedQuota);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 

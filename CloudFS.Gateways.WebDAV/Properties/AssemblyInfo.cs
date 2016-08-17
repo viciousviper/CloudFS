@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2015 IgorSoft
+Copyright(c) 2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,15 @@ SOFTWARE.
 */
 
 using System;
-using CG.Web.MegaApiClient;
-using IgorSoft.CloudFS.Interface.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace IgorSoft.CloudFS.Gateways.Mega
-{
-    internal static class NodeExtensions
-    {
-        public static FileSystemInfoContract ToFileSystemInfoContract(this INode item) => item.Type == NodeType.Directory
-                ? new DirectoryInfoContract(item.Id, item.Name, DateTimeOffset.FromFileTime(0), item.LastModificationDate) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, DateTimeOffset.FromFileTime(0), item.LastModificationDate, item.Size, null) as FileSystemInfoContract;
-    }
-}
+[assembly: AssemblyTitle("CloudFS.Gateways.WebDAV")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyProduct("CloudFS.WebDAV")]
+[assembly: AssemblyCulture("")]
+
+[assembly: ComVisible(false)]
+
+[assembly: CLSCompliant(true)]

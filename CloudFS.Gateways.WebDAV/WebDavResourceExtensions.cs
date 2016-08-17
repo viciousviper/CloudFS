@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2015 IgorSoft
+Copyright(c) 2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,22 @@ SOFTWARE.
 */
 
 using System;
-using CG.Web.MegaApiClient;
+using WebDav;
 using IgorSoft.CloudFS.Interface.IO;
 
-namespace IgorSoft.CloudFS.Gateways.Mega
+namespace IgorSoft.CloudFS.Gateways.WebDAV
 {
-    internal static class NodeExtensions
+    internal static class WebDavResourceExtensions
     {
-        public static FileSystemInfoContract ToFileSystemInfoContract(this INode item) => item.Type == NodeType.Directory
-                ? new DirectoryInfoContract(item.Id, item.Name, DateTimeOffset.FromFileTime(0), item.LastModificationDate) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, DateTimeOffset.FromFileTime(0), item.LastModificationDate, item.Size, null) as FileSystemInfoContract;
+        public static string GetName(this WebDavResource item)
+        {
+            var normalizedUri = item.Uri.TrimEnd('/');
+            var lastSlashIndex = normalizedUri.LastIndexOf('/');
+            return normalizedUri.Substring(lastSlashIndex + 1);
+        }
+
+        public static FileSystemInfoContract ToFileSystemInfoContract(this WebDavResource item) => item.IsCollection
+                ? new DirectoryInfoContract(item.Uri, item.GetName(), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0)) as FileSystemInfoContract
+                : new FileInfoContract(item.Uri, item.GetName(), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), item.ContentLength ?? -1, item.ETag) as FileSystemInfoContract;
     }
 }

@@ -40,9 +40,10 @@ namespace IgorSoft.CloudFS.Interface.Composition
         /// </summary>
         /// <param name="root">The root name identifying a cloud file system instance.</param>
         /// <param name="apiKey">An optional API key authenticating the user.</param>
+        /// <param name="parameters">Additional parameters for drive configuration.</param>
         /// <returns>A <see cref="Task{bool}"/> representing the authentication result: <c>true</c> if the authentication succeeded; otherwise <c>false</c>.</returns>
         /// <remarks>If no <paramref name="apiKey"/> is specified, this method will load a stored authentication token, if present, or else prompt the user for credentials.</remarks>
-        Task<bool> TryAuthenticateAsync(RootName root, string apiKey);
+        Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         /// <summary>
         /// Gets the drive associated with a cloud file system asynchronously.
@@ -59,9 +60,10 @@ namespace IgorSoft.CloudFS.Interface.Composition
         /// </summary>
         /// <param name="root">The root name identifying a cloud file system instance.</param>
         /// <param name="apiKey">An optional API key authenticating the user.</param>
+        /// <param name="parameters">Additional parameters for drive configuration.</param>
         /// <returns>A <see cref="Task{RootDirectoryInfoContract}"/> representing the root directory.</returns>
         /// <remarks>If no <paramref name="apiKey"/> is specified, this method will load a stored authentication token, if present, or else prompt the user for credentials.</remarks>
-        Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey);
+        Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters);
 
         /// <summary>
         /// Gets the child items of the specified parent directory asynchronously.
