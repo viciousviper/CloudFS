@@ -69,6 +69,14 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
         private readonly IDictionary<RootName, OneDriveContext> contextCache = new Dictionary<RootName, OneDriveContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public OneDriveGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<OneDriveContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -76,14 +84,14 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
             var result = default(OneDriveContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var connection = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
+                var connection = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 var drive = await connection.GetDrive();
                 contextCache.Add(root, result = new OneDriveContext(connection, drive));
             }
             return result;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -102,7 +110,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             return new DriveInfoContract(item.Id, item.Quota.Remaining, item.Quota.Used);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 
@@ -123,7 +131,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
         public Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<bool>(new NotSupportedException(Resources.EmptyFilesNotSupported));
+            return Task.FromException<bool>(new NotSupportedException(Properties.Resources.EmptyFilesNotSupported));
         }
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)

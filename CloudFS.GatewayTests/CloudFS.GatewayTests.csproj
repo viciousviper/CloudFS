@@ -131,6 +131,7 @@
     <Compile Include="GenericAsyncGatewayTests.Fixture.cs">
       <DependentUpon>GenericAsyncGatewayTests.cs</DependentUpon>
     </Compile>
+    <Compile Include="Secrets.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="GenericGatewayTests.cs" />
     <Compile Include="GenericGatewayTests.Fixture.cs">

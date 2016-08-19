@@ -72,6 +72,14 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         private readonly IDictionary<RootName, BoxContext> contextCache = new Dictionary<RootName, BoxContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public BoxGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<BoxContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -79,13 +87,13 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var result = default(BoxContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
+                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new BoxContext(client));
             }
             return result;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -104,7 +112,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
             return new DriveInfoContract(item.Id, item.SpaceAmount.Value - item.SpaceUsed.Value, item.SpaceUsed.Value);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 

@@ -68,6 +68,14 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
         private readonly IDictionary<RootName, YandexContext> contextCache = new Dictionary<RootName, YandexContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public YandexGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<YandexContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -75,7 +83,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
             var result = default(YandexContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
+                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new YandexContext(client));
             }
             return result;
@@ -95,7 +103,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             return true;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -115,7 +123,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             return new DriveInfoContract(root.Value, item.TotalSpace - item.UsedSpace - item.TrashSize, item.UsedSpace);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 
@@ -176,7 +184,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var copyRequest = new CopyFileRequest() { From = source.Value, Path = path };
             var link = await context.Client.Commands.CopyAsync(copyRequest, CancellationToken.None);
             if (!await OperationProgressAsync(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.CopyAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.CopyAsync)));
             var request = new ResourceRequest() { Path = path };
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
@@ -191,7 +199,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var moveRequest = new MoveFileRequest() { From = source.Value, Path = path };
             var link = await context.Client.Commands.MoveAsync(moveRequest, CancellationToken.None);
             if (!await OperationProgressAsync(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.MoveAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.MoveAsync)));
             var request = new ResourceRequest() { Path = path };
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
@@ -205,7 +213,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var request = new ResourceRequest() { Path = parent.Value.TrimEnd('/') + '/' + name };
             var link = await context.Client.Commands.CreateDictionaryAsync(request.Path, CancellationToken.None);
             if (!await OperationProgressAsync(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(ICommandsClient.CreateDictionaryAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.CreateDictionaryAsync)));
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
             return new DirectoryInfoContract(item.Path, item.Name, item.Created, item.Modified);
@@ -234,7 +242,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var request = new DeleteFileRequest() { Path = target.Value };
             var link = await context.Client.Commands.DeleteAsync(request, CancellationToken.None);
             if (!await OperationProgressAsync(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(ICommandsClient.DeleteAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.DeleteAsync)));
 
             return true;
         }
@@ -248,7 +256,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var moveRequest = new MoveFileRequest() { From = target.Value, Path = path };
             var link = await context.Client.Commands.MoveAsync(moveRequest, CancellationToken.None);
             if (!await OperationProgressAsync(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Resources.OperationFailed, nameof(ICommandsClient.MoveAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.MoveAsync)));
             var request = new ResourceRequest() { Path = path };
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 

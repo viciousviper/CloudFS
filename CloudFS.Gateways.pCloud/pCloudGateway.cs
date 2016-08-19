@@ -70,6 +70,14 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         private readonly IDictionary<RootName, pCloudContext> contextCache = new Dictionary<RootName, pCloudContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public pCloudGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<pCloudContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -77,7 +85,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
             var result = default(pCloudContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await Authenticator.LoginAsync(root.UserName, apiKey);
+                var client = await Authenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new pCloudContext(client));
             }
             return result;
@@ -86,7 +94,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         private static long ToId(DirectoryId folderId)
         {
             if (!folderId.Value.StartsWith("d", StringComparison.Ordinal))
-                throw new FormatException(string.Format(CultureInfo.InvariantCulture, Resources.InvalidFolderId, folderId));
+                throw new FormatException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.InvalidFolderId, folderId));
 
             return long.Parse(folderId.Value.Substring(1), NumberStyles.Number);
         }
@@ -94,12 +102,12 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         private static long ToId(FileId fileId)
         {
             if (!fileId.Value.StartsWith("f", StringComparison.Ordinal))
-                throw new FormatException(string.Format(CultureInfo.InvariantCulture, Resources.InvalidFileId, fileId));
+                throw new FormatException(string.Format(CultureInfo.InvariantCulture, Properties.Resources.InvalidFileId, fileId));
 
             return long.Parse(fileId.Value.Substring(1), NumberStyles.Number);
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -118,7 +126,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             return new DriveInfoContract(item.UserId, item.Quota - item.UsedQuota, item.UsedQuota);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 
@@ -180,7 +188,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         {
             var fileSource = source as FileId;
             if (fileSource == null)
-                 throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
+                 throw new NotSupportedException(Properties.Resources.CopyingOfDirectoriesNotSupported);
 
             var context = await RequireContextAsync(root);
 
@@ -207,7 +215,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
                 return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.ItemTypeNotSupported, source.GetType().Name));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ItemTypeNotSupported, source.GetType().Name));
         }
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
@@ -248,7 +256,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
                 return true;
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.ItemTypeNotSupported, target.GetType().Name));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ItemTypeNotSupported, target.GetType().Name));
         }
 
         public async Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
@@ -274,7 +282,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
                 return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resources.ItemTypeNotSupported, target.GetType().Name));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ItemTypeNotSupported, target.GetType().Name));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

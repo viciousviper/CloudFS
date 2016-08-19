@@ -28,7 +28,7 @@ using IgorSoft.CloudFS.Interface.IO;
 
 namespace IgorSoft.CloudFS.Gateways.Mega
 {
-    internal static class FileSystemExtensions
+    internal static class NodeExtensions
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this INode item) => item.Type == NodeType.Directory
                 ? new DirectoryInfoContract(item.Id, item.Name, DateTimeOffset.FromFileTime(0), item.LastModificationDate) as FileSystemInfoContract

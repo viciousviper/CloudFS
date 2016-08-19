@@ -50,7 +50,7 @@ namespace IgorSoft.CloudFS.GatewayTests
                 this.root = root;
 
                 gateway.GetDrive(root, apiKey, parameters);
-                var rootDirectory = gateway.GetRoot(root, apiKey);
+                var rootDirectory = gateway.GetRoot(root, apiKey, parameters);
 
                 var residualDirectory = gateway.GetChildItem(root, rootDirectory.Id).SingleOrDefault(f => f.Name == path) as DirectoryInfoContract;
                 if (residualDirectory != null)

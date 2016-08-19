@@ -54,7 +54,7 @@ namespace IgorSoft.CloudFS.Gateways.File
 
         private string rootPath;
 
-        public bool TryAuthenticate(RootName root, string apiKey)
+        public bool TryAuthenticate(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             return true;
         }
@@ -72,7 +72,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             return new DriveInfoContract(root.Value, drive.AvailableFreeSpace, drive.TotalSize - drive.AvailableFreeSpace);
         }
 
-        public RootDirectoryInfoContract GetRoot(RootName root, string apiKey)
+        public RootDirectoryInfoContract GetRoot(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
@@ -220,7 +220,7 @@ namespace IgorSoft.CloudFS.Gateways.File
                 return new FileInfoContract(GetRelativePath(rootPath, fileCopy.FullName), fileCopy.Name, fileCopy.CreationTime, fileCopy.LastWriteTime, fileCopy.Length, null);
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.PathNotFound, source.Value));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PathNotFound, source.Value));
         }
 
         public FileSystemInfoContract MoveItem(RootName root, FileSystemId source, string moveName, DirectoryId destination)
@@ -254,7 +254,7 @@ namespace IgorSoft.CloudFS.Gateways.File
                 return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.PathNotFound, source.Value));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PathNotFound, source.Value));
         }
 
         public DirectoryInfoContract NewDirectoryItem(RootName root, DirectoryId parent, string name)
@@ -272,7 +272,7 @@ namespace IgorSoft.CloudFS.Gateways.File
 
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists)
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.DuplicatePath, effectivePath));
+                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicatePath, effectivePath));
 
             directory.Create();
 
@@ -294,7 +294,7 @@ namespace IgorSoft.CloudFS.Gateways.File
 
             var file = new FileInfo(effectivePath);
             if (file.Exists)
-                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.DuplicatePath, parent.Value));
+                throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.DuplicatePath, parent.Value));
 
             using (var fileStream = file.Create()) {
                 if (content != null)
@@ -328,7 +328,7 @@ namespace IgorSoft.CloudFS.Gateways.File
                 return;
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.PathNotFound, target.Value));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PathNotFound, target.Value));
         }
 
         public FileSystemInfoContract RenameItem(RootName root, FileSystemId target, string newName)
@@ -357,7 +357,7 @@ namespace IgorSoft.CloudFS.Gateways.File
                 return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
             }
 
-            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Resource.PathNotFound, target.Value));
+            throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PathNotFound, target.Value));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

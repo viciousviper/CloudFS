@@ -70,6 +70,14 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         private readonly IDictionary<RootName, MediaFireContext> contextCache = new Dictionary<RootName, MediaFireContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public MediaFireGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<MediaFireContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -77,13 +85,13 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
             var result = default(MediaFireContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var agent = await Authenticator.LoginAsync(root.UserName, apiKey);
+                var agent = await Authenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new MediaFireContext(agent));
             }
             return result;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -103,7 +111,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             return new DriveInfoContract(item.UserDetails.Email, item.UserDetails.StorageLimit - item.UserDetails.UsedStorageSize, item.UserDetails.UsedStorageSize);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root);
 
@@ -131,7 +139,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         public Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<bool>(new NotSupportedException(Resources.EmptyFilesNotSupported));
+            return Task.FromException<bool>(new NotSupportedException(Properties.Resources.EmptyFilesNotSupported));
         }
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
@@ -213,7 +221,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
                 //return new DirectoryInfoContract(item.FolderInfo.FolderKey, item.FolderInfo.Name, item.FolderInfo.Created, item.FolderInfo.Created);
 
-                throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
+                throw new NotSupportedException(Properties.Resources.CopyingOfDirectoriesNotSupported);
             } else {
                 var copy = await context.Agent.GetAsync<ApiExtensions.MediaFireCopyFileResponse>(MediaFireApiFileMethods.Copy, new Dictionary<string, object>() {
                     { MediaFireApiParameters.QuickKey, source.Value },
@@ -358,7 +366,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
         public void Dispose()
         {
             foreach (var context in contextCache)
-                Authenticator.SaveRefreshToken(context.Key.UserName, context.Value.Agent.User.GetAuthenticationContext());
+                Authenticator.SaveRefreshToken(context.Key.UserName, context.Value.Agent.User.GetAuthenticationContext(), settingsPassPhrase);
             contextCache.Clear();
         }
 

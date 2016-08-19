@@ -28,10 +28,11 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable |
 | [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.15.0.578 | async      | official  | stable |
 | [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.10.0     | async      | official  | stable |
-| [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 1.2.2      | async      | 3<sup>rd</sup> party | stable |
+| [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 2.0.0-beta-0010| async      | 3<sup>rd</sup> party | stable |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.3    | async      | 3<sup>rd</sup> party / local build | experimental |
 | [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.2.2      | async      | 3<sup>rd</sup> party | stable |
 | [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A        | async      | 3<sup>rd</sup> party | stable |
+| WebDAV<sup id="a3">[4](#f4)</sup>                                | [WebDAV Client](https://github.com/skazantsev/WebDavClient)             | 1.0.3      | async      | 3<sup>rd</sup> party / local build | stable |
 | [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.7      | async      | 3<sup>rd</sup> party | stable |
 | **Degraded services**                                            |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 1.1.47     | async      | official  | stable |
@@ -44,6 +45,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 > <sup><b id="f1">1</b></sup> Following Microsoft's November 2<sup>nd</sup>, 2015 announcement of its "[OneDrive storage plans change in pursuit of productivity and collaboration](https://blog.onedrive.com/onedrive_changes/)" the OneDrive cloud storage service will fail to meet the requirements for support in CloudFS as stated above after mid-July 2016.<br/> Despite this unprecedented and highly objectionable degradation of service quality, OneDrive will continue to be supported by CloudFS for historical reasons. [^](#a1)<br/>
 > <sup><b id="f2">2</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. [^](#a2)<br/>
 > <sup><b id="f3">3</b></sup> The Copy cloud storage service was discontinued as of May 1<sup>st</sup> 2016 according to this [announcement](https://www.copy.com/page/home;cs_login:login;;section:plans).<br/>The Copy gateway has therefore been retired from CloudFS. [^](#a3)<br/>
+> <sup><b id="f4">4</b></sup> WebDAV-based cloud storage is available through various public cloud providers or by self-hosting an [OwnCloud](https://github.com/owncloud) private cloud. [^](#a4)<br/>
 
 
 ## System Requirements
@@ -73,6 +75,7 @@ At the time of writing this Readme, the following URLs provided access to applic
 | MediaFire             | [MediaFire - Developers](https://www.mediafire.com/index.php#settings/applications) |
 | MEGA                  | [Mega Core SDK - Developers](https://mega.nz/#sdk)     |
 | pCloud                | *- no configuration required -*                        |
+| WebDAV                | *- no configuration required -*
 | Yandex Disk           | [Yandex OAuth Access](https://oauth.yandex.com/)       |
 | **Obsolete**          |                                                        |
 | <del>Copy</del>       | <del>[Copy Developers - Applications]()</del>          |

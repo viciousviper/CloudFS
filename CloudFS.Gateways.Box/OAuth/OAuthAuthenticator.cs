@@ -48,20 +48,20 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
 
         private static BrowserLogOn logOn;
 
-        private static string LoadRefreshToken(string account)
+        private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return setting.RefreshToken;
+                        return setting.RefreshToken.DecryptUsing(settingsPassPhrase);
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, string refreshToken)
+        private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -69,12 +69,12 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         private static string GetAuthCode(string account, Uri authenticationUri, Uri redirectUri)
@@ -94,12 +94,12 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
             return authCode;
         }
 
-        public static async Task<BoxClient> LoginAsync(string account, string code)
+        public static async Task<BoxClient> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             var client = default(BoxClient);
             var config = new BoxConfig(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, new Uri(BOX_LOGIN_DESKTOP_URI));
@@ -119,13 +119,13 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
                     var authenticationUri = client.Config.AuthCodeUri;
                     code = GetAuthCode(account, authenticationUri, new Uri(BOX_LOGIN_DESKTOP_URI));
                     if (string.IsNullOrEmpty(code))
-                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
                 }
 
                 response = await client.Auth.AuthenticateAsync(code);
             }
 
-            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken);
+            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken, settingsPassPhrase);
 
             return client;
         }

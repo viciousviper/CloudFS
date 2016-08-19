@@ -87,7 +87,7 @@ namespace IgorSoft.CloudFS.Authentication
         public void Close()
         {
             if (window == null)
-                throw new InvalidOperationException(Resources.WindowNotInitialized);
+                throw new InvalidOperationException(Properties.Resources.WindowNotInitialized);
 
             window.Close();
         }

@@ -68,6 +68,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.GDrive", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.AuthenticationTests", "CloudFS.AuthenticationTests\CloudFS.AuthenticationTests.csproj", "{AC34207D-3295-4650-A7BF-0B816B9B253F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Gateways.WebDAV", "CloudFS.Gateways.WebDAV\CloudFS.Gateways.WebDAV.csproj", "{B05DED7D-AF07-4E89-91C0-E75E52599848}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -171,6 +173,12 @@ Global
 		{AC34207D-3295-4650-A7BF-0B816B9B253F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AC34207D-3295-4650-A7BF-0B816B9B253F}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
 		{AC34207D-3295-4650-A7BF-0B816B9B253F}.Signed|Any CPU.Build.0 = Signed|Any CPU
+		{B05DED7D-AF07-4E89-91C0-E75E52599848}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B05DED7D-AF07-4E89-91C0-E75E52599848}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B05DED7D-AF07-4E89-91C0-E75E52599848}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B05DED7D-AF07-4E89-91C0-E75E52599848}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B05DED7D-AF07-4E89-91C0-E75E52599848}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{B05DED7D-AF07-4E89-91C0-E75E52599848}.Signed|Any CPU.Build.0 = Signed|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

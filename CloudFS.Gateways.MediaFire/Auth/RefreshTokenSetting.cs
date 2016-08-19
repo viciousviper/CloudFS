@@ -32,7 +32,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
         public string SessionToken { get; set; }
 
-        public long SecretKey { get; set; }
+        public string SecretKey { get; set; }
 
         public string Time { get; set; }
     }

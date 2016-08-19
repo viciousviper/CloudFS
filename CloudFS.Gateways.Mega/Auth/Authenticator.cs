@@ -26,6 +26,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Security.Authentication;
+using System.Text;
 using System.Threading.Tasks;
 using CG.Web.MegaApiClient;
 using IgorSoft.CloudFS.Authentication;
@@ -36,20 +37,20 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
     {
         private static DirectLogOn logOn;
 
-        private static MegaApiClient.AuthInfos LoadRefreshToken(string account)
+        private static MegaApiClient.AuthInfos LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return new MegaApiClient.AuthInfos(setting.EMail, setting.Hash, setting.PasswordAesKey);
+                        return new MegaApiClient.AuthInfos(setting.EMail.DecryptUsing(settingsPassPhrase), setting.Hash.DecryptUsing(settingsPassPhrase), Encoding.Unicode.GetBytes(setting.PasswordAesKey.DecryptUsing(settingsPassPhrase)));
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, MegaApiClient.AuthInfos refreshToken)
+        private static void SaveRefreshToken(string account, MegaApiClient.AuthInfos refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -57,12 +58,12 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, EMail = refreshToken.Email, Hash = refreshToken.Hash, PasswordAesKey = refreshToken.PasswordAesKey });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, EMail = refreshToken.Email.EncryptUsing(settingsPassPhrase), Hash = refreshToken.Hash.EncryptUsing(settingsPassPhrase), PasswordAesKey = Encoding.Unicode.GetString(refreshToken.PasswordAesKey).EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         public static string GetAuthCode(string account)
@@ -82,14 +83,14 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
             return authCode;
         }
 
-        public static async Task<MegaApiClient> LoginAsync(string account, string code)
+        public static async Task<MegaApiClient> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
             var client = new MegaApiClient();
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             if (refreshToken != null) {
                 await client.LoginAsync(refreshToken);
@@ -99,13 +100,13 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
 
                 var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
                 if (parts.Length != 2)
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ProvideAuthenticationData, account));
 
                 refreshToken = MegaApiClient.GenerateAuthInfos(parts[0], parts[1]);
                 client.Login(refreshToken);
             }
 
-            SaveRefreshToken(account, refreshToken);
+            SaveRefreshToken(account, refreshToken, settingsPassPhrase);
 
             return client;
         }

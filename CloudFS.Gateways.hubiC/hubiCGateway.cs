@@ -74,6 +74,14 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         private readonly IDictionary<RootName, hubiCContext> contextCache = new Dictionary<RootName, hubiCContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public hubiCGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<hubiCContext> RequireContextAsync(RootName root, string apiKey = null, string container = DEFAULT_CONTAINER)
         {
             if (root == null)
@@ -81,13 +89,13 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
             var result = default(hubiCContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
+                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new hubiCContext(client, container));
             }
             return result;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -111,7 +119,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             return new DriveInfoContract(root.Value, totalSpace - usedSpace, usedSpace);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 
@@ -169,7 +177,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var context = await RequireContextAsync(root);
 
             if (source is DirectoryId)
-                throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
+                throw new NotSupportedException(Properties.Resources.CopyingOfDirectoriesNotSupported);
 
             var targetName = !string.IsNullOrEmpty(copyName) ? copyName : source.GetName();
             var targetId = destination.GetObjectId(targetName);
@@ -183,7 +191,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.MovingOfFilesNotSupported));
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.MovingOfFilesNotSupported));
         }
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
@@ -243,7 +251,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.RenamingOfFilesNotSupported));
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.RenamingOfFilesNotSupported));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

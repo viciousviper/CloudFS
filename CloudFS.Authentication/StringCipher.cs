@@ -33,6 +33,7 @@ namespace IgorSoft.CloudFS.Authentication
     /// <summary>
     /// Encrypts and decrypts <see cref="string"/> content with the <see cref="RijndaelManaged"/> algorithm.
     /// </summary>
+    /// <remarks>Adapted from a StackOverflow contribution by CraigTP (http://stackoverflow.com/users/57477/craigtp) at <http://stackoverflow.com/a/10177020>.</remarks>
     public static class StringCipher
     {
         // This constant is used to determine the keysize of the encryption algorithm in bits.
@@ -44,6 +45,35 @@ namespace IgorSoft.CloudFS.Authentication
 
         // This constant determines the number of iterations for the password bytes generation function.
         private const int DerivationIterations = 1000;
+
+        /// <summary>
+        /// Encrypts the plain text if a pass phrase is specified.
+        /// </summary>
+        /// <param name="plainText">The plain text.</param>
+        /// <param name="passPhrase">The pass phrase.</param>
+        /// <returns>The cipher text, if a pass phrase is specified; otherwise the unmodified plain text.</returns>
+        public static string EncryptUsing(this string plainText, string passPhrase)
+        {
+            return string.IsNullOrEmpty(passPhrase) ? plainText : Encrypt(plainText, passPhrase);
+        }
+
+        /// <summary>
+        /// Decrypts the cipher text if a pass phrase is specified.
+        /// </summary>
+        /// <param name="cipherText">The cipher text.</param>
+        /// <param name="passPhrase">The pass phrase.</param>
+        /// <returns>The plain text, if a suitable pass phrase is specified; otherwise the unmodified cipher text.</returns>
+        public static string DecryptUsing(this string cipherText, string passPhrase)
+        {
+            if (string.IsNullOrEmpty(passPhrase) || cipherText?.Length < Keysize / 8 + BlockSize / 8)
+                return cipherText;
+
+            try {
+                return Decrypt(cipherText, passPhrase);
+            } catch (Exception ex) when (ex is CryptographicException || ex is FormatException) {
+                return cipherText;
+            }
+        }
 
         /// <summary>
         /// Encrypts the specified plain text.

@@ -66,6 +66,14 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
         private readonly IDictionary<RootName, CopyContext> contextCache = new Dictionary<RootName, CopyContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public CopyGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<CopyContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -73,13 +81,13 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
             var result = default(CopyContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
+                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new CopyContext(client));
             }
             return result;
         }
 
-        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey)
+        public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
                 await RequireContextAsync(root, apiKey);
@@ -98,7 +106,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             return new DriveInfoContract(item.Id, item.Storage.Quota - item.Storage.Used, item.Storage.Used);
         }
 
-        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey)
+        public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             var context = await RequireContextAsync(root, apiKey);
 
@@ -158,7 +166,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
         public Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.CopyingOfFilesOrDirectoriesNotSupported));
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.CopyingOfFilesOrDirectoriesNotSupported));
         }
 
         public /*async*/ Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
@@ -175,7 +183,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             //var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.GetFileSystemInformationAsync(movedItemPath), RETRIES);
 
             //return item.ToFileSystemInfoContract();
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.MovingOfFilesOrDirectoriesNotSupported));
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.MovingOfFilesOrDirectoriesNotSupported));
         }
 
         public async Task<DirectoryInfoContract> NewDirectoryItemAsync(RootName root, DirectoryId parent, string name)
@@ -221,7 +229,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             //var item = await AsyncFunc.Retry<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.GetFileSystemInformationAsync(renamedItemPath), RETRIES);
 
             //return item.ToFileSystemInfoContract();
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.RenamingOfFilesOrDirectoriesNotSupported));
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.RenamingOfFilesOrDirectoriesNotSupported));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
