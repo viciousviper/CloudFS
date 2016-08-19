@@ -88,6 +88,14 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
         private readonly IDictionary<RootName, WebDAVContext> contextCache = new Dictionary<RootName, WebDAVContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public WebDAVGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<WebDAVContext> RequireContextAsync(RootName root, string apiKey = null, Uri baseAddress = null)
         {
             if (root == null)
@@ -95,7 +103,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var result = default(WebDAVContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await Authenticator.LoginAsync(root.UserName, apiKey, baseAddress);
+                var client = await Authenticator.LoginAsync(root.UserName, apiKey, baseAddress, settingsPassPhrase);
                 contextCache.Add(root, result = new WebDAVContext(client, baseAddress.AbsolutePath.TrimEnd('/')));
             }
             return result;

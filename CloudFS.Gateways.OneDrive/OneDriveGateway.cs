@@ -67,6 +67,14 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 
         private readonly IDictionary<RootName, OneDriveContext> contextCache = new Dictionary<RootName, OneDriveContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public OneDriveGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<OneDriveContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -74,7 +82,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 
             var result = default(OneDriveContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
+                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new OneDriveContext(client));
             }
             return result;

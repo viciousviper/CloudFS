@@ -74,18 +74,18 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
         private static readonly string[] scopes = { "wl.basic", "wl.offline_access", "wl.signin", "onedrive.readwrite" };
 
-        private static string LoadRefreshToken(string account)
+        private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return setting.RefreshToken;
+                        return setting.RefreshToken.DecryptUsing(settingsPassPhrase);
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, string refreshToken)
+        private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
             var refreshTokens = Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
@@ -98,17 +98,17 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                 refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken.EncryptUsing(settingsPassPhrase) });
 
             Settings.Default.Save();
         }
 
-        public static async Task<IOneDriveClient> LoginAsync(string account, string code)
+        public static async Task<IOneDriveClient> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             var client = default(IOneDriveClient);
             if (!string.IsNullOrEmpty(refreshToken)) {
@@ -127,7 +127,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                     throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, LIVE_LOGIN_AUTHORIZE_URI));
             }
 
-            SaveRefreshToken(account, client.AuthenticationProvider.CurrentAccountSession.RefreshToken);
+            SaveRefreshToken(account, client.AuthenticationProvider.CurrentAccountSession.RefreshToken, settingsPassPhrase);
 
             return client;
         }

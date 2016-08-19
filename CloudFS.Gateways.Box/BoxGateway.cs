@@ -72,6 +72,14 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         private readonly IDictionary<RootName, BoxContext> contextCache = new Dictionary<RootName, BoxContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public BoxGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<BoxContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -79,7 +87,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var result = default(BoxContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey);
+                var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new BoxContext(client));
             }
             return result;

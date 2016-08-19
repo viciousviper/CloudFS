@@ -39,20 +39,20 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
 
         private static BrowserLogOn logOn;
 
-        private static Tuple<string, string> LoadRefreshToken(string account)
+        private static Tuple<string, string> LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return new Tuple<string, string>(setting.Token, setting.TokenSecret);
+                        return new Tuple<string, string>(setting.Token.DecryptUsing(settingsPassPhrase), setting.TokenSecret.DecryptUsing(settingsPassPhrase));
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, Tuple<string, string> refreshToken)
+        private static void SaveRefreshToken(string account, Tuple<string, string> refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -60,12 +60,12 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, Token = refreshToken.Item1, TokenSecret = refreshToken.Item2 });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, Token = refreshToken.Item1.EncryptUsing(settingsPassPhrase), TokenSecret = refreshToken.Item2.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         private static Tuple<string, string> GetAuthCode(string account, Uri authenticationUri, Uri redirectUri)
@@ -97,7 +97,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
             return new Tuple<string, string>(parts[0], parts.Length == 2 ? parts[1] : string.Empty);
         }
 
-        public static async Task<CopyClient> LoginAsync(string account, string code)
+        public static async Task<CopyClient> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
@@ -106,7 +106,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
                 ConsumerKey = Secrets.CONSUMER_KEY, ConsumerSecret = Secrets.CONSUMER_SECRET, CallbackUrl = COPY_LOGIN_DESKTOP_URI
             });
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             var tokens = refreshToken ?? (!string.IsNullOrEmpty(code) ? SplitToken(code) : default(Tuple<string, string>));
 
@@ -117,14 +117,14 @@ namespace IgorSoft.CloudFS.Gateways.Copy.OAuth
                 var requestToken = await client.Authorization.GetRequestTokenAsync();
                 tokens = GetAuthCode(account, requestToken.AuthCodeUri, new Uri(COPY_LOGIN_DESKTOP_URI));
                 if (string.IsNullOrEmpty(tokens.Item1) || string.IsNullOrEmpty(tokens.Item2))
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, requestToken.AuthCodeUri.ToString()));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, requestToken.AuthCodeUri.ToString()));
 
                 await client.Authorization.GetAccessTokenAsync(tokens.Item2);
 
                 tokens = new Tuple<string, string>(client.Config.Token, client.Config.TokenSecret);
             }
 
-            SaveRefreshToken(account, tokens);
+            SaveRefreshToken(account, tokens, settingsPassPhrase);
 
             return client;
         }

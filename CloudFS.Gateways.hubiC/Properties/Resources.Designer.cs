@@ -22,27 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.File {
+namespace IgorSoft.CloudFS.Gateways.hubiC.Properties
+{
     using System;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resource {
-
+    internal class Resources
+    {
         private static global::System.Resources.ResourceManager resourceMan;
 
         private static global::System.Globalization.CultureInfo resourceCulture;
 
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resource() {
+        internal Resources()
+        {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.File.Resource", typeof(Resource).Assembly);
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.hubiC.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -50,39 +55,70 @@ namespace IgorSoft.CloudFS.Gateways.File {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is already present.
+        ///   Looks up a localized string similar to hubiC does not support copying of directories..
         /// </summary>
-        internal static string DuplicatePath {
-            get {
-                return ResourceManager.GetString("DuplicatePath", resourceCulture);
+        internal static string CopyingOfDirectoriesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("CopyingOfDirectoriesNotSupported", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Path &apos;{0}&apos; does not exist.
+        ///   Looks up a localized string similar to hubiC does not support moving of files or directories..
         /// </summary>
-        internal static string PathNotFound {
-            get {
-                return ResourceManager.GetString("PathNotFound", resourceCulture);
+        internal static string MovingOfFilesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("MovingOfFilesNotSupported", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Deletion of nonempty directory &apos;{0}&apos; requires parameter &apos;-Recurse&apos;.
+        ///   Looks up a localized string similar to The object ID '{0}' does not match its containing directory '{1}'..
         /// </summary>
-        internal static string RemoveNonEmptyDirectoryRequiresRecurse {
-            get {
-                return ResourceManager.GetString("RemoveNonEmptyDirectoryRequiresRecurse", resourceCulture);
+        internal static string ObjectNotInDirectory
+        {
+            get
+            {
+                return ResourceManager.GetString("ObjectNotInDirectory", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to hubiC does not support renaming of files or directories..
+        /// </summary>
+        internal static string RenamingOfFilesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("RenamingOfFilesNotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}.
+        /// </summary>
+        internal static string RetrieveAuthenticationCodeFromUri
+        {
+            get
+            {
+                return ResourceManager.GetString("RetrieveAuthenticationCodeFromUri", resourceCulture);
             }
         }
     }

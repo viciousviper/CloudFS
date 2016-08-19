@@ -22,27 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.Mega {
+namespace IgorSoft.CloudFS.Gateways.pCloud.Properties
+{
     using System;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-
+    internal class Resources
+    {
         private static global::System.Resources.ResourceManager resourceMan;
 
         private static global::System.Globalization.CultureInfo resourceCulture;
 
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Resources()
+        {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.Mega.Resources", typeof(Resources).Assembly);
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.pCloud.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -50,48 +55,70 @@ namespace IgorSoft.CloudFS.Gateways.Mega {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Mega does not support copying of files or directories..
+        ///   Looks up a localized string similar to pCloud does not support copying of directories.
         /// </summary>
-        internal static string CopyingOfFilesNotSupported {
-            get {
-                return ResourceManager.GetString("CopyingOfFilesNotSupported", resourceCulture);
+        internal static string CopyingOfDirectoriesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("CopyingOfDirectoriesNotSupported", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Please provide authentication data for account &apos;{0}&apos; as &quot;&lt;email&gt;,&lt;password&gt;&quot;..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid fileId.
         /// </summary>
-        internal static string ProvideAuthenticationData {
-            get {
+        internal static string InvalidFileId
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidFileId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid folderId.
+        /// </summary>
+        internal static string InvalidFolderId
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidFolderId", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to pCloud does not support items of type &apos;{0}&apos;.
+        /// </summary>
+        internal static string ItemTypeNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("ItemTypeNotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide authentication data as &quot;&lt;user&gt;,&lt;password&gt;&quot;.
+        /// </summary>
+        internal static string ProvideAuthenticationData
+        {
+            get
+            {
                 return ResourceManager.GetString("ProvideAuthenticationData", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Mega does not support renaming of files or directories..
-        /// </summary>
-        internal static string RenamingOfFilesNotSupported {
-            get {
-                return ResourceManager.GetString("RenamingOfFilesNotSupported", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Mega does not support setting the content of an existing file..
-        /// </summary>
-        internal static string SettingOfFileContentNotSupported {
-            get {
-                return ResourceManager.GetString("SettingOfFileContentNotSupported", resourceCulture);
             }
         }
     }

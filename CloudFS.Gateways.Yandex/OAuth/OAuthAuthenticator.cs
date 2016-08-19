@@ -42,20 +42,20 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
 
         private static BrowserLogOn logOn;
 
-        private static string LoadRefreshToken(string account)
+        private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return setting.Token;
+                        return setting.Token.DecryptUsing(settingsPassPhrase);
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, string refreshToken)
+        private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -63,12 +63,12 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, Token = refreshToken });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, Token = refreshToken.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         private static Uri GetAuthenticationUri(string clientId)
@@ -98,24 +98,24 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
             return oauth_token;
         }
 
-        public static Task<IDiskApi> LoginAsync(string account, string code)
+        public static Task<IDiskApi> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             if (string.IsNullOrEmpty(refreshToken) && string.IsNullOrEmpty(code)) {
                 var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
                 code = GetAuthCode(account, authenticationUri, new Uri(YANDEX_LOGIN_TOKEN_URI));
 
                 if (string.IsNullOrEmpty(code))
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
 
                 refreshToken = code;
             }
 
-            SaveRefreshToken(account, refreshToken);
+            SaveRefreshToken(account, refreshToken, settingsPassPhrase);
 
             return Task.FromResult<IDiskApi>(new DiskHttpApi(refreshToken));
         }

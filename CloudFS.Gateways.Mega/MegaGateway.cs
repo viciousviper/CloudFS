@@ -66,6 +66,14 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         private readonly IDictionary<RootName, MegaContext> contextCache = new Dictionary<RootName, MegaContext>();
 
+        private string settingsPassPhrase;
+
+        [ImportingConstructor]
+        public MegaGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
+        {
+            this.settingsPassPhrase = settingsPassPhrase;
+        }
+
         private async Task<MegaContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)
@@ -73,7 +81,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
             var result = default(MegaContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                var client = await Authenticator.LoginAsync(root.UserName, apiKey);
+                var client = await Authenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new MegaContext(client));
             }
             return result;
@@ -121,7 +129,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<bool>(new NotSupportedException(Resources.SettingOfFileContentNotSupported));
+            return Task.FromException<bool>(new NotSupportedException(Properties.Resources.SettingOfFileContentNotSupported));
         }
 
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
@@ -137,12 +145,12 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public Task<bool> SetContentAsync(RootName root, FileId target, Stream content, IProgress<ProgressValue> progress, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<bool>(new NotSupportedException(Resources.SettingOfFileContentNotSupported));
+            return Task.FromException<bool>(new NotSupportedException(Properties.Resources.SettingOfFileContentNotSupported));
         }
 
         public Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.CopyingOfFilesNotSupported));
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.CopyingOfFilesNotSupported));
         }
 
         public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
@@ -152,7 +160,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             var nodes = await context.Client.GetNodesAsync();
             var sourceItem = nodes.Single(n => n.Id == source.Value);
             if (!string.IsNullOrEmpty(moveName) && moveName != sourceItem.Name)
-                throw new NotSupportedException(Resources.RenamingOfFilesNotSupported);
+                throw new NotSupportedException(Properties.Resources.RenamingOfFilesNotSupported);
             var destinationParentItem = nodes.Single(n => n.Id == destination.Value);
             var item = await context.Client.MoveAsync(sourceItem, destinationParentItem);
 
@@ -198,7 +206,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Resources.RenamingOfFilesNotSupported));
+            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.RenamingOfFilesNotSupported));
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

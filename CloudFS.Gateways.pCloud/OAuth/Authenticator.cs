@@ -36,20 +36,20 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
     {
         private static DirectLogOn logOn;
 
-        private static string LoadRefreshToken(string account)
+        private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return setting.RefreshToken;
+                        return setting.RefreshToken.DecryptUsing(settingsPassPhrase);
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, string refreshToken)
+        private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -57,12 +57,12 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         public static string GetAuthCode(string account)
@@ -82,14 +82,14 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
             return authCode;
         }
 
-        public static async Task<pCloudClient> LoginAsync(string account, string code)
+        public static async Task<pCloudClient> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
             var client = default(pCloudClient);
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             if (refreshToken != null) {
                 client = pCloudClient.FromAuthToken(refreshToken);
@@ -99,12 +99,12 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
 
                 var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
                 if (parts.Length != 2)
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ProvideAuthenticationData, account));
 
                 client = await pCloudClient.CreateClientAsync(parts[0], parts[1]);
             }
 
-            SaveRefreshToken(account, client.AuthToken);
+            SaveRefreshToken(account, client.AuthToken, settingsPassPhrase);
 
             return client;
         }

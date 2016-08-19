@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.GDrive_V2
+namespace IgorSoft.CloudFS.Gateways.Copy.Properties
 {
     using System;
 
@@ -31,7 +31,6 @@ namespace IgorSoft.CloudFS.Gateways.GDrive_V2
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources
     {
-
         private static global::System.Resources.ResourceManager resourceMan;
 
         private static global::System.Globalization.CultureInfo resourceCulture;
@@ -48,7 +47,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive_V2
             {
                 if (object.ReferenceEquals(resourceMan, null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.GDrive_V2.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.Copy.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -69,13 +68,67 @@ namespace IgorSoft.CloudFS.Gateways.GDrive_V2
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Google Drive does not support copying of directories.
+        ///   Looks up a localized string similar to Copy does not support copying of files or directories.
         /// </summary>
-        internal static string CopyingOfDirectoriesNotSupported
+        internal static string CopyingOfFilesOrDirectoriesNotSupported
         {
             get
             {
-                return ResourceManager.GetString("CopyingOfDirectoriesNotSupported", resourceCulture);
+                return ResourceManager.GetString("CopyingOfFilesOrDirectoriesNotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The file/folder &apos;{0}&apos; could not be moved to &apos;{1}{2}&apos;.
+        /// </summary>
+        internal static string MoveFailed
+        {
+            get
+            {
+                return ResourceManager.GetString("MoveFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy does not support moving of files or directories.
+        /// </summary>
+        internal static string MovingOfFilesOrDirectoriesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("MovingOfFilesOrDirectoriesNotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The file/folder &apos;{0}&apos; could not be renamed to &apos;{1}&apos;.
+        /// </summary>
+        internal static string RenameFailed
+        {
+            get
+            {
+                return ResourceManager.GetString("RenameFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy does not support renaming of files or directories.
+        /// </summary>
+        internal static string RenamingOfFilesOrDirectoriesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("RenamingOfFilesOrDirectoriesNotSupported", resourceCulture);
+            }
+        }
+        /// <summary>
+        ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}
+        /// </summary>
+        internal static string RetrieveAuthenticationCodeFromUri
+        {
+            get
+            {
+                return ResourceManager.GetString("RetrieveAuthenticationCodeFromUri", resourceCulture);
             }
         }
     }

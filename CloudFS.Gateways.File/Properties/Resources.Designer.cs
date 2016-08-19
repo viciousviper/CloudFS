@@ -22,27 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.MediaFire {
+namespace IgorSoft.CloudFS.Gateways.File.Properties
+{
     using System;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-
+    internal class Resources
+    {
         private static global::System.Resources.ResourceManager resourceMan;
 
         private static global::System.Globalization.CultureInfo resourceCulture;
 
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Resources()
+        {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.MediaFire.Resources", typeof(Resources).Assembly);
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.File.Properties.Resource", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -50,39 +55,48 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to MediaFire does not support copying of directories..
+        ///   Looks up a localized string similar to &apos;{0}&apos; is already present.
         /// </summary>
-        internal static string CopyingOfDirectoriesNotSupported {
-            get {
-                return ResourceManager.GetString("CopyingOfDirectoriesNotSupported", resourceCulture);
+        internal static string DuplicatePath
+        {
+            get
+            {
+                return ResourceManager.GetString("DuplicatePath", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to MediaFire does not support empty files..
+        ///   Looks up a localized string similar to Path &apos;{0}&apos; does not exist.
         /// </summary>
-        internal static string EmptyFilesNotSupported {
-            get {
-                return ResourceManager.GetString("EmptyFilesNotSupported", resourceCulture);
+        internal static string PathNotFound
+        {
+            get
+            {
+                return ResourceManager.GetString("PathNotFound", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Please provide authentication data for account &apos;{0}&apos; as &quot;&lt;email&gt;,&lt;password&gt;&quot;..
+        ///   Looks up a localized string similar to Deletion of nonempty directory &apos;{0}&apos; requires parameter &apos;-Recurse&apos;.
         /// </summary>
-        internal static string ProvideAuthenticationData {
-            get {
-                return ResourceManager.GetString("ProvideAuthenticationData", resourceCulture);
+        internal static string RemoveNonEmptyDirectoryRequiresRecurse
+        {
+            get
+            {
+                return ResourceManager.GetString("RemoveNonEmptyDirectoryRequiresRecurse", resourceCulture);
             }
         }
     }

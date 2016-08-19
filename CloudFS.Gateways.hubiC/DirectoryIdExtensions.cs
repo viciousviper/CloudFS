@@ -37,12 +37,12 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var parentPath = parent.Value == "/" ? string.Empty : parent.Value + "/";
 
             if (!(objectId.Length > parentPath.Length && objectId.StartsWith(parentPath, StringComparison.InvariantCulture)))
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ObjectNotInDirectory, objectId, parent.Value));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ObjectNotInDirectory, objectId, parent.Value));
 
             var objectName = objectId.Remove(0, parentPath.Length);
 
             if (objectName.IndexOf('/') != -1)
-                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ObjectNotInDirectory, objectId, parent.Value));
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ObjectNotInDirectory, objectId, parent.Value));
 
             return objectName;
         }

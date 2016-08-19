@@ -22,27 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy {
+namespace IgorSoft.CloudFS.Gateways.Mega.Properties
+{
     using System;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-
+    internal class Resources
+    {
         private static global::System.Resources.ResourceManager resourceMan;
 
         private static global::System.Globalization.CultureInfo resourceCulture;
 
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Resources()
+        {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive_Legacy.Resources", typeof(Resources).Assembly);
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.Mega.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -50,30 +55,59 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to OneDrive does not support empty files..
+        ///   Looks up a localized string similar to Mega does not support copying of files or directories..
         /// </summary>
-        internal static string EmptyFilesNotSupported {
-            get {
-                return ResourceManager.GetString("EmptyFilesNotSupported", resourceCulture);
+        internal static string CopyingOfFilesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("CopyingOfFilesNotSupported", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}.
+        ///   Looks up a localized string similar to Please provide authentication data for account &apos;{0}&apos; as &quot;&lt;email&gt;,&lt;password&gt;&quot;..
         /// </summary>
-        internal static string RetrieveAuthenticationCodeFromUri {
-            get {
-                return ResourceManager.GetString("RetrieveAuthenticationCodeFromUri", resourceCulture);
+        internal static string ProvideAuthenticationData
+        {
+            get
+            {
+                return ResourceManager.GetString("ProvideAuthenticationData", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mega does not support renaming of files or directories..
+        /// </summary>
+        internal static string RenamingOfFilesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("RenamingOfFilesNotSupported", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mega does not support setting the content of an existing file..
+        /// </summary>
+        internal static string SettingOfFileContentNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("SettingOfFileContentNotSupported", resourceCulture);
             }
         }
     }

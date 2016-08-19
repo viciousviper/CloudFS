@@ -79,20 +79,20 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
             public DateTimeOffset TokenExpirationDuration { get; set; }
         }
 
-        private static string LoadRefreshToken(string account)
+        private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return setting.Token;
+                        return setting.Token.DecryptUsing(settingsPassPhrase);
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, string refreshToken)
+        private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -100,12 +100,12 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, Token = refreshToken });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, Token = refreshToken.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         private static Uri GetAuthenticationUri(string clientId)
@@ -199,12 +199,12 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
             return oauth_token;
         }
 
-        public static async Task<Client> LoginAsync(string account, string code)
+        public static async Task<Client> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             AppTokenResponse response = null;
             if (!string.IsNullOrEmpty(refreshToken))
@@ -215,13 +215,13 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                     var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
                     code = GetAuthCode(account, authenticationUri, new Uri(HUBIC_LOGIN_REDIRECT_URI));
                     if (string.IsNullOrEmpty(code))
-                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
                 }
 
                 response = await RedeemAccessTokenAsync(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, code);
             }
 
-            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken);
+            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken, settingsPassPhrase);
 
             var authManager = new SwiftAuthManager() { Credentials = new SwiftCredentials() { Password = response.AccessToken }, Authenticate = (user, password, endpoint) => AuthenticateAsync(password) };
             authManager.SetEndpoints(new[] { "http://localhost:8080" }.ToList());

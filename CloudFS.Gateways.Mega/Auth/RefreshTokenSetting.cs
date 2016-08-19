@@ -34,7 +34,6 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
 
         public string Hash { get; set; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays", Justification = "Defined by API")]
-        public byte[] PasswordAesKey { get; set; }
+        public string PasswordAesKey { get; set; }
     }
 }

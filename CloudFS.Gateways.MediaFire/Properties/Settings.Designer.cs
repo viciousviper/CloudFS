@@ -22,28 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.hubiC {
-
+namespace IgorSoft.CloudFS.Gateways.MediaFire.Properties
+{
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
+    {
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
 
-        public static Settings Default {
-            get {
+        public static Settings Default
+        {
+            get
+            {
                 return defaultInstance;
             }
         }
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting> RefreshTokens
+        public global::System.Collections.ObjectModel.Collection<Auth.RefreshTokenSetting> RefreshTokens
         {
-            get {
-                return ((global::System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>)(this["RefreshTokens"]));
+            get
+            {
+                return ((global::System.Collections.ObjectModel.Collection<Auth.RefreshTokenSetting>)(this["RefreshTokens"]));
             }
-            set {
+            set
+            {
                 this["RefreshTokens"] = value;
             }
         }

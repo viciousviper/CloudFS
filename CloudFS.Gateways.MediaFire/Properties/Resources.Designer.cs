@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.hubiC
+namespace IgorSoft.CloudFS.Gateways.MediaFire.Properties
 {
     using System;
 
@@ -31,7 +31,6 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources
     {
-
         private static global::System.Resources.ResourceManager resourceMan;
 
         private static global::System.Globalization.CultureInfo resourceCulture;
@@ -48,7 +47,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             {
                 if (object.ReferenceEquals(resourceMan, null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.hubiC.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.MediaFire.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -69,7 +68,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to hubiC does not support copying of directories..
+        ///   Looks up a localized string similar to MediaFire does not support copying of directories..
         /// </summary>
         internal static string CopyingOfDirectoriesNotSupported
         {
@@ -80,46 +79,24 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to hubiC does not support moving of files or directories..
+        ///   Looks up a localized string similar to MediaFire does not support empty files..
         /// </summary>
-        internal static string MovingOfFilesNotSupported
+        internal static string EmptyFilesNotSupported
         {
             get
             {
-                return ResourceManager.GetString("MovingOfFilesNotSupported", resourceCulture);
+                return ResourceManager.GetString("EmptyFilesNotSupported", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to The object ID '{0}' does not match its containing directory '{1}'..
+        ///   Looks up a localized string similar to Please provide authentication data for account &apos;{0}&apos; as &quot;&lt;email&gt;,&lt;password&gt;&quot;..
         /// </summary>
-        internal static string ObjectNotInDirectory
+        internal static string ProvideAuthenticationData
         {
             get
             {
-                return ResourceManager.GetString("ObjectNotInDirectory", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to hubiC does not support renaming of files or directories..
-        /// </summary>
-        internal static string RenamingOfFilesNotSupported
-        {
-            get
-            {
-                return ResourceManager.GetString("RenamingOfFilesNotSupported", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}.
-        /// </summary>
-        internal static string RetrieveAuthenticationCodeFromUri
-        {
-            get
-            {
-                return ResourceManager.GetString("RetrieveAuthenticationCodeFromUri", resourceCulture);
+                return ResourceManager.GetString("ProvideAuthenticationData", resourceCulture);
             }
         }
     }

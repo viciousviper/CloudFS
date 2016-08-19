@@ -170,7 +170,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive_V2
         public async Task<FileSystemInfoContract> CopyItemAsync(RootName root, FileSystemId source, string copyName, DirectoryId destination, bool recurse)
         {
             if (source is DirectoryId)
-                throw new NotSupportedException(Resources.CopyingOfDirectoriesNotSupported);
+                throw new NotSupportedException(Properties.Resources.CopyingOfDirectoriesNotSupported);
 
             var context = await RequireContextAsync(root);
 

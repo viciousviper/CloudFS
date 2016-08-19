@@ -38,18 +38,18 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
     {
         private static DirectLogOn logOn;
 
-        private static NetworkCredential LoadCredential(string account)
+        private static NetworkCredential LoadCredential(string account, string settingsPassPhrase)
         {
             var credentials = Settings.Default.Credentials;
             if (credentials != null)
                 foreach (CredentialsSetting setting in credentials)
                     if (setting.Account == account)
-                        return new NetworkCredential(setting.UserName, setting.Password);
+                        return new NetworkCredential(setting.UserName.DecryptUsing(settingsPassPhrase), setting.Password.DecryptUsing(settingsPassPhrase));
 
             return null;
         }
 
-        private static void SaveCredential(string account, NetworkCredential credential)
+        private static void SaveCredential(string account, NetworkCredential credential, string settingsPassPhrase)
         {
             var credentials = Settings.Default.Credentials;
             if (credentials != null) {
@@ -62,7 +62,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
                 credentials = Settings.Default.Credentials = new System.Collections.ObjectModel.Collection<CredentialsSetting>();
             }
 
-            credentials.Insert(0, new CredentialsSetting() { Account = account, UserName = credential.UserName, Password = credential.Password });
+            credentials.Insert(0, new CredentialsSetting() { Account = account, UserName = credential.UserName.EncryptUsing(settingsPassPhrase), Password = credential.Password.EncryptUsing(settingsPassPhrase) });
 
             Settings.Default.Save();
         }
@@ -84,14 +84,14 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
             return authCode;
         }
 
-        public static async Task<WebDavClient> LoginAsync(string account, string code, Uri baseAddress)
+        public static async Task<WebDavClient> LoginAsync(string account, string code, Uri baseAddress, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
             if (baseAddress == null)
                 throw new ArgumentNullException(nameof(baseAddress));
 
-            var credential = LoadCredential(account);
+            var credential = LoadCredential(account, settingsPassPhrase);
 
             if (credential == null) {
                 if (string.IsNullOrEmpty(code))
@@ -104,7 +104,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
                 credential = new NetworkCredential(parts[0], parts[1]);
             }
 
-            SaveCredential(account, credential);
+            SaveCredential(account, credential, settingsPassPhrase);
 
             var clientParams = new WebDavClientParams() {
                 BaseAddress = baseAddress,

@@ -68,20 +68,20 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth
             public string RefreshToken { get; set; }
         }
 
-        private static string LoadRefreshToken(string account)
+        private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return setting.RefreshToken;
+                        return setting.RefreshToken.DecryptUsing(settingsPassPhrase);
 
             return null;
         }
 
-        private static void SaveRefreshToken(string account, string refreshToken)
+        private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -89,12 +89,12 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         private static Uri GetAuthenticationUri(string clientId)
@@ -175,12 +175,12 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth
             return authCode;
         }
 
-        public static async Task<ODConnection> LoginAsync(string account, string code)
+        public static async Task<ODConnection> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            var refreshToken = LoadRefreshToken(account);
+            var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
             AppTokenResponse response = null;
             if (!string.IsNullOrEmpty(refreshToken))
@@ -191,13 +191,13 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth
                     var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
                     code = GetAuthCode(account, authenticationUri, new Uri(LIVE_LOGIN_DESKTOP_URI));
                     if (string.IsNullOrEmpty(code))
-                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
                 }
 
                 response = await RedeemAccessTokenAsync(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, code);
             }
 
-            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken);
+            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken, settingsPassPhrase);
 
             return response != null ? new ODConnection(ONEDRIVE_API_URI, response.AccessToken) : null;
         }

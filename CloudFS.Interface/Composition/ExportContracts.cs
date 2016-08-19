@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2015 IgorSoft
+Copyright(c) 2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,16 @@ SOFTWARE.
 
 using System;
 
-namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
+namespace IgorSoft.CloudFS.Interface.Composition
 {
-    public class RefreshTokenSetting
+    /// <summary>
+    /// Declares export contracts for MEF composition.
+    /// </summary>
+    public static class ExportContracts
     {
-        public string Account { get; set; }
-
-        public string SessionToken { get; set; }
-
-        public string SecretKey { get; set; }
-
-        public string Time { get; set; }
+        /// <summary>
+        /// The MEF contract used to export the encryption passphrase for privacy sensitive settings.
+        /// </summary>
+        public const string SettingsPassPhrase = nameof(SettingsPassPhrase);
     }
 }

@@ -47,11 +47,14 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
             public bool ContextUpdated { get; private set; }
 
-            public SynchronizationContext(IMediaFireUserApi contextHolder)
+            public string SettingsPassPhrase { get; }
+
+            public SynchronizationContext(IMediaFireUserApi contextHolder, string settingsPassPhrase)
             {
                 contextHolders.Add(contextHolder);
                 LatestContext = contextHolder.GetAuthenticationContext();
                 contextHolder.AuthenticationContextChanged += UpdateContexts;
+                SettingsPassPhrase = settingsPassPhrase;
             }
 
             public void UpdateContexts(object source, EventArgs eventArgs)
@@ -87,23 +90,23 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
         {
             foreach (var item in contextDirectory)
                 if (item.Value.ContextUpdated)
-                    SaveRefreshToken(item.Key, item.Value.LatestContext);
+                    SaveRefreshToken(item.Key, item.Value.LatestContext, item.Value.SettingsPassPhrase);
         }
 
-        private static AuthenticationContext LoadRefreshToken(string account)
+        private static AuthenticationContext LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null)
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account)
-                        return new AuthenticationContext(setting.SessionToken, setting.SecretKey, setting.Time);
+                        return new AuthenticationContext(setting.SessionToken.DecryptUsing(settingsPassPhrase), long.Parse(setting.SecretKey.DecryptUsing(settingsPassPhrase)), setting.Time.DecryptUsing(settingsPassPhrase));
 
             return null;
         }
 
-        internal static void SaveRefreshToken(string account, AuthenticationContext refreshToken)
+        internal static void SaveRefreshToken(string account, AuthenticationContext refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
                 foreach (RefreshTokenSetting setting in refreshTokens)
                     if (setting.Account == account) {
@@ -111,12 +114,12 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                         break;
                     }
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
 
-            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, SessionToken = refreshToken.SessionToken, SecretKey = refreshToken.SecretKey, Time = refreshToken.Time });
+            refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, SessionToken = refreshToken.SessionToken.EncryptUsing(settingsPassPhrase), SecretKey = refreshToken.SecretKey.ToString().EncryptUsing(settingsPassPhrase), Time = refreshToken.Time.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         private static async Task<AuthenticationContext> RefreshSessionTokenAsync(IMediaFireAgent agent)
@@ -147,7 +150,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             return authCode;
         }
 
-        public static async Task<MediaFireAgent> LoginAsync(string account, string code)
+        public static async Task<MediaFireAgent> LoginAsync(string account, string code, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
@@ -158,7 +161,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             if (contextDirectory.TryGetValue(account, out synchronizationContext)) {
                 synchronizationContext.AttachContextHolder(agent.User);
             } else {
-                var refreshToken = LoadRefreshToken(account);
+                var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
                 if (refreshToken != null) {
                     agent.User.SetAuthenticationContext(refreshToken);
@@ -172,12 +175,12 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
                     var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
                     if (parts.Length != 2)
-                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ProvideAuthenticationData, account));
 
                     await agent.User.GetSessionToken(parts[0], parts[1], TokenVersion.V2);
                 }
 
-                contextDirectory.Add(account, synchronizationContext = new SynchronizationContext(agent.User));
+                contextDirectory.Add(account, synchronizationContext = new SynchronizationContext(agent.User, settingsPassPhrase));
             }
 
             return agent;

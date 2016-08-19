@@ -22,27 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.pCloud {
+namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy.Properties
+{
     using System;
 
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-
+    internal class Resources
+    {
         private static global::System.Resources.ResourceManager resourceMan;
 
         private static global::System.Globalization.CultureInfo resourceCulture;
 
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Resources()
+        {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.pCloud.Resources", typeof(Resources).Assembly);
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive_Legacy.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -50,57 +55,37 @@ namespace IgorSoft.CloudFS.Gateways.pCloud {
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to pCloud does not support copying of directories.
+        ///   Looks up a localized string similar to OneDrive does not support empty files..
         /// </summary>
-        internal static string CopyingOfDirectoriesNotSupported {
-            get {
-                return ResourceManager.GetString("CopyingOfDirectoriesNotSupported", resourceCulture);
+        internal static string EmptyFilesNotSupported
+        {
+            get
+            {
+                return ResourceManager.GetString("EmptyFilesNotSupported", resourceCulture);
             }
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid fileId.
+        ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}.
         /// </summary>
-        internal static string InvalidFileId {
-            get {
-                return ResourceManager.GetString("InvalidFileId", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid folderId.
-        /// </summary>
-        internal static string InvalidFolderId {
-            get {
-                return ResourceManager.GetString("InvalidFolderId", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to pCloud does not support items of type &apos;{0}&apos;.
-        /// </summary>
-        internal static string ItemTypeNotSupported {
-            get {
-                return ResourceManager.GetString("ItemTypeNotSupported", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Please provide authentication data as &quot;&lt;user&gt;,&lt;password&gt;&quot;.
-        /// </summary>
-        internal static string ProvideAuthenticationData {
-            get {
-                return ResourceManager.GetString("ProvideAuthenticationData", resourceCulture);
+        internal static string RetrieveAuthenticationCodeFromUri
+        {
+            get
+            {
+                return ResourceManager.GetString("RetrieveAuthenticationCodeFromUri", resourceCulture);
             }
         }
     }
