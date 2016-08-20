@@ -35,6 +35,19 @@ namespace IgorSoft.CloudFS.Authentication.Configuration
     {
         private static readonly object lockObject = new object();
 
+        /// <summary>
+        /// Returns the collection of setting property values for the specified application instance and settings property group.
+        /// </summary>
+        /// <param name="context">A <see cref="T:System.Configuration.SettingsContext" /> describing the current application usage.</param>
+        /// <param name="properties">A <see cref="T:System.Configuration.SettingsPropertyCollection" /> containing the settings property group whose values are to be retrieved.</param>
+        /// <returns>
+        /// A <see cref="T:System.Configuration.SettingsPropertyValueCollection" /> containing the values for the specified settings property group.
+        /// </returns>
+        /// <PermissionSet>
+        ///   <IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true" />
+        ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true" />
+        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="ControlEvidence, ControlPrincipal" />
+        /// </PermissionSet>
         public override SettingsPropertyValueCollection GetPropertyValues(SettingsContext context, SettingsPropertyCollection properties)
         {
             lock (lockObject){
@@ -42,6 +55,14 @@ namespace IgorSoft.CloudFS.Authentication.Configuration
             }
         }
 
+        /// <summary>Sets the values of the specified group of property settings.</summary>
+        /// <param name="context">A <see cref="T:System.Configuration.SettingsContext" />, der die aktuelle Anwendungsverwendung beschreibt.</param>
+        /// <param name="values">A <see cref="T:System.Configuration.SettingsPropertyValueCollection" /> representing the group of property settings to set.</param>
+        /// <PermissionSet>
+        ///   <IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true" />
+        ///   <IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true" />
+        ///   <IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="ControlEvidence, ControlPrincipal" />
+        /// </PermissionSet>
         public override void SetPropertyValues(SettingsContext context, SettingsPropertyValueCollection values)
         {
             lock (lockObject) {

@@ -105,12 +105,14 @@ namespace IgorSoft.CloudFS.Gateways.Yandex.OAuth
 
             var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
-            if (string.IsNullOrEmpty(refreshToken) && string.IsNullOrEmpty(code)) {
-                var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
-                code = GetAuthCode(account, authenticationUri, new Uri(YANDEX_LOGIN_TOKEN_URI));
+            if (string.IsNullOrEmpty(refreshToken)) {
+                if (string.IsNullOrEmpty(code)) {
+                    var authenticationUri = GetAuthenticationUri(Secrets.CLIENT_ID);
+                    code = GetAuthCode(account, authenticationUri, new Uri(YANDEX_LOGIN_TOKEN_URI));
 
-                if (string.IsNullOrEmpty(code))
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                    if (string.IsNullOrEmpty(code))
+                        throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, authenticationUri.ToString()));
+                }
 
                 refreshToken = code;
             }
