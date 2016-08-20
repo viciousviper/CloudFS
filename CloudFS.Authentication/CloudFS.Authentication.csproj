@@ -49,6 +49,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -62,6 +63,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AuthenticatedEventArgs.cs" />
+    <Compile Include="Configuration\SynchronizedFileSettingsProvider.cs" />
     <Compile Include="LogOnBase.cs" />
     <Compile Include="DirectLogOn.cs" />
     <Compile Include="BrowserLogOn.cs" />
