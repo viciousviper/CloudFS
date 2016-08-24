@@ -25,12 +25,13 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using pCloud.NET;
 using IgorSoft.CloudFS.Authentication;
 
-namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
+namespace IgorSoft.CloudFS.Gateways.pCloud.Auth
 {
     internal static class Authenticator
     {
@@ -39,23 +40,17 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
         private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
-            if (refreshTokens != null)
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account)
-                        return setting.RefreshToken.DecryptUsing(settingsPassPhrase);
-
-            return null;
+            var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
+            return setting?.RefreshToken.DecryptUsing(settingsPassPhrase);
         }
 
         private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account) {
-                        refreshTokens.Remove(setting);
-                        break;
-                    }
+                var setting = refreshTokens.SingleOrDefault(s => s.Account == account);
+                if (setting != null)
+                    refreshTokens.Remove(setting);
             } else {
                 refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
@@ -107,6 +102,15 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
             SaveRefreshToken(account, client.AuthToken, settingsPassPhrase);
 
             return client;
+        }
+
+        public static void PurgeRefreshToken(string account)
+        {
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
+            var settings = refreshTokens?.Where(s => account == null || s.Account == account).ToArray();
+            foreach (var setting in settings)
+                refreshTokens.Remove(setting);
+            Properties.Settings.Default.Save();
         }
     }
 }

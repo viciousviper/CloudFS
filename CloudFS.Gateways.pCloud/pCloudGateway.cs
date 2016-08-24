@@ -31,10 +31,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using pCloud.NET;
+using IgorSoft.CloudFS.Gateways.pCloud.Auth;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.Gateways.pCloud.OAuth;
 
 using pCloudFile = pCloud.NET.File;
 
@@ -46,7 +46,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), pCloudGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), pCloudGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public class pCloudGateway : IAsyncCloudGateway
+    public class pCloudGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "pcloud";
 
@@ -283,6 +283,11 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ItemTypeNotSupported, target.GetType().Name));
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            Authenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

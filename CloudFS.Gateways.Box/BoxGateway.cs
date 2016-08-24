@@ -44,7 +44,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), BoxGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), BoxGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class BoxGateway : IAsyncCloudGateway
+    public sealed class BoxGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "box";
 
@@ -253,6 +253,11 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
                 return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
             }
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            OAuthAuthenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

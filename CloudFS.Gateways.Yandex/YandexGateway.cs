@@ -46,7 +46,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), YandexGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(YandexDisk))]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class YandexGateway : IAsyncCloudGateway
+    public sealed class YandexGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "yandex";
 
@@ -261,6 +261,11 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
             return item.ToFileSystemInfoContract();
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            OAuthAuthenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

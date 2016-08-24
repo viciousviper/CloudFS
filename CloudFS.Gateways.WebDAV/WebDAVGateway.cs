@@ -28,14 +28,14 @@ using System.Collections.Generic;
 using System.Composition;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using WebDav;
+using IgorSoft.CloudFS.Gateways.WebDAV.Auth;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.Gateways.WebDAV.Auth;
-using System.Net;
-using System.Xml.Linq;
 
 namespace IgorSoft.CloudFS.Gateways.WebDAV
 {
@@ -44,7 +44,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
     [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), WebDAVGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), WebDAVGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public class WebDAVGateway : IAsyncCloudGateway
+    public class WebDAVGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "webdav";
 
@@ -314,6 +314,11 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var item = propfindResponse.Resources.Single(r => r.Uri == newName);
 
             return item.ToFileSystemInfoContract();
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            Authenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

@@ -24,7 +24,7 @@ SOFTWARE.
 
 using System;
 
-namespace IgorSoft.CloudFS.Gateways.pCloud.OAuth
+namespace IgorSoft.CloudFS.Gateways.pCloud.Auth
 {
     public class RefreshTokenSetting
     {

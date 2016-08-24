@@ -29,10 +29,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using OneDrive;
+using IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth;
 
 namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 {
@@ -42,7 +42,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), OneDriveGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), OneDriveGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class OneDriveGateway : IAsyncCloudGateway
+    public sealed class OneDriveGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "onedrive_legacy";
 
@@ -224,6 +224,11 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.PatchItemAsync(itemReference, new ODItem() { Name = newName }), RETRIES);
 
             return item.ToFileSystemInfoContract();
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            OAuthAuthenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

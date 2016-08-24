@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using MediaFireSDK;
@@ -96,23 +97,19 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
         private static AuthenticationContext LoadRefreshToken(string account, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
-            if (refreshTokens != null)
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account)
-                        return new AuthenticationContext(setting.SessionToken.DecryptUsing(settingsPassPhrase), long.Parse(setting.SecretKey.DecryptUsing(settingsPassPhrase)), setting.Time.DecryptUsing(settingsPassPhrase));
-
-            return null;
+            var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
+            return setting != null
+                ? new AuthenticationContext(setting.SessionToken.DecryptUsing(settingsPassPhrase), long.Parse(setting.SecretKey.DecryptUsing(settingsPassPhrase)), setting.Time.DecryptUsing(settingsPassPhrase))
+                : null;
         }
 
         internal static void SaveRefreshToken(string account, AuthenticationContext refreshToken, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account) {
-                        refreshTokens.Remove(setting);
-                        break;
-                    }
+                var setting = refreshTokens.SingleOrDefault(s => s.Account == account);
+                if (setting != null)
+                    refreshTokens.Remove(setting);
             } else {
                 refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
@@ -184,6 +181,15 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
             }
 
             return agent;
+        }
+
+        public static void PurgeRefreshToken(string account)
+        {
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
+            var settings = refreshTokens?.Where(s => account == null || s.Account == account).ToArray();
+            foreach (var setting in settings)
+                refreshTokens.Remove(setting);
+            Properties.Settings.Default.Save();
         }
     }
 }

@@ -48,7 +48,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), MediaFireGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(MediaFireSDK))]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class MediaFireGateway : IAsyncCloudGateway, IDisposable
+    public sealed class MediaFireGateway : IAsyncCloudGateway, IPersistGatewaySettings, IDisposable
     {
         private const string SCHEMA = "mediafire";
 
@@ -361,6 +361,11 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
                 return new FileInfoContract(item.FileInfo.QuickKey, item.FileInfo.Name, item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
             }
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            Authenticator.PurgeRefreshToken(root?.UserName);
         }
 
         public void Dispose()

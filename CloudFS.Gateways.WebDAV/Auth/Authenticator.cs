@@ -25,12 +25,12 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using WebDav;
 using IgorSoft.CloudFS.Authentication;
-using IgorSoft.CloudFS.Gateways.WebDAV.Properties;
 
 namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
 {
@@ -40,31 +40,27 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
 
         private static NetworkCredential LoadCredential(string account, string settingsPassPhrase)
         {
-            var credentials = Settings.Default.Credentials;
-            if (credentials != null)
-                foreach (CredentialsSetting setting in credentials)
-                    if (setting.Account == account)
-                        return new NetworkCredential(setting.UserName.DecryptUsing(settingsPassPhrase), setting.Password.DecryptUsing(settingsPassPhrase));
-
-            return null;
+            var credentials = Properties.Settings.Default.Credentials;
+            var setting = credentials?.SingleOrDefault(s => s.Account == account);
+            return setting != null
+                ? new NetworkCredential(setting.UserName.DecryptUsing(settingsPassPhrase), setting.Password.DecryptUsing(settingsPassPhrase))
+                : null;
         }
 
         private static void SaveCredential(string account, NetworkCredential credential, string settingsPassPhrase)
         {
-            var credentials = Settings.Default.Credentials;
+            var credentials = Properties.Settings.Default.Credentials;
             if (credentials != null) {
-                foreach (CredentialsSetting setting in credentials)
-                    if (setting.Account == account) {
-                        credentials.Remove(setting);
-                        break;
-                    }
+                var setting = credentials.SingleOrDefault(s => s.Account == account);
+                if (setting != null)
+                    credentials.Remove(setting);
             } else {
-                credentials = Settings.Default.Credentials = new System.Collections.ObjectModel.Collection<CredentialsSetting>();
+                credentials = Properties.Settings.Default.Credentials = new System.Collections.ObjectModel.Collection<CredentialsSetting>();
             }
 
             credentials.Insert(0, new CredentialsSetting() { Account = account, UserName = credential.UserName.EncryptUsing(settingsPassPhrase), Password = credential.Password.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         public static string GetAuthCode(string account)
@@ -99,7 +95,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
 
                 var parts = code?.Split(new[] { ',' }, 2) ?? Array.Empty<string>();
                 if (parts.Length != 2)
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.ProvideAuthenticationData, account));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ProvideAuthenticationData, account));
 
                 credential = new NetworkCredential(parts[0], parts[1]);
             }
@@ -112,6 +108,15 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
                 UseDefaultCredentials = false
             };
             return new WebDavClient(clientParams);
+        }
+
+        public static void PurgeRefreshToken(string account)
+        {
+            var credentials = Properties.Settings.Default.Credentials;
+            var settings = credentials?.Where(s => account == null || s.Account == account).ToArray();
+            foreach (var setting in settings)
+                credentials.Remove(setting);
+            Properties.Settings.Default.Save();
         }
     }
 }

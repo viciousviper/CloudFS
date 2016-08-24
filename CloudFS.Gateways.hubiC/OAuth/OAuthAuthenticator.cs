@@ -30,10 +30,10 @@ using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using IgorSoft.CloudFS.Authentication;
-using static IgorSoft.CloudFS.Authentication.OAuth.Constants;
 using Newtonsoft.Json;
 using SwiftClient;
+using IgorSoft.CloudFS.Authentication;
+using static IgorSoft.CloudFS.Authentication.OAuth.Constants;
 
 namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
 {
@@ -82,23 +82,17 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
         private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
-            if (refreshTokens != null)
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account)
-                        return setting.Token.DecryptUsing(settingsPassPhrase);
-
-            return null;
+            var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
+            return setting?.Token.DecryptUsing(settingsPassPhrase);
         }
 
         private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account) {
-                        refreshTokens.Remove(setting);
-                        break;
-                    }
+                var setting = refreshTokens.SingleOrDefault(s => s.Account == account);
+                if (setting != null)
+                    refreshTokens.Remove(setting);
             } else {
                 refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
@@ -226,6 +220,15 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
             var authManager = new SwiftAuthManager() { Credentials = new SwiftCredentials() { Password = response.AccessToken }, Authenticate = (user, password, endpoint) => AuthenticateAsync(password) };
             authManager.SetEndpoints(new[] { "http://localhost:8080" }.ToList());
             return new Client(authManager);
+        }
+
+        public static void PurgeRefreshToken(string account)
+        {
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
+            var settings = refreshTokens?.Where(s => account == null || s.Account == account).ToArray();
+            foreach (var setting in settings)
+                refreshTokens.Remove(setting);
+            Properties.Settings.Default.Save();
         }
     }
 }

@@ -26,11 +26,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.OneDrive.Sdk;
 using IgorSoft.CloudFS.Authentication;
-using IgorSoft.CloudFS.Gateways.OneDrive.Properties;
 
 namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 {
@@ -76,31 +76,24 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
         private static string LoadRefreshToken(string account, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
-            if (refreshTokens != null)
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account)
-                        return setting.RefreshToken.DecryptUsing(settingsPassPhrase);
-
-            return null;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
+            var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
+            return setting?.RefreshToken.DecryptUsing(settingsPassPhrase);
         }
 
         private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
         {
-            var refreshTokens = Settings.Default.RefreshTokens;
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account) {
-                        refreshTokens.Remove(setting);
-                        break;
-                    }
+                var setting = refreshTokens.SingleOrDefault(s => s.Account == account);
+                    refreshTokens.Remove(setting);
             } else {
-                refreshTokens = Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
+                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
             }
 
             refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken.EncryptUsing(settingsPassPhrase) });
 
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         public static async Task<IOneDriveClient> LoginAsync(string account, string code, string settingsPassPhrase)
@@ -124,12 +117,21 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                 await client.AuthenticateAsync();
 
                 if (!client.IsAuthenticated)
-                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Resources.RetrieveAuthenticationCodeFromUri, LIVE_LOGIN_AUTHORIZE_URI));
+                    throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, LIVE_LOGIN_AUTHORIZE_URI));
             }
 
             SaveRefreshToken(account, client.AuthenticationProvider.CurrentAccountSession.RefreshToken, settingsPassPhrase);
 
             return client;
+        }
+
+        public static void PurgeRefreshToken(string account)
+        {
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
+            var settings = refreshTokens?.Where(s => account == null || s.Account == account).ToArray();
+            foreach (var setting in settings)
+                refreshTokens.Remove(setting);
+            Properties.Settings.Default.Save();
         }
     }
 }

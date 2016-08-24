@@ -44,11 +44,11 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.Properties
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting> RefreshTokens
+        public global::System.Collections.ObjectModel.Collection<Auth.RefreshTokenSetting> RefreshTokens
         {
             get
             {
-                return ((global::System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>)(this["RefreshTokens"]));
+                return ((global::System.Collections.ObjectModel.Collection<Auth.RefreshTokenSetting>)(this["RefreshTokens"]));
             }
             set
             {

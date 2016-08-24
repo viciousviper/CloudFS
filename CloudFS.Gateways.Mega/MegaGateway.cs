@@ -29,10 +29,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CG.Web.MegaApiClient;
+using IgorSoft.CloudFS.Gateways.Mega.Auth;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.Gateways.Mega.Auth;
 
 namespace IgorSoft.CloudFS.Gateways.Mega
 {
@@ -42,7 +42,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), MegaGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), MegaGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class MegaGateway : IAsyncCloudGateway
+    public sealed class MegaGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "mega";
 
@@ -207,6 +207,11 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
             return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.RenamingOfFilesNotSupported));
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            Authenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

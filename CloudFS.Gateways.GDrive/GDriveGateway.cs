@@ -28,15 +28,17 @@ using System.Composition;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using IgorSoft.CloudFS.Interface;
-using IgorSoft.CloudFS.Interface.Composition;
-using IgorSoft.CloudFS.Interface.IO;
 using Google;
 using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Responses;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Upload;
+using Google.Apis.Util.Store;
+using IgorSoft.CloudFS.Interface;
+using IgorSoft.CloudFS.Interface.Composition;
+using IgorSoft.CloudFS.Interface.IO;
 
 using GoogleFile = Google.Apis.Drive.v3.Data.File;
 
@@ -48,7 +50,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), GDriveGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), GDriveGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class GDriveGateway : IAsyncCloudGateway
+    public sealed class GDriveGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "gdrive";
 
@@ -82,11 +84,10 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
                 throw new ArgumentNullException(nameof(root));
 
             var result = default(GDriveContext);
-            if (!contextCache.TryGetValue(root, out result))
-            {
+            if (!contextCache.TryGetValue(root, out result)) {
                 var clientSecret = new ClientSecrets() { ClientId = Secrets.CLIENT_ID, ClientSecret = Secrets.CLIENT_SECRET };
                 var credentials = await GoogleWebAuthorizationBroker.AuthorizeAsync(clientSecret, new[] { DriveService.Scope.Drive }, root.UserName, System.Threading.CancellationToken.None);
-                var service = new DriveService(new BaseClientService.Initializer() { HttpClientInitializer = credentials, ApplicationName = "GDrvTest" });
+                var service = new DriveService(new BaseClientService.Initializer() { HttpClientInitializer = credentials, ApplicationName = "CloudFS" });
                 contextCache.Add(root, result = new GDriveContext(service));
             }
             return result;
@@ -94,13 +95,10 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
         public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
-            try
-            {
+            try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 return false;
             }
         }
@@ -253,6 +251,15 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var item = await AsyncFunc.RetryAsync<GoogleFile, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
 
             return item.ToFileSystemInfoContract();
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            var dataStore = new FileDataStore(GoogleWebAuthorizationBroker.Folder, false);
+            if (root != null)
+                dataStore.DeleteAsync<TokenResponse>(root.UserName).Wait();
+            else
+                dataStore.ClearAsync().Wait();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

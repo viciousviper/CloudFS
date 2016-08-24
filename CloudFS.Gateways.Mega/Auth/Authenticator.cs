@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,23 +41,19 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
         private static MegaApiClient.AuthInfos LoadRefreshToken(string account, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
-            if (refreshTokens != null)
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account)
-                        return new MegaApiClient.AuthInfos(setting.EMail.DecryptUsing(settingsPassPhrase), setting.Hash.DecryptUsing(settingsPassPhrase), Encoding.Unicode.GetBytes(setting.PasswordAesKey.DecryptUsing(settingsPassPhrase)));
-
-            return null;
+            var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
+            return setting != null
+                ? new MegaApiClient.AuthInfos(setting.EMail.DecryptUsing(settingsPassPhrase), setting.Hash.DecryptUsing(settingsPassPhrase), Encoding.Unicode.GetBytes(setting.PasswordAesKey.DecryptUsing(settingsPassPhrase)))
+                : null;
         }
 
         private static void SaveRefreshToken(string account, MegaApiClient.AuthInfos refreshToken, string settingsPassPhrase)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
             if (refreshTokens != null) {
-                foreach (RefreshTokenSetting setting in refreshTokens)
-                    if (setting.Account == account) {
-                        refreshTokens.Remove(setting);
-                        break;
-                    }
+                var setting = refreshTokens.SingleOrDefault(s => s.Account == account);
+                if (setting != null)
+                    refreshTokens.Remove(setting);
             } else {
                 refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
             }
@@ -109,6 +106,15 @@ namespace IgorSoft.CloudFS.Gateways.Mega.Auth
             SaveRefreshToken(account, refreshToken, settingsPassPhrase);
 
             return client;
+        }
+
+        public static void PurgeRefreshToken(string account)
+        {
+            var refreshTokens = Properties.Settings.Default.RefreshTokens;
+            var settings = refreshTokens?.Where(s => account == null || s.Account == account).ToArray();
+            foreach (var setting in settings)
+                refreshTokens.Remove(setting);
+            Properties.Settings.Default.Save();
         }
     }
 }

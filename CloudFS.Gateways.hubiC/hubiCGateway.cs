@@ -43,7 +43,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), hubiCGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), nameof(hubiCGateway))]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class hubiCGateway : IAsyncCloudGateway
+    public sealed class hubiCGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "hubic";
 
@@ -252,6 +252,11 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
             return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.RenamingOfFilesNotSupported));
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            OAuthAuthenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

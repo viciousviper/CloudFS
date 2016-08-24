@@ -43,7 +43,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), OneDriveGateway.URL)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ApiAssembly), OneDriveGateway.API)]
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-    public sealed class OneDriveGateway : IAsyncCloudGateway
+    public sealed class OneDriveGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
         private const string SCHEMA = "onedrive";
 
@@ -218,6 +218,11 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             var item = await AsyncFunc.RetryAsync<Item, OneDriveException>(async () => await context.Client.Drive.Items[target.Value].Request().UpdateAsync(new Item() { Name = newName }), RETRIES);
 
             return item.ToFileSystemInfoContract();
+        }
+
+        public void PurgeSettings(RootName root)
+        {
+            OAuthAuthenticator.PurgeRefreshToken(root?.UserName);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
