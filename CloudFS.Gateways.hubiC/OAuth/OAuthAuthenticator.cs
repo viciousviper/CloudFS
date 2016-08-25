@@ -83,7 +83,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
             var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
-            return setting?.Token.DecryptUsing(settingsPassPhrase);
+            return setting?.Token?.DecryptUsing(settingsPassPhrase);
         }
 
         private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)

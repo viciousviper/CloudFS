@@ -41,7 +41,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.Auth
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
             var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
-            return setting?.RefreshToken.DecryptUsing(settingsPassPhrase);
+            return setting?.RefreshToken?.DecryptUsing(settingsPassPhrase);
         }
 
         private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
