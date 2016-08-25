@@ -45,17 +45,6 @@
     <AssemblyOriginatorKeyFile>..\..\..\IgorSoft\IgorSoft.OpenSource.snk.pfx</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
-  <Choose>
-    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' " />
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="WebDav.Client, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\SignedLibrary\WebDav.Client.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
   <ItemGroup>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
       <HintPath>..\packages\SemanticTypes.1.0.1\lib\net35\SemanticTypes.dll</HintPath>
@@ -130,7 +119,6 @@
     <PreBuildEvent>
 if $(ConfigurationName) == Signed (
     if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-    if not exist $(SolutionDir)SignedLibrary\WebDav.Client.dll cmd /c "$(SolutionDir)SignAssembly.cmd WebDav.Client $(SolutionDir)packages\WebDav.Client.1.0.3.0\lib\net45 $(SolutionDir)SignedLibrary"
 )
 </PreBuildEvent>
   </PropertyGroup>

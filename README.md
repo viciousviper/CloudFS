@@ -84,6 +84,7 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 | Date       | Version     | Comments                                                                       |
 | :--------- | :---------- | :----------------------------------------------------------------------------- |
+| 2016-08-26 | 1.0.8-alpha | - New gateway for generic WebDAV providers added.<br/>- Support AES encryption of account credentials and access tokens in locally persisted application settings.<br/>- Fixed concurrent access to locally persisted application settings.<br/>- Version updates to API libraries for Box, Google Drive, SwiftClient, and SemanticTypes.<br/>- Activated static code analysis via Coverity Scan. |
 | 2016-08-07 | 1.0.7-alpha | - Added an explicit authentication method for cloud gateways. All other gateway methods still require successful authentication to the cloud service. **Note:** This breaks compatibility with the previous versions of `ICloudGateway` and `IAsyncCloudGateway`.<br/>- Migrated gateway for Google Drive and OneDrive to Google Drive API v3 and OneDriveSDK, respectively (previously used API libraries remain available via *_Legacy gateways).<br/>- MediaFire gateway now supports session token v2 (lifetime 2 years instead of 10 minutes)<br/>- OneDrive gateway now supports creation of empty files.<br/>- Fixed cross-thread marshalling of authentication tokens.<br/>- Version updates to API libraries for Box, Google Drive, OneDrive |
 | 2016-05-20 | 1.0.6-alpha | - Fixed broken package references in NuGet specs (present since 1.0.3-alpha)<br/>- Version update to API library for Box |
 | 2016-05-18 | 1.0.5-alpha | - Retired gateway for Cloud<br/>- Version update to API library for Google Drive<br/>- Support for Windows Explorer new file creation sequence in MEGA<br/>- Improved online editing capability in non-encrypting File gateway
@@ -98,3 +99,4 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 - include additional gateways for more Cloud storage services
 - improve usability of cloud service authentication dialogs
+- improve stability of large file uploads

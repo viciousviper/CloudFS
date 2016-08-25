@@ -31,6 +31,7 @@ namespace IgorSoft.CloudFS.GatewayTests
     /// <summary>
     /// Defines secrets for the CloudFS gateways unit tests assembly.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Used in MEF composition")]
     internal class Secrets
     {
         /// <summary>
