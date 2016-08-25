@@ -47,7 +47,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
                 this.account = account;
             }
 
-            public async Task<IDictionary<string, string>> AuthenticateAsync(Uri requestUri, Uri callbackUri)
+            public Task<IDictionary<string, string>> AuthenticateAsync(Uri requestUri, Uri callbackUri)
             {
                 var result = new Dictionary<string, string>();
 
@@ -64,7 +64,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
                 logOn.Authenticated -= callback;
 
-                return result;
+                return Task.FromResult<IDictionary<string, string>>(result);
             }
         }
 

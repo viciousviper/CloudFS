@@ -80,7 +80,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
             return authCode;
         }
 
-        public static async Task<WebDavClient> LoginAsync(string account, string code, Uri baseAddress, string settingsPassPhrase)
+        public static Task<WebDavClient> LoginAsync(string account, string code, Uri baseAddress, string settingsPassPhrase)
         {
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
@@ -107,7 +107,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
                 Credentials = credential,
                 UseDefaultCredentials = false
             };
-            return new WebDavClient(clientParams);
+            return Task.FromResult(new WebDavClient(clientParams));
         }
 
         public static void PurgeRefreshToken(string account)

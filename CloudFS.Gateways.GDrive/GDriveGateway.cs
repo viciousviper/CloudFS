@@ -78,6 +78,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
         private readonly IDictionary<RootName, GDriveContext> contextCache = new Dictionary<RootName, GDriveContext>();
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "apiKey")]
         private async Task<GDriveContext> RequireContextAsync(RootName root, string apiKey = null)
         {
             if (root == null)

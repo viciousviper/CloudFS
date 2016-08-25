@@ -57,8 +57,6 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         private const string DEFAULT_CONTAINER = "default";
 
-        private static readonly Dictionary<string, string> directoryContentHeaders = new Dictionary<string, string>() { { "Content-Type", "application/directory" } };
-
         private class hubiCContext
         {
             public Client Client { get; }

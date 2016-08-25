@@ -31,9 +31,11 @@ namespace IgorSoft.CloudFS.Interface.IO
     /// <summary>
     /// The unique identifier of a cloud drive.
     /// </summary>
-    /// <seealso cref="SemanticTypes.SemanticType{System.String}" />
+    /// <seealso cref="SemanticType{string}" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
+#pragma warning disable CS3009 // Basistyp ist nicht CLS-kompatibel
     public sealed class DriveId : SemanticType<string>
+#pragma warning restore CS3009 // Basistyp ist nicht CLS-kompatibel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DriveId"/> class.
