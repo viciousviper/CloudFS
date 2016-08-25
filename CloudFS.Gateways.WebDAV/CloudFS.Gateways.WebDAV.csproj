@@ -46,14 +46,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <Choose>
-    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
-      <ItemGroup>
-        <Reference Include="WebDav.Client, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\WebDav.Client.1.0.3.0\lib\net45\WebDav.Client.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-      </ItemGroup>
-    </When>
+    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' " />
     <Otherwise>
       <ItemGroup>
         <Reference Include="WebDav.Client, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
@@ -80,6 +73,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebDav.Client, Version=1.0.4.0, Culture=neutral, PublicKeyToken=daed9acc7deb9472, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebDav.Client.1.0.4.0\lib\net45\WebDav.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
