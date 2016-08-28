@@ -113,9 +113,14 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV.Auth
         public static void PurgeRefreshToken(string account)
         {
             var credentials = Properties.Settings.Default.Credentials;
-            var settings = credentials?.Where(s => account == null || s.Account == account).ToArray();
+            if (credentials == null)
+                return;
+
+            var settings = credentials.Where(s => account == null || s.Account == account).ToArray();
             foreach (var setting in settings)
                 credentials.Remove(setting);
+            if (!credentials.Any())
+                Properties.Settings.Default.Credentials = null;
             Properties.Settings.Default.Save();
         }
     }

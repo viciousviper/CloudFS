@@ -53,7 +53,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
             var setting = refreshTokens?.SingleOrDefault(s => s.Account == account);
-            return setting?.RefreshToken?.DecryptUsing(settingsPassPhrase);
+            return setting?.RefreshToken.DecryptUsing(settingsPassPhrase);
         }
 
         private static void SaveRefreshToken(string account, string refreshToken, string settingsPassPhrase)
@@ -128,9 +128,14 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
         public static void PurgeRefreshToken(string account)
         {
             var refreshTokens = Properties.Settings.Default.RefreshTokens;
-            var settings = refreshTokens?.Where(s => account == null || s.Account == account).ToArray();
+            if (refreshTokens == null)
+                return;
+
+            var settings = refreshTokens.Where(s => account == null || s.Account == account).ToArray();
             foreach (var setting in settings)
                 refreshTokens.Remove(setting);
+            if (!refreshTokens.Any())
+                Properties.Settings.Default.RefreshTokens = null;
             Properties.Settings.Default.Save();
         }
     }
