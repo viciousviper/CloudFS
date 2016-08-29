@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>CloudFS-Signed</id>
-    <version>1.0.8-alpha</version>
+    <version>1.0.9-alpha</version>
     <title>CloudFS-Signed</title>
     <authors>IgorSoft</authors>
     <owners>IgorSoft</owners>
@@ -10,11 +10,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The CloudFS library is a collection of .NET assemblies as gateways to various publicly accessible Cloud storage services.</description>
     <releaseNotes>
-      - New gateway for generic WebDAV providers added.
-      - Support AES encryption of account credentials and access tokens in locally persisted application settings.
-      - Fixed concurrent access to locally persisted application settings.
-      - Version updates to API libraries for Box, Google Drive, SwiftClient, and SemanticTypes.
-      - Activated static code analysis via Coverity Scan.
+      - Implemented settings purge function in gateways.
+      - Version updates to API libraries for Box and OneDrive.
     </releaseNotes>
     <copyright>Copyright © 2016</copyright>
 	<tags>Cloud Filesystem Box GoogleDrive hubiC MediaFire Mega OneDrive pCloud Swift WebDAV YandexDisk</tags>
@@ -22,14 +19,14 @@
         <group targetFramework="net46">
           <dependency id="Microsoft.AspNet.WebApi.Client" version="[5.2.3,)" />
           <dependency id="Microsoft.Composition" version="[1.0.30,)" />
-          <dependency id="Microsoft.IdentityModel.Clients.ActiveDirectory" version="[3.13.2,)" />
+          <dependency id="Microsoft.IdentityModel.Clients.ActiveDirectory" version="[3.13.4,)" />
           <dependency id="Newtonsoft.Json" version="[9.0.1,)" />
           <dependency id="SemanticTypes" version="[1.0.0,)" />
-          <dependency id="Box.V2" version="[2.11.0,)" />
+          <dependency id="Box.V2" version="[2.12.0,)" />
           <dependency id="Google.Apis.Drive.v2" version="1.16.0.596" />
           <dependency id="Google.Apis.Drive.v3" version="1.16.0.596" />
           <dependency id="MegaApiClient" version="[1.2.2,)" />
-          <dependency id="Microsoft.OneDriveSDK" version="1.1.47" />
+          <dependency id="Microsoft.OneDriveSDK" version="1.2.0" />
         </group>
     </dependencies>
   </metadata>
