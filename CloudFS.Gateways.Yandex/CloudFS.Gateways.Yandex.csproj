@@ -49,15 +49,15 @@
   <Choose>
     <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
       <ItemGroup>
-        <Reference Include="YandexDisk.Client, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\YandexDisk.Client.1.0.7\lib\net46\YandexDisk.Client.dll</HintPath>
+        <Reference Include="YandexDisk.Client, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\YandexDisk.Client.1.0.8\lib\net46\YandexDisk.Client.dll</HintPath>
           <Private>True</Private>
         </Reference>
       </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="YandexDisk.Client, Version=1.0.7.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+        <Reference Include="YandexDisk.Client, Version=1.0.8.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
           <SpecificVersion>False</SpecificVersion>
           <HintPath>..\SignedLibrary\YandexDisk.Client.dll</HintPath>
         </Reference>
@@ -144,7 +144,7 @@
     <PreBuildEvent>
 if $(ConfigurationName) == Signed (
     if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-    if not exist $(SolutionDir)SignedLibrary\YandexDisk.Client.dll cmd /c "$(SolutionDir)SignAssembly.cmd YandexDisk.Client $(SolutionDir)packages\YandexDisk.Client.1.0.7\lib\net46 $(SolutionDir)SignedLibrary"
+    if not exist $(SolutionDir)SignedLibrary\YandexDisk.Client.dll cmd /c "$(SolutionDir)SignAssembly.cmd YandexDisk.Client $(SolutionDir)packages\YandexDisk.Client.1.0.8\lib\net46 $(SolutionDir)SignedLibrary"
 )
 </PreBuildEvent>
   </PropertyGroup>
