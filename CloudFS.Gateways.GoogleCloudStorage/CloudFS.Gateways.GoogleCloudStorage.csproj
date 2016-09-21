@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CDF43233-42A3-4D67-800D-5E7647327CF6}</ProjectGuid>
+    <ProjectGuid>{0455770E-AA25-4F01-A7E1-4FBBA826531D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IgorSoft.CloudFS.Gateways.GDrive</RootNamespace>
-    <AssemblyName>IgorSoft.CloudFS.Gateways.GDrive</AssemblyName>
+    <RootNamespace>IgorSoft.CloudFS.Gateways.GoogleCloudStorage</RootNamespace>
+    <AssemblyName>IgorSoft.CloudFS.Gateways.GoogleCloudStorage</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,7 +32,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Signed|AnyCPU' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Signed|AnyCPU'">
     <OutputPath>bin\Signed\</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS;SIGNED</DefineConstants>
     <Optimize>true</Optimize>
@@ -41,13 +41,14 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
-    <PreBuildEventUseInBuild>true</PreBuildEventUseInBuild>
-    <AssemblyOriginatorKeyFile>..\..\..\IgorSoft\IgorSoft.OpenSource.snk.pfx</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.8.1.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
-      <HintPath>..\packages\BouncyCastle.1.8.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.7.4137.9688, Culture=neutral, PublicKeyToken=a4292a325f69b123, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.1.7.0\lib\Net40-Client\BouncyCastle.Crypto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Api.Gax.Rest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=3ec5ea7f18953e47, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Api.Gax.Rest.1.0.0-beta02\lib\net45\Google.Api.Gax.Rest.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Google.Apis, Version=1.16.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
@@ -66,12 +67,16 @@
       <HintPath>..\packages\Google.Apis.Core.1.16.0\lib\net45\Google.Apis.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Google.Apis.Drive.v3, Version=1.16.0.609, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Drive.v3.1.16.0.609\lib\netstandard1.3\Google.Apis.Drive.v3.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Google.Apis.PlatformServices, Version=1.16.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.16.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Apis.Storage.v1, Version=1.16.0.609, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Apis.Storage.v1.1.16.0.609\lib\netstandard1.3\Google.Apis.Storage.v1.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Google.Storage.V1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=185c282632e132a0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Storage.V1.1.0.0-beta02\lib\net45\Google.Storage.V1.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -82,9 +87,8 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
+    <Reference Include="SemanticTypes">
       <HintPath>..\packages\SemanticTypes.1.0.1\lib\net35\SemanticTypes.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Composition.AttributedModel">
@@ -94,13 +98,10 @@
       <HintPath>..\packages\Microsoft.Composition.1.0.30\lib\portable-net45+win8+wp8+wpa81\System.Composition.TypedParts.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http.Extensions">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+    <Reference Include="System.Interactive.Async, Version=3.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Interactive.Async.3.0.0\lib\net45\System.Interactive.Async.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Net.Http.Primitives">
-      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -116,26 +117,25 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="FileExtensions.cs" />
-    <Compile Include="GDriveGateway.cs" />
+    <Compile Include="GoogleCloudStorageGateway.cs" />
+    <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RequestExtensions.cs" />
-    <Compile Include="Secrets.cs" />
+    <Compile Include="StorageObjectId.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config">
+    <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CloudFS.Interface\CloudFS.Interface.csproj">
-      <Project>{3c92bdc3-ae94-4269-8fc6-9114a90184ac}</Project>
+      <Project>{3C92BDC3-AE94-4269-8FC6-9114A90184AC}</Project>
       <Name>CloudFS.Interface</Name>
     </ProjectReference>
   </ItemGroup>
@@ -156,7 +156,7 @@ if $(ConfigurationName) == Signed (
   <PropertyGroup>
     <PostBuildEvent>
 if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config Google.Apis.dll Google.Apis.Auth.dll Google.Apis.Auth.PlatformServices.dll Google.Apis.Core.dll Google.Apis.Drive.v3.dll Google.Apis.PlatformServices.dll Microsoft.Threading.Tasks.dll Microsoft.Threading.Tasks.Extensions.Desktop.dll System.Net.Http.Primitives.dll ZLib.Portable.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
+for %25%25f in ($(TargetFileName) $(TargetFileName).config BouncyCastle.Crypto.dll Google.Api.Gax.Rest.dll Google.Apis.dll Google.Apis.Auth.dll Google.Apis.Auth.PlatformServices.dll Google.Apis.Core.dll Google.Apis.PlatformServices.dll Google.Apis.Storage.v1.dll Google.Storage.V1.dll log4net.dll Newtonsoft.Json.dll System.Interactive.Async.dll Zlib.Portable.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
