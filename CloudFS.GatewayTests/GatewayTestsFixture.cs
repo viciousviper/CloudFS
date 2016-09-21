@@ -113,7 +113,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             return result;
         }
 
-        private void CallTimedTestOnConfig<TGateway>(Action<TGateway, RootName, GatewayElement> test, GatewayElement config, Func<GatewayElement, TGateway> getGateway, IDictionary<string, Exception> failures, string mode)
+        private void CallTimedTestOnConfig<TGateway>(Action<TGateway, RootName, GatewayElement> test, GatewayElement config, Func<GatewayElement, TGateway> getGateway, IDictionary<string, Exception> failures)
         {
             try {
                 var startedAt = DateTime.Now;
@@ -121,28 +121,32 @@ namespace IgorSoft.CloudFS.GatewayTests
                 var rootName = GetRootName(config);
                 test(gateway, rootName, config);
                 var completedAt = DateTime.Now;
-                Log($"{mode} test for schema '{config.Schema}' completed in {completedAt - startedAt}".ToString(CultureInfo.CurrentCulture));
+                Log($"Test for schema '{config.Schema}' completed in {completedAt - startedAt}".ToString(CultureInfo.CurrentCulture));
             } catch (Exception ex) {
-                Log($"{mode} test for schema '{config.Schema}' failed".ToString(CultureInfo.CurrentCulture));
+                var aggregateException = ex as AggregateException;
+                var message = aggregateException != null ? string.Join(", ", aggregateException.InnerExceptions.Select(e => e.Message)) : ex.Message;
+                Log($"Test for schema '{config.Schema}' failed:\n\t {message}".ToString(CultureInfo.CurrentCulture));
                 failures.Add(config.Schema, ex);
             }
         }
 
-        private void ExecuteByConfiguration<TGateway>(Action<TGateway, RootName, GatewayElement> test, GatewayType type, Func<GatewayElement, TGateway> getGateway, bool inParallel = true)
+        private void ExecuteByConfiguration<TGateway>(Action<TGateway, RootName, GatewayElement> test, GatewayType type, Func<GatewayElement, TGateway> getGateway, int maxDegreeOfParallelism)
         {
             var configurations = GetGatewayConfigurations(type, GatewayCapabilities.None);
             var failures = default(IDictionary<string, Exception>);
 
-            if (inParallel) {
+            if (maxDegreeOfParallelism > 1) {
                 failures = new ConcurrentDictionary<string, Exception>();
-                Parallel.ForEach(configurations, config => {
-                    CallTimedTestOnConfig<TGateway>(test, config, getGateway, failures, "Parallel");
+                Parallel.ForEach(configurations, new ParallelOptions() { MaxDegreeOfParallelism = maxDegreeOfParallelism }, config => {
+                    CallTimedTestOnConfig<TGateway>(test, config, getGateway, failures);
                 });
-            } else {
+            } else if (maxDegreeOfParallelism == 1) {
                 failures = new Dictionary<string, Exception>();
                 foreach (var config in configurations) {
-                    CallTimedTestOnConfig<TGateway>(test, config, getGateway, failures, "Sequential");
+                    CallTimedTestOnConfig<TGateway>(test, config, getGateway, failures);
                 }
+            } else {
+                throw new ArgumentException("Degree of parallelism must be positive", nameof(maxDegreeOfParallelism));
             }
 
             if (failures.Any())
@@ -151,16 +155,16 @@ namespace IgorSoft.CloudFS.GatewayTests
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void ExecuteByConfiguration(Action<IAsyncCloudGateway, RootName, GatewayElement> test, bool inParallel = true)
+        public void ExecuteByConfiguration(Action<IAsyncCloudGateway, RootName, GatewayElement> test, int maxDegreeOfParallelism = int.MaxValue)
         {
-            ExecuteByConfiguration(test, GatewayType.Async, config => GetAsyncGateway(config), inParallel);
+            ExecuteByConfiguration(test, GatewayType.Async, config => GetAsyncGateway(config), maxDegreeOfParallelism);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        public void ExecuteByConfiguration(Action<ICloudGateway, RootName, GatewayElement> test, bool inParallel = true)
+        public void ExecuteByConfiguration(Action<ICloudGateway, RootName, GatewayElement> test, int maxDegreeOfParallelism = int.MaxValue)
         {
-            ExecuteByConfiguration(test, GatewayType.Sync, config => GetGateway(config), inParallel);
+            ExecuteByConfiguration(test, GatewayType.Sync, config => GetGateway(config), maxDegreeOfParallelism);
         }
 
         public IProgress<ProgressValue> GetProgressReporter() => new NullProgressReporter();

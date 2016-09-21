@@ -85,11 +85,11 @@ namespace IgorSoft.CloudFS.Interface
             if (taskFactory == null)
                 throw new ArgumentNullException(nameof(taskFactory));
 
-            var exceptions = new List<TException>();
+            var exceptions = new List<Exception>();
             do {
                 try {
                     return await taskFactory();
-                } catch (TException ex) {
+                } catch (Exception ex) when (ex is TException || ex is TaskCanceledException) {
                     exceptions.Add(ex);
                     Thread.Sleep((1 << (exceptions.Count - 1)) * 100);
                 }

@@ -58,9 +58,9 @@ namespace IgorSoft.CloudFS.GatewayTests
                 directory = gateway.NewDirectoryItemAsync(root, rootDirectory.Id, path).Result;
             }
 
-            internal static TestDirectoryFixture CreateTestDirectory(GatewayElement config, GatewayTestsFixture fixture)
+            internal static TestDirectoryFixture CreateTestDirectory(IAsyncCloudGateway gateway, GatewayElement config, GatewayTestsFixture fixture)
             {
-                return new TestDirectoryFixture(fixture.GetAsyncGateway(config), fixture.GetRootName(config), config.ApiKey, fixture.GetParameters(config), config.TestDirectory);
+                return new TestDirectoryFixture(gateway, fixture.GetRootName(config), config.ApiKey, fixture.GetParameters(config), config.TestDirectory);
             }
 
             internal DirectoryInfoContract ToContract()

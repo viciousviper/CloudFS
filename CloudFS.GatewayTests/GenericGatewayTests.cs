@@ -128,7 +128,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void GetChildItem_ReturnsResults()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     gateway.NewDirectoryItem(rootName, testDirectory.Id, "DirectoryContent");
@@ -150,7 +150,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void ClearContent_ExecutesClear()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(new byte[100]), fixture.GetProgressReporter());
@@ -174,7 +174,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void GetContent_ReturnsResult()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter());
@@ -194,7 +194,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void SetContent_ExecutesSet()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(new byte[100]), fixture.GetProgressReporter());
@@ -217,7 +217,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void SetContent_AfterGetContent_ExecutesSet()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter());
@@ -246,7 +246,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void SetContent_WhereContentIsLarge_ExecutesSet()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var testFile = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", new MemoryStream(new byte[100]), fixture.GetProgressReporter());
@@ -268,14 +268,14 @@ namespace IgorSoft.CloudFS.GatewayTests
                         }
                     });
                 }
-            });
+            }, 4);
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void CopyItem_WhereItemIsDirectory_ToSameDirectoryExecutesCopy()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var directoryOriginal = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
@@ -304,7 +304,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void CopyItem_WhereItemIsDirectory_ToDifferentDirectoryExecutesCopy()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var directoryOriginal = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
@@ -335,7 +335,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void CopyItem_WhereItemIsFile_ToSameDirectory_ExecutesCopy()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var fileOriginal = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter());
@@ -360,7 +360,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void CopyItem_WhereItemIsFile_ToDifferentDirectory_ExecutesCopy()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var fileOriginal = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter());
@@ -387,7 +387,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void MoveItem_WhereItemIsDirectory_ExecutesMove()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var directoryOriginal = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
@@ -422,7 +422,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void MoveItem_WhereItemIsFile_ExecutesMove()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var directoryTarget = gateway.NewDirectoryItem(rootName, testDirectory.Id, "DirectoryTarget");
@@ -452,7 +452,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void NewDirectoryItem_CreatesDirectory()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     fixture.OnCondition(config, GatewayCapabilities.NewDirectoryItem, () =>
@@ -471,7 +471,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void NewFileItem_CreatesFile()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
@@ -494,7 +494,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void NewFileItem_WhereContentIsLarge_CreatesFile()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
@@ -516,14 +516,14 @@ namespace IgorSoft.CloudFS.GatewayTests
                         }
                     });
                 }
-            });
+            }, 4);
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void RemoveItem_WhereItemIsDirectory_ExecutesRemove()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var directory = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
@@ -544,7 +544,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void RemoveItem_WhereItemIsFile_ExecutesRemove()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var file = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter());
@@ -564,7 +564,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void RenameItem_WhereItemIsDirectory_ExecutesRename()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var directory = gateway.NewDirectoryItem(rootName, testDirectory.Id, "Directory");
@@ -586,7 +586,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         public void RenameItem_WhereItemIsFile_ExecutesRename()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
-                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(config, fixture)) {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
                     gateway.GetDrive(rootName, config.ApiKey, fixture.GetParameters(config));
 
                     var file = gateway.NewFileItem(rootName, testDirectory.Id, "File.ext", smallContent.ToStream(), fixture.GetProgressReporter());
