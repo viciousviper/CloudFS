@@ -1,6 +1,7 @@
-The MIT License (MIT)
+﻿/*
+The MIT License(MIT)
 
-Copyright (c) 2015-2016 IgorSoft
+Copyright(c) 2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +20,23 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+using System;
+using System.IO;
+using IgorSoft.CloudFS.Interface.IO;
+
+namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
+{
+    internal static class ObjectExtensions
+    {
+        private static string PathToName(string path) => path.Substring(path.LastIndexOf(Path.AltDirectorySeparatorChar) + 1);
+
+        public static FileSystemInfoContract ToFileSystemInfoContract(this Google.Apis.Storage.v1.Data.Object item)
+        {
+            return item.Name.EndsWith(Path.AltDirectorySeparatorChar.ToString())
+                ? new DirectoryInfoContract(item.Id, PathToName(item.Name.TrimEnd(Path.AltDirectorySeparatorChar)), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value)) as FileSystemInfoContract
+                : new FileInfoContract(item.Id, PathToName(item.Name), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value), (long)item.Size.Value, item.Md5Hash);
+        }
+    }
+}
