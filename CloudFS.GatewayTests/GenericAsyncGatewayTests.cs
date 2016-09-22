@@ -43,6 +43,12 @@ namespace IgorSoft.CloudFS.GatewayTests
 
         private GatewayTestsFixture fixture;
 
+        private TestContext testContext;
+        public TestContext TestContext {
+            get { return testContext; }
+            set { testContext = value; }
+        }
+
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
@@ -468,6 +474,31 @@ namespace IgorSoft.CloudFS.GatewayTests
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void NewDirectoryItemAsync_WhereNameContainsSpecialCharacters_CreatesDirectory()
+        {
+            fixture.ExecuteByConfiguration((gateway, rootName, config) => {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
+                    gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
+
+                    fixture.OnCondition(config, GatewayCapabilities.NewDirectoryItem, () =>
+                    {
+                        using (var namesStream = File.OpenRead($"{nameof(GenericAsyncGatewayTests)}.SpecialCharacters.txt"))
+                        using (var reader = new StreamReader(namesStream)) {
+                            while (!reader.EndOfStream) {
+                                var directoryName = reader.ReadLine().Split(new[] { ' ', '\t' }, 2)[0];
+                                var newDirectory = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, directoryName).Result;
+
+                                var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
+                                Assert.AreEqual(1, items.Count(i => i.Name == directoryName), $"Expected directory '{directoryName}' is missing");
+                                Assert.AreEqual(items.Single(i => i.Name == directoryName).Id, newDirectory.Id, $"Mismatched directory Id for directory '{directoryName}'");
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void NewFileItemAsync_CreatesFile()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
@@ -484,6 +515,35 @@ namespace IgorSoft.CloudFS.GatewayTests
                         using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result)
                         using (var streamReader = new StreamReader(result)) {
                             Assert.AreEqual(smallContent, streamReader.ReadToEnd(), "Mismatched content");
+                        }
+                    });
+                }
+            });
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void NewFileItemAsync_WhereNameContainsSpecialCharacters_CreatesFile()
+        {
+            fixture.ExecuteByConfiguration((gateway, rootName, config) => {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
+                    gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
+
+                    fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
+                    {
+                        using (var namesStream = File.OpenRead($"{nameof(GenericAsyncGatewayTests)}.SpecialCharacters.txt"))
+                        using (var reader = new StreamReader(namesStream)) {
+                            while (!reader.EndOfStream) {
+                                var fileName = $"{reader.ReadLine().Split(new[] { ' ', '\t' }, 2)[0]}.txt";
+                                var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, fileName, smallContent.ToStream(), fixture.GetProgressReporter()).Result;
+
+                                var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
+                                Assert.AreEqual(1, items.Count(i => i.Name == fileName), $"Expected file '{fileName}' is missing");
+                                Assert.AreEqual(items.Single(i => i.Name == fileName).Id, newFile.Id, $"Mismatched file Id for file '{fileName}'");
+                                using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result)
+                                using (var streamReader = new StreamReader(result)) {
+                                    Assert.AreEqual(smallContent, streamReader.ReadToEnd(), $"Mismatched content for file '{fileName}'");
+                                }
+                            }
                         }
                     });
                 }

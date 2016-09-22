@@ -171,7 +171,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var propfindResponse = await context.Client.Propfind(parent.Value);
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), parent.Value);
 
-            var items = propfindResponse.Resources.Where(r => r.Uri != parent.Value);
+            var items = propfindResponse.Resources.Where(r => WebUtility.UrlDecode(r.Uri) != parent.Value);
 
             return items.Select(i => i.ToFileSystemInfoContract());
         }
@@ -223,7 +223,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var propfindResponse = await context.Client.Propfind(targetName);
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), targetName);
 
-            var item = propfindResponse.Resources.Single(r => r.Uri == targetName);
+            var item = propfindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == targetName);
 
             return item.ToFileSystemInfoContract();
         }
@@ -247,7 +247,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var propfindResponse = await context.Client.Propfind(targetName);
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), targetName);
 
-            var item = propfindResponse.Resources.Single(r => r.Uri == targetName);
+            var item = propfindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == targetName);
 
             return item.ToFileSystemInfoContract();
         }
@@ -264,9 +264,9 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var propFindResponse = await context.Client.Propfind(path);
             CheckSuccess(propFindResponse, nameof(WebDavClient.Propfind), path);
 
-            var item = propFindResponse.Resources.Single(r => r.Uri == path);
+            var item = propFindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == path);
 
-            return new DirectoryInfoContract(path, item.GetName(), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0));
+            return new DirectoryInfoContract(WebUtility.UrlDecode(path), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0));
         }
 
         public async Task<FileInfoContract> NewFileItemAsync(RootName root, DirectoryId parent, string name, Stream content, IProgress<ProgressValue> progress)
@@ -281,9 +281,9 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var propFindResponse = await context.Client.Propfind(path);
             CheckSuccess(propFindResponse, nameof(WebDavClient.Propfind), path);
 
-            var item = propFindResponse.Resources.Single(r => r.Uri == path);
+            var item = propFindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == path);
 
-            return new FileInfoContract(path, item.GetName(), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), item.ContentLength ?? -1, item.ETag);
+            return new FileInfoContract(WebUtility.UrlDecode(path), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), item.ContentLength ?? -1, item.ETag);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

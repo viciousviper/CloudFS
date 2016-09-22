@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Net;
 using WebDav;
 using IgorSoft.CloudFS.Interface.IO;
 
@@ -38,7 +39,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
         }
 
         public static FileSystemInfoContract ToFileSystemInfoContract(this WebDavResource item) => item.IsCollection
-                ? new DirectoryInfoContract(item.Uri, item.GetName(), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0)) as FileSystemInfoContract
-                : new FileInfoContract(item.Uri, item.GetName(), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), item.ContentLength ?? -1, item.ETag) as FileSystemInfoContract;
+                ? new DirectoryInfoContract(WebUtility.UrlDecode(item.Uri), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0)) as FileSystemInfoContract
+                : new FileInfoContract(WebUtility.UrlDecode(item.Uri), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), item.ContentLength ?? -1, item.ETag) as FileSystemInfoContract;
     }
 }

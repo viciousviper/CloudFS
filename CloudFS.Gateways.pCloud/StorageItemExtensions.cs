@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Net;
 using pCloud.NET;
 using IgorSoft.CloudFS.Interface.IO;
 
@@ -31,7 +32,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
     internal static class StorageItemExtensions
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this StorageItem item) => item is Folder
-                ? new DirectoryInfoContract(item.Id, item.Name, item.Created, item.Modified) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, ((File)item).Size, null) as FileSystemInfoContract;
+                ? new DirectoryInfoContract(item.Id, WebUtility.UrlDecode(item.Name), item.Created, item.Modified) as FileSystemInfoContract
+                : new FileInfoContract(item.Id, WebUtility.UrlDecode(item.Name), item.Created, item.Modified, ((File)item).Size, null) as FileSystemInfoContract;
     }
 }

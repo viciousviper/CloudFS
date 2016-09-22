@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Net;
 using MediaFireSDK.Model;
 using IgorSoft.CloudFS.Interface.IO;
 
@@ -31,6 +32,6 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
     internal static class MediaFireFileExtensions
     {
         public static FileInfoContract ToFileInfoContract(this MediaFireFile file)
-            => new FileInfoContract(file.QuickKey, file.Name, file.Created, file.Created, file.Size, file.Hash);
+            => new FileInfoContract(file.QuickKey, WebUtility.UrlDecode(file.Name), file.Created, file.Created, file.Size, file.Hash);
     }
 }
