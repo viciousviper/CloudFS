@@ -120,7 +120,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             //var item = await AsyncFunc.Retry<Disk, YandexApiException>(async () => await context.Client.MetaInfo.GetDiskInfoAsync(CancellationToken.None), RETRIES);
             var item = await context.Client.MetaInfo.GetDiskInfoAsync(CancellationToken.None);
 
-            return new DriveInfoContract(root.Value, item.TotalSpace - item.UsedSpace - item.TrashSize, item.UsedSpace);
+            return new DriveInfoContract(root.Value, item.TotalSpace - item.UsedSpace, item.UsedSpace);
         }
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
