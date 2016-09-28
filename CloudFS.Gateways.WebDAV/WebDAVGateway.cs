@@ -145,7 +145,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var availableSpaceValue = item.Properties.SingleOrDefault(p => p.Name == availableSpaceProperty)?.Value;
             var usedSpaceValue = item.Properties.SingleOrDefault(p => p.Name == usedSpaceProperty)?.Value;
 
-            return new DriveInfoContract(root.Value, !string.IsNullOrEmpty(availableSpaceValue) ? long.Parse(availableSpaceValue) : default(long?), !string.IsNullOrEmpty(usedSpaceValue) ? long.Parse(usedSpaceValue) : default(long?));
+            return new DriveInfoContract(root.Value, !string.IsNullOrEmpty(availableSpaceValue) ? long.Parse(availableSpaceValue) : 1 << 30, !string.IsNullOrEmpty(usedSpaceValue) ? long.Parse(usedSpaceValue) : 0);
         }
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)

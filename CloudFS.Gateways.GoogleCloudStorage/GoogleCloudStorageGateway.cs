@@ -57,6 +57,8 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
         private const string MIME_TYPE_FILE = "application/octet-stream";
 
+        private const long FREE_SPACE = 5 * 1L << 30;
+
         private class GoogleCloudStorageContext
         {
             public StorageClient Client { get; }
@@ -98,13 +100,6 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
             var result = default(GoogleCloudStorageContext);
             if (!contextCache.TryGetValue(root, out result)) {
-                //var clientSecret = new ClientSecrets() { ClientId = Secrets.CLIENT_ID, ClientSecret = Secrets.CLIENT_SECRET };
-                //var credentials = await GoogleWebAuthorizationBroker.AuthorizeAsync(clientSecret, new[] { DriveService.Scope.Drive }, root.UserName, System.Threading.CancellationToken.None);
-            //var credentials = default(GoogleCredential);
-            //using (var credentialStream = new FileStream(@"D:\Entwicklung\GIT\CloudFS\CloudFS.Gateways.GoogleCloudStorage\GoogleCredentials.json", FileMode.Open)) {
-            //    credentials = GoogleCredential.FromStream(credentialStream);
-            //}
-
                 if (string.IsNullOrEmpty(apiKey))
                     throw new InvalidOperationException("Credentials missing");
 
@@ -130,8 +125,10 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             var context = await RequireContextAsync(root, apiKey, parameters[PARAMETER_BUCKET]);
 
             var item = await context.Client.GetBucketAsync(context.Bucket);
+            var usedSpace = await context.Client.ListObjectsAsync(context.Bucket, string.Empty).Aggregate(0UL, (u, o) => u + (o.Size ?? 0));
 
-            return new DriveInfoContract(item.Id, null, null);
+            // HACK: Assume freeSpace to be the maximum supported file size because Google Cloud Storage does not expose free space info.
+            return new DriveInfoContract(item.Id, FREE_SPACE, (long)usedSpace);
         }
 
         public async Task<RootDirectoryInfoContract> GetRootAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
