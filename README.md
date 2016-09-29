@@ -27,7 +27,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | Cloud storage service                                            | API library                                                             | version    | sync/async | origin    | status |
 | :--------------------------------------------------------------- | :---------------------------------------------------------------------- | :--------: | :--------: | :-------: | :----: |
 | *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable |
-| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.16.0.621 | async      | official  | stable |
+| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.16.0.630 | async      | official  | stable |
 | [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.12.1     | async      | official  | stable |
 | [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 2.0.0-beta-0010| async      | 3<sup>rd</sup> party | stable |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.3    | async      | 3<sup>rd</sup> party / local build | experimental |
@@ -41,7 +41,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | [Google Cloud Storage](https://cloud.google.com// "Google Cloud Storage") | [Google Cloud Libraries for .NET](https://github.com/GoogleCloudPlatform/google-cloud-dotnet) | 1.0.0-beta02 | async      | official  | experimental |
 | **Superseded services**                                          |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive-Legacy")<sup id="a1">[1](#f1)</sup> | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a2">[2](#f2)</sup> | N/A        | async      | inofficial  | obsolete |
-| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.16.0.609 | async      | official  | stable |
+| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.16.0.630 | async      | official  | stable |
 | **Obsolete services**                                            |
 | *[Copy](https://www.copy.com/ "Copy")*<sup id="a3">[3](#f3)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* |
 
