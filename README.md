@@ -88,6 +88,7 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 | Date       | Version     | Comments                                                                       |
 | :--------- | :---------- | :----------------------------------------------------------------------------- |
+| 2016-10-01 | 1.0.10-beta | - New gateway for Google Cloud Storage added.<br/>- Fixed drive free space calculation for Yandex gateway.<br/>- Version update to API libraries for Box, Google Drive, and Yandex.Disk. |
 | 2016-08-31 | 1.0.9.1-alpha | - Fixed NuGet packages.                                                      |
 | 2016-08-29 | 1.0.9-alpha | - Implemented settings purge function in gateways.<br/>- Version updates to API libraries for Box and OneDrive. |
 | 2016-08-26 | 1.0.8-alpha | - New gateway for generic WebDAV providers added.<br/>- Support AES encryption of account credentials and access tokens in locally persisted application settings.<br/>- Fixed concurrent access to locally persisted application settings.<br/>- Version updates to API libraries for Box, Google Drive, SwiftClient, and SemanticTypes.<br/>- Activated static code analysis via Coverity Scan. |
