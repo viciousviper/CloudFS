@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>CloudFS</id>
-    <version>1.0.10-beta</version>
+    <version>1.0.10.1-beta</version>
     <title>CloudFS</title>
     <authors>IgorSoft</authors>
     <owners>IgorSoft</owners>
@@ -25,7 +25,7 @@
           <dependency id="CopyRestApi" version="[1.1.0,)" />
           <dependency id="Google.Apis.Drive.v2" version="1.16.0.630" />
           <dependency id="Google.Apis.Drive.v3" version="1.16.0.630" />
-          <dependency id="Google.Storage.V1" version="[1.0.0,)" />
+          <dependency id="Google.Storage.V1" version="[1.0.0-beta02,)" />
           <dependency id="MegaApiClient" version="[1.2.2,)" />
           <dependency id="Microsoft.OneDriveSDK" version="1.2.0" />
           <dependency id="SwiftClient" version="2.0.0-beta-0010" />
