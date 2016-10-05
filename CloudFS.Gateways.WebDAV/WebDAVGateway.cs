@@ -29,6 +29,7 @@ using System.Composition;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using WebDav;
@@ -118,7 +119,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             try {
                 var context = await RequireContextAsync(root, apiKey, new Uri(baseAddress));
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

@@ -29,6 +29,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
 using pCloud.NET;
@@ -113,7 +114,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

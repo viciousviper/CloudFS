@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.OneDrive.Sdk;
@@ -93,7 +94,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

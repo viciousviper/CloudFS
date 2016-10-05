@@ -30,6 +30,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
 using MediaFireSDK;
@@ -97,7 +98,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

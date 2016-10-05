@@ -28,6 +28,7 @@ using System.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using SwiftClient;
 using IgorSoft.CloudFS.Gateways.hubiC.OAuth;
@@ -98,7 +99,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

@@ -28,6 +28,7 @@ using System.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
 using YandexDisk.Client;
@@ -108,7 +109,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

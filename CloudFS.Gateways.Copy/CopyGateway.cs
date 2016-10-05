@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using CopyRestAPI;
 using CopyRestAPI.Helpers;
@@ -92,7 +93,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

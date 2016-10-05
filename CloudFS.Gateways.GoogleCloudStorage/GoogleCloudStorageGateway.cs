@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Upload;
@@ -115,7 +116,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             try {
                 await RequireContextAsync(root, apiKey, parameters[PARAMETER_BUCKET]);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

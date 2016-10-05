@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Composition;
 using System.IO;
 using System.Linq;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using Box.V2;
 using Box.V2.Exceptions;
@@ -98,7 +99,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (AuthenticationException) {
                 return false;
             }
         }

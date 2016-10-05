@@ -99,7 +99,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             try {
                 await RequireContextAsync(root, apiKey);
                 return true;
-            } catch (Exception) {
+            } catch (TokenResponseException) {
                 return false;
             }
         }
