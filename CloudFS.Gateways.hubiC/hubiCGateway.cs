@@ -234,8 +234,8 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             if (target is DirectoryId && recurse) {
                 var directoryId = target.Value.TrimEnd('/');
                 var queryParameters = new Dictionary<string, string>() {
-                    { "marker", directoryId },
-                    { "end_marker", directoryId + '0' }
+                    ["marker"] = directoryId,
+                    ["end_marker"] = directoryId + '0'
                 };
 
                 var container = await context.Client.GetContainer(context.Container, queryParams: queryParameters);
