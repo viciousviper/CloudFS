@@ -7,8 +7,8 @@
     <ProjectGuid>{576EB7DA-EF14-481C-9529-185684B40594}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IgorSoft.CloudFS.Gateways.OneDrive</RootNamespace>
-    <AssemblyName>IgorSoft.CloudFS.Gateways.OneDrive</AssemblyName>
+    <RootNamespace>IgorSoft.CloudFS.Gateways.OneDrive_V1</RootNamespace>
+    <AssemblyName>IgorSoft.CloudFS.Gateways.OneDrive-V1</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

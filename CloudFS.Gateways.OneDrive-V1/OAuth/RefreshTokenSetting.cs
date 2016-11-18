@@ -24,7 +24,7 @@ SOFTWARE.
 
 using System;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1.OAuth
 {
     public class RefreshTokenSetting
     {

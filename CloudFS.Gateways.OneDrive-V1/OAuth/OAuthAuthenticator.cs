@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 using Microsoft.OneDrive.Sdk;
 using IgorSoft.CloudFS.Authentication;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1.OAuth
 {
     internal static class OAuthAuthenticator
     {

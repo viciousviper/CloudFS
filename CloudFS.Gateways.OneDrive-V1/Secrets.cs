@@ -24,7 +24,7 @@ SOFTWARE.
 
 using System;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1
 {
     internal static class Secrets
     {

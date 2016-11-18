@@ -26,7 +26,7 @@ using System;
 using Microsoft.OneDrive.Sdk;
 using IgorSoft.CloudFS.Interface.IO;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1
 {
     internal static class ItemExtensions
     {

@@ -34,11 +34,11 @@ using Microsoft.OneDrive.Sdk;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.Gateways.OneDrive.OAuth;
+using IgorSoft.CloudFS.Gateways.OneDrive_V1.OAuth;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1
 {
-    [ExportAsAsyncCloudGateway("OneDrive")]
+    [ExportAsAsyncCloudGateway("OneDrive-V1")]
     [ExportMetadata(nameof(CloudGatewayMetadata.CloudService), OneDriveGateway.SCHEMA)]
     [ExportMetadata(nameof(CloudGatewayMetadata.Capabilities), OneDriveGateway.CAPABILITIES)]
     [ExportMetadata(nameof(CloudGatewayMetadata.ServiceUri), OneDriveGateway.URL)]
@@ -46,7 +46,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public sealed class OneDriveGateway : IAsyncCloudGateway, IPersistGatewaySettings
     {
-        private const string SCHEMA = "onedrive";
+        private const string SCHEMA = "onedrive_v1";
 
         private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All;
 

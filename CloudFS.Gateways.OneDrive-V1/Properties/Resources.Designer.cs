@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1.Properties
 {
     using System;
 
@@ -41,10 +41,11 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive_V1.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -52,7 +53,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
             get {
                 return resourceCulture;
             }
@@ -64,7 +66,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
         /// <summary>
         ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}.
         /// </summary>
-        internal static string RetrieveAuthenticationCodeFromUri {
+        internal static string RetrieveAuthenticationCodeFromUri
+        {
             get {
                 return ResourceManager.GetString("RetrieveAuthenticationCodeFromUri", resourceCulture);
             }
