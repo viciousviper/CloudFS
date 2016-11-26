@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2015 IgorSoft
+Copyright(c) 2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,13 @@ SOFTWARE.
 */
 
 using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("CloudFS.OneDrive-V1")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("CloudFS.OneDrive-V1")]
-[assembly: AssemblyCulture("")]
+namespace IgorSoft.CloudFS.Gateways.OneDrive
+{
+    internal static class Secrets
+    {
+        public const string CLIENT_ID = "<Insert client ID here>";
 
-[assembly: ComVisible(false)]
-
-[assembly: CLSCompliant(true)]
+        public const string CLIENT_SECRET = "<Insert client secret here>";
+    }
+}
