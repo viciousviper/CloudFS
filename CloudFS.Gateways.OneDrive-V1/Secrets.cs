@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2016 IgorSoft
+Copyright(c) 2015 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,12 @@ SOFTWARE.
 
 using System;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1
 {
-    public class RefreshTokenSetting
+    internal static class Secrets
     {
-        public string Account { get; set; }
+        public const string CLIENT_ID = "<Insert client ID here>";
 
-        public string RefreshToken { get; set; }
+        public const string CLIENT_SECRET = "<Insert client secret here>";
     }
 }

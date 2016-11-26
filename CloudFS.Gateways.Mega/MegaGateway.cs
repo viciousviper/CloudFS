@@ -47,7 +47,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
     {
         private const string SCHEMA = "mega";
 
-        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ClearContent ^ GatewayCapabilities.SetContent ^ GatewayCapabilities.CopyItems ^ GatewayCapabilities.RenameItems;
+        private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.ClearContent ^ GatewayCapabilities.SetContent ^ GatewayCapabilities.CopyItems;
 
         private const string URL = "https://mega.co.nz";
 
@@ -160,8 +160,6 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
             var nodes = await context.Client.GetNodesAsync();
             var sourceItem = nodes.Single(n => n.Id == source.Value);
-            if (!string.IsNullOrEmpty(moveName) && moveName != sourceItem.Name)
-                throw new NotSupportedException(Properties.Resources.RenamingOfFilesNotSupported);
             var destinationParentItem = nodes.Single(n => n.Id == destination.Value);
             var item = await context.Client.MoveAsync(sourceItem, destinationParentItem);
 
@@ -205,9 +203,15 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             return true;
         }
 
-        public Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
+        public async Task<FileSystemInfoContract> RenameItemAsync(RootName root, FileSystemId target, string newName, Func<FileSystemInfoLocator> locatorResolver)
         {
-            return Task.FromException<FileSystemInfoContract>(new NotSupportedException(Properties.Resources.RenamingOfFilesNotSupported));
+            var context = await RequireContextAsync(root);
+
+            var nodes = await context.Client.GetNodesAsync();
+            var targetItem = nodes.Single(n => n.Id == target.Value);
+            var item = await context.Client.RenameAsync(targetItem, newName);
+
+            return item.ToFileSystemInfoContract();
         }
 
         public void PurgeSettings(RootName root)

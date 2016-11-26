@@ -57,6 +57,8 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         private const int RETRIES = 3;
 
+        private static TimeSpan UploadTimeoutPerMegabyte = TimeSpan.FromSeconds(30);
+
         private static readonly List<string> boxFileFields = new List<string>(new[] { BoxItem.FieldName, BoxItem.FieldCreatedAt, BoxItem.FieldModifiedAt, BoxItem.FieldSize, BoxFile.FieldSha1 });
 
         private static readonly List<string> boxFolderFields = new List<string>(new[] { BoxItem.FieldName, BoxItem.FieldCreatedAt, BoxItem.FieldModifiedAt });
@@ -92,6 +94,11 @@ namespace IgorSoft.CloudFS.Gateways.Box
                 contextCache.Add(root, result = new BoxContext(client));
             }
             return result;
+        }
+
+        private TimeSpan GetUploadTimeout(long uploadSize)
+        {
+            return TimeSpan.FromSeconds(UploadTimeoutPerMegabyte.Seconds * (uploadSize / (1 << 20) + 1));
         }
 
         public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
@@ -162,7 +169,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var locator = locatorResolver();
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, stream), RETRIES);
+            var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, stream, timeout: GetUploadTimeout(content.Length)), RETRIES);
 
             return true;
         }
@@ -222,7 +229,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var request = new BoxFileRequest() { Name = name, Parent = new BoxRequestEntity() { Id = parent.Value } };
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadAsync(request, stream, boxFileFields), RETRIES);
+            var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadAsync(request, stream, boxFileFields, timeout: GetUploadTimeout(content.Length)), RETRIES);
 
             return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
         }

@@ -54,6 +54,10 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         private const int RETRIES = 3;
 
+        private const int LARGE_FILE_THRESHOLD = 30 * 1 << 20;
+
+        private const int MAX_CHUNK_SIZE = 5 * 1 << 20;
+
         private const string PARAMETER_CONTAINER = "container";
 
         private const string DEFAULT_CONTAINER = "default";
@@ -92,6 +96,31 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
                 contextCache.Add(root, result = new hubiCContext(client, container));
             }
             return result;
+        }
+
+        private async Task<SwiftResponse> ChunkedUpload(hubiCContext context, string objectId, Stream content, IProgress<ProgressValue> progress)
+        {
+            var readBuffer = new byte[MAX_CHUNK_SIZE];
+            var bytesTransferred = 0;
+            var bytesTotal = (int)content.Length;
+            progress?.Report(new ProgressValue(bytesTransferred, bytesTotal));
+
+            var chunks = (content.Length - 1) / MAX_CHUNK_SIZE + 1;
+            var item = default(SwiftResponse);
+            for (var i = 0; i < chunks; ++i) {
+                var chunkSize = await content.ReadAsync(readBuffer, 0, MAX_CHUNK_SIZE);
+                item = await context.Client.PutObjectChunk(context.Container, objectId, chunkSize == MAX_CHUNK_SIZE ? readBuffer : readBuffer.Take(chunkSize).ToArray(), i);
+                if (!item.IsSuccess)
+                    throw new ApplicationException(item.Reason);
+
+                progress?.Report(new ProgressValue(bytesTransferred += chunkSize, bytesTotal));
+            }
+
+            var manifest = await context.Client.PutManifest(context.Container, objectId);
+            if (!manifest.IsSuccess)
+                throw new ApplicationException(manifest.Reason);
+
+            return item;
         }
 
         public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
@@ -165,8 +194,13 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         {
             var context = await RequireContextAsync(root);
 
-            var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await context.Client.PutObject(context.Container, target.Value, stream);
+            var item = default(SwiftResponse);
+            if (content.Length <= LARGE_FILE_THRESHOLD) {
+                var stream = progress != null ? new ProgressStream(content, progress) : content;
+                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await context.Client.PutObject(context.Container, target.Value, stream), RETRIES);
+            } else {
+                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await ChunkedUpload(context, target.Value, content, progress), RETRIES);
+            }
 
             return item.IsSuccess;
         }
@@ -217,10 +251,15 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var objectId = parent.GetObjectId(name);
             var length = content.Length;
 
-            var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await context.Client.PutObject(context.Container, objectId, stream);
-            if (!item.IsSuccess)
-                throw new ApplicationException(item.Reason);
+            var item = default(SwiftResponse);
+            if (length <= LARGE_FILE_THRESHOLD) {
+                var stream = progress != null ? new ProgressStream(content, progress) : content;
+                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await context.Client.PutObject(context.Container, objectId, stream), RETRIES);
+                if (!item.IsSuccess)
+                    throw new ApplicationException(item.Reason);
+            } else {
+                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await ChunkedUpload(context, objectId, content, progress), RETRIES);
+            }
 
             var creationTime = DateTime.Parse(item.Headers["Date"]);
             return new FileInfoContract(objectId, name, creationTime, creationTime, length, item.Headers["ETag"]);
@@ -234,8 +273,8 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             if (target is DirectoryId && recurse) {
                 var directoryId = target.Value.TrimEnd('/');
                 var queryParameters = new Dictionary<string, string>() {
-                    { "marker", directoryId },
-                    { "end_marker", directoryId + '0' }
+                    ["marker"] = directoryId,
+                    ["end_marker"] = directoryId + '0'
                 };
 
                 var container = await context.Client.GetContainer(context.Container, queryParams: queryParameters);

@@ -120,7 +120,4 @@
   <data name="RetriesExhausted" xml:space="preserve">
     <value>Task failed too many times. See InnerException property for a list of Exceptions that occured.</value>
   </data>
-  <data name="RetrieveAuthenticationCodeFromUri" xml:space="preserve">
-    <value>Please retrieve an authentication code from the following Uri: {0}</value>
-  </data>
 </root>

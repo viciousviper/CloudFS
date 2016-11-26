@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2016 IgorSoft
+Copyright(c) 2015 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,15 @@ SOFTWARE.
 */
 
 using System;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
-{
-    public class RefreshTokenSetting
-    {
-        public string Account { get; set; }
+[assembly: AssemblyTitle("CloudFS.OneDrive-V1")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyProduct("CloudFS.OneDrive-V1")]
+[assembly: AssemblyCulture("")]
 
-        public string RefreshToken { get; set; }
-    }
-}
+[assembly: ComVisible(false)]
+
+[assembly: CLSCompliant(true)]

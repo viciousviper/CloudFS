@@ -25,7 +25,7 @@ SOFTWARE.
 using System.Configuration;
 using IgorSoft.CloudFS.Authentication.Configuration;
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1.Properties
 {
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]

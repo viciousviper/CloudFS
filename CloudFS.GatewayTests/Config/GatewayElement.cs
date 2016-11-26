@@ -39,6 +39,7 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         private const string apiKeyPropertyName = "apiKey";
         private const string parametersPropertyName = "parameters";
         private const string exclusionsPropertyName = "exclusions";
+        private const string maxFileSizePropertyName = "maxFileSize";
         private const string testDirectoryPropertyName = "testDirectory";
 
         [ConfigurationProperty(schemaPropertyName, IsKey = true, IsRequired = true)]
@@ -89,6 +90,13 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         {
             get { return (GatewayCapabilities)this[exclusionsPropertyName]; }
             set { this[exclusionsPropertyName] = value; }
+        }
+
+        [ConfigurationProperty(maxFileSizePropertyName)]
+        public int MaxFileSize
+        {
+            get { return (int)this[maxFileSizePropertyName]; }
+            set { this[maxFileSizePropertyName] = value; }
         }
 
         [ConfigurationProperty(testDirectoryPropertyName, DefaultValue = "FileSystemTests")]

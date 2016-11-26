@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2016 IgorSoft
+Copyright(c) 2015 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
+namespace IgorSoft.CloudFS.Gateways.OneDrive_V1.Properties
 {
     using System;
 
@@ -45,7 +45,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
         {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive_V1.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,16 +60,6 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
             }
             set {
                 resourceCulture = value;
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Task failed too many times. See InnerException property for a list of Exceptions that occured.
-        /// </summary>
-        internal static string RetriesExhausted
-        {
-            get {
-                return ResourceManager.GetString("RetriesExhausted", resourceCulture);
             }
         }
 

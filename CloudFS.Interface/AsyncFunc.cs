@@ -60,11 +60,11 @@ namespace IgorSoft.CloudFS.Interface
                     return result;
                 } catch (TException ex) {
                     exceptions.Add(ex);
-                    Thread.Sleep((1 << (exceptions.Count - 1)) * 100);
+                    Thread.Sleep((1 << (exceptions.Count - 1)) * 1000);
                 }
             } while (--retries >= 0);
 
-            throw new AggregateException(string.Join(", ", exceptions.Select(e => e.Message)), exceptions);
+            throw new TaskCanceledException(Properties.Resources.RetriesExhausted, new AggregateException(string.Join(", ", exceptions.Select(e => e.ToString())), exceptions));
         }
 
         /// <summary>
@@ -91,11 +91,11 @@ namespace IgorSoft.CloudFS.Interface
                     return await taskFactory();
                 } catch (Exception ex) when (ex is TException || ex is TaskCanceledException) {
                     exceptions.Add(ex);
-                    Thread.Sleep((1 << (exceptions.Count - 1)) * 100);
+                    Thread.Sleep((1 << (exceptions.Count - 1)) * 1000);
                 }
             } while (--retries >= 0);
 
-            throw new AggregateException(string.Join(", ", exceptions.Select(e => e.Message)), exceptions);
+            throw new TaskCanceledException(Properties.Resources.RetriesExhausted, new AggregateException(string.Join(", ", exceptions.Select(e => e.ToString())), exceptions));
         }
     }
 }

@@ -39,22 +39,12 @@ namespace IgorSoft.CloudFS.GatewayTests
     {
         private const string smallContent = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
-        private static byte[] largeContent;
-
         private GatewayTestsFixture fixture;
 
         private TestContext testContext;
         public TestContext TestContext {
             get { return testContext; }
             set { testContext = value; }
-        }
-
-        [ClassInitialize]
-        public static void ClassInitialize(TestContext context)
-        {
-            largeContent = new byte[12 * (1 << 20)];
-            for (int i = 0; i < largeContent.Length; ++i)
-                largeContent[i] = (byte)(i % 251 + 1);
         }
 
         [ClassCleanup]
@@ -260,17 +250,18 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.SetContent, () =>
                     {
-                        gateway.SetContentAsync(rootName, testFile.Id, new MemoryStream(largeContent), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
+                        var content = fixture.GetArbitraryBytes(12 * 1 << 20);
+                        gateway.SetContentAsync(rootName, testFile.Id, new MemoryStream(content), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
 
                         using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
-                            var buffer = new byte[largeContent.Length];
+                            var buffer = new byte[content.Length];
                             int position = 0, bytesRead = 0;
                             do {
                                 position += bytesRead = result.Read(buffer, position, buffer.Length - position);
                             } while (bytesRead != 0);
                             Assert.AreEqual(buffer.Length, position, "Truncated result content");
                             Assert.AreEqual(-1, result.ReadByte(), "Excessive result content");
-                            CollectionAssert.AreEqual(largeContent, buffer, "Mismatched result content");
+                            CollectionAssert.AreEqual(content, buffer, "Mismatched result content");
                         }
                     });
                 }
@@ -559,20 +550,54 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
                     {
-                        var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(largeContent), fixture.GetProgressReporter()).Result;
+                        var content = fixture.GetArbitraryBytes(12 * 1 << 20);
+                        var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(content), fixture.GetProgressReporter()).Result;
 
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                         Assert.AreEqual(1, items.Count(i => i.Name == "File.ext"), "Expected file is missing");
                         Assert.AreEqual(items.Single(i => i.Name == "File.ext").Id, newFile.Id, "Mismatched file Id");
                         using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result) {
-                            var buffer = new byte[largeContent.Length];
+                            var buffer = new byte[content.Length];
                             int position = 0, bytesRead = 0;
                             do {
                                 position += bytesRead = result.Read(buffer, position, buffer.Length - position);
                             } while (bytesRead != 0);
                             Assert.AreEqual(buffer.Length, position, "Truncated result content");
                             Assert.AreEqual(-1, result.ReadByte(), "Excessive result content");
-                            CollectionAssert.AreEqual(largeContent, buffer, "Mismatched result content");
+                            CollectionAssert.AreEqual(content, buffer, "Mismatched result content");
+                        }
+                    });
+                }
+            }, 4);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online)), Timeout(3000000)]
+        public void NewFileItemAsync_WhereContentIsMaxSized_CreatesFile()
+        {
+            fixture.ExecuteByConfiguration((gateway, rootName, config) => {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture))
+                {
+                    gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
+
+                    fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
+                    {
+                        var content = fixture.GetArbitraryBytes(config.MaxFileSize * (1 << 20));
+                        var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(content), fixture.GetProgressReporter()).Result;
+
+                        var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
+                        Assert.AreEqual(1, items.Count(i => i.Name == "File.ext"), "Expected file is missing");
+                        Assert.AreEqual(items.Single(i => i.Name == "File.ext").Id, newFile.Id, "Mismatched file Id");
+                        using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result)
+                        {
+                            var buffer = new byte[content.Length];
+                            int position = 0, bytesRead = 0;
+                            do
+                            {
+                                position += bytesRead = result.Read(buffer, position, buffer.Length - position);
+                            } while (bytesRead != 0);
+                            Assert.AreEqual(buffer.Length, position, $"Truncated result content for size {config.MaxFileSize}MB");
+                            Assert.AreEqual(-1, result.ReadByte(), "Excessive result content");
+                            CollectionAssert.AreEqual(content, buffer, $"Mismatched result content for size {config.MaxFileSize}MB");
                         }
                     });
                 }

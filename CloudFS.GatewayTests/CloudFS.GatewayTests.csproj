@@ -72,6 +72,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Reference Include="LazyCache">
+      <HintPath>..\packages\LazyCache.0.7.0.34\lib\net45\LazyCache.dll</HintPath>
+    </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
       <HintPath>..\packages\SemanticTypes.1.0.1\lib\net35\SemanticTypes.dll</HintPath>
       <Private>True</Private>
