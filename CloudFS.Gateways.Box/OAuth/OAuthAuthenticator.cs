@@ -43,7 +43,7 @@ namespace IgorSoft.CloudFS.Gateways.Box.OAuth
 
         private const string BOX_LOGIN_AUTHORIZE_URI = "https://account.box.com/api/oauth2/authorize";
 
-        private const string BOX_LOGIN_TOKEN_URI = "https://account.box.com/api/oauth2/token";
+        private const string BOX_LOGIN_TOKEN_URI = "https://api.box.com/api/oauth2/token";
 
         private const string BOX_API_URI = "https://api.box.com/2.0";
 
