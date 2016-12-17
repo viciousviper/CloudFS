@@ -31,7 +31,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Upload;
-using Google.Storage.V1;
+using Google.Cloud.Storage.V1;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;

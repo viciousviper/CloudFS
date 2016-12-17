@@ -79,8 +79,8 @@
       <HintPath>..\packages\Google.Apis.Storage.v1.1.20.0.692\lib\net45\Google.Apis.Storage.v1.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Google.Storage.V1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=185c282632e132a0, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Storage.V1.1.0.0-beta04\lib\net45\Google.Storage.V1.dll</HintPath>
+    <Reference Include="Google.Cloud.Storage.V1, Version=1.0.0.0, Culture=neutral, PublicKeyToken=185c282632e132a0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Cloud.Storage.V1.1.0.0-beta06\lib\net45\Google.Cloud.Storage.V1.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
