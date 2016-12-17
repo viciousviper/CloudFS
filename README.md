@@ -27,8 +27,8 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | Cloud storage service                                            | API library                                                             | version    | sync/async | origin    | status | max. file size<sup id="a1">[1](#f1)</sup> |
 | :--------------------------------------------------------------- | :---------------------------------------------------------------------- | :--------: | :--------: | :-------: | :----: | :------------: |
 | *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable | *N/A*          |
-| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.19.0.682 | async      | official  | stable | >= 256 MB      |
-| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.12.1     | async      | official  | stable | 128 MB         |
+| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.20.0.700 | async      | official  | stable | >= 256 MB      |
+| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.13.0     | async      | official  | stable | 128 MB         |
 | [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 2.0.0-beta-0010| async      | 3<sup>rd</sup> party | stable | 160 MB         |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.3    | async      | 3<sup>rd</sup> party / local build | experimental | **12 MB**      |
 | [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.3.1      | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
@@ -38,11 +38,11 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | **Degraded services**                                            |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")<sup id="a2">[2](#f2)</sup> | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 2.0.6      | async      | official  | stable | >= 256 MB      |
 | **Included by community request**                                |
-| [Google Cloud Storage](https://cloud.google.com// "Google Cloud Storage") | [Google Cloud Libraries for .NET](https://github.com/GoogleCloudPlatform/google-cloud-dotnet) | 1.0.0-beta04 | async      | official  | experimental | >= 256 MB      |
+| [Google Cloud Storage](https://cloud.google.com// "Google Cloud Storage") | [Google Cloud Libraries for .NET](https://github.com/GoogleCloudPlatform/google-cloud-dotnet) | 1.0.0-beta06 | async      | official  | experimental | >= 256 MB      |
 | **Superseded services**                                          |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive V1")   | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 1.2.0      | async      | official  | stable | **48 MB**      |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive-Legacy") | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a3">[3](#f3)</sup> | N/A        | async      | inofficial  | obsolete | **48 MB**      |
-| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.19.0.682 | async      | official  | stable | >= 256 MB      |
+| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.20.0.700 | async      | official  | stable | >= 256 MB      |
 | **Obsolete services**                                            |
 | *[Copy](https://www.copy.com/ "Copy")*<sup id="a4">[4](#f4)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* | *N/A*          |
 
