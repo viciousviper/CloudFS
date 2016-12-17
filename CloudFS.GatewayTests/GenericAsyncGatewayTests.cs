@@ -66,7 +66,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             fixture = null;
         }
 
-        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void Import_AsyncGateways_MatchConfigurations()
         {
             var configuredGateways = GatewayTestsFixture.GetGatewayConfigurations(GatewayType.Async, GatewayCapabilities.None);
