@@ -62,7 +62,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// Gets or sets the size, in bytes, of the current file.
         /// </summary>
         /// <value>The size of the current file in bytes.</value>
-        public long Size { get; set; }
+        public FileSize Size { get; set; }
 
         /// <summary>
         /// Gets the cryptographic hash of the current file.
@@ -80,10 +80,10 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <param name="size">The file size in bytes.</param>
         /// <param name="hash">The cryptographic hash.</param>
         /// <exception cref="ArgumentException">The size is negative.</exception>
-        public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, long size, string hash) : base(new FileId(id), name, created, updated)
+        public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, FileSize size, string hash) : base(new FileId(id), name, created, updated)
         {
-            if (size < 0)
-                throw new ArgumentException($"{nameof(size)} is < 0", nameof(size));
+            if (size == FileSize.Undefined)
+                throw new ArgumentException($"{nameof(size)} == {nameof(FileSize.Undefined)}", nameof(size));
 
             Size = size;
             Hash = hash;
@@ -91,6 +91,6 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(FileInfoContract)} {Id} ({Name})".ToString(CultureInfo.CurrentCulture);
+        private string DebuggerDisplay() => $"{nameof(FileInfoContract)} {Id} ({Name}) [{Size}]".ToString(CultureInfo.CurrentCulture);
     }
 }

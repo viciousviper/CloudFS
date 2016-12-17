@@ -160,7 +160,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                         testFile = (FileInfoContract)items.Single();
                         Assert.AreEqual("File.ext", testFile.Name, "Expected file is missing");
-                        Assert.AreEqual(0, testFile.Size, "Mismatched content size");
+                        Assert.AreEqual(FileSize.Empty, testFile.Size, "Mismatched content size");
                     });
                 }
             });
@@ -250,7 +250,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.SetContent, () =>
                     {
-                        var content = fixture.GetArbitraryBytes(12 * 1 << 20);
+                        var content = fixture.GetArbitraryBytes(new FileSize("12MB"));
                         gateway.SetContentAsync(rootName, testFile.Id, new MemoryStream(content), fixture.GetProgressReporter(), () => new FileSystemInfoLocator(testFile)).Wait();
 
                         using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
@@ -550,7 +550,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
                     {
-                        var content = fixture.GetArbitraryBytes(12 * 1 << 20);
+                        var content = fixture.GetArbitraryBytes(new FileSize("12MB"));
                         var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(content), fixture.GetProgressReporter()).Result;
 
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
@@ -581,7 +581,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
                     {
-                        var content = fixture.GetArbitraryBytes(config.MaxFileSize * (1 << 20));
+                        var content = fixture.GetArbitraryBytes(config.MaxFileSize * new FileSize("1MB"));
                         var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(content), fixture.GetProgressReporter()).Result;
 
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;

@@ -242,7 +242,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                     [MediaFireApiParameters.QuickKey] = newQuickKey
                 });
 
-                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
             }
         }
 
@@ -283,7 +283,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                     [MediaFireApiParameters.QuickKey] = source.Value
                 });
 
-                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
             }
         }
 
@@ -318,7 +318,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                 [MediaFireApiParameters.QuickKey] = upload.QuickKey
             });
 
-            return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+            return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
@@ -361,7 +361,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                     [MediaFireApiParameters.QuickKey] = target.Value
                 });
 
-                return new FileInfoContract(item.FileInfo.QuickKey, item.FileInfo.Name, item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+                return new FileInfoContract(item.FileInfo.QuickKey, item.FileInfo.Name, item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
             }
         }
 

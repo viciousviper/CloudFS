@@ -189,7 +189,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
             var contentLength = content.Length;
             var item = await context.Client.UploadAsync(content, name, parentItem, new Progress<double>(d => progress?.Report(new ProgressValue((int)(contentLength * d), (int)contentLength))));
 
-            return new FileInfoContract(item.Id, item.Name, item.LastModificationDate, item.LastModificationDate, item.Size, null);
+            return new FileInfoContract(item.Id, item.Name, item.LastModificationDate, item.LastModificationDate, (FileSize)item.Size, null);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

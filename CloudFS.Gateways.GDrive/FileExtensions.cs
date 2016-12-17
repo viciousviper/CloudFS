@@ -32,6 +32,6 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this File item) => !item.Size.HasValue
                 ? new DirectoryInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value)) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), item.Size.Value, item.Md5Checksum) as FileSystemInfoContract;
+                : new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), (FileSize)item.Size.Value, item.Md5Checksum) as FileSystemInfoContract;
     }
 }

@@ -58,9 +58,9 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 
         private const int RETRIES = 3;
 
-        private const int LARGE_FILE_THRESHOLD = 50 * 1 << 20;
+        private static readonly FileSize LargeFileThreshold = new FileSize("50MB");
 
-        private const int MAX_CHUNK_SIZE = 5 * 1 << 20;
+        private static readonly FileSize MaxChunkSize = new FileSize("5MB");
 
         private class OneDriveContext
         {
@@ -103,7 +103,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 
         private async Task<Item> ChunkedUploadAsync(ChunkedUploadProvider provider, IProgress<ProgressValue> progress, int retries)
         {
-            var readBuffer = new byte[MAX_CHUNK_SIZE];
+            var readBuffer = new byte[MaxChunkSize];
             var exceptions = new List<Exception>();
             do {
                 var uploadChunkRequests = provider.GetUploadChunkRequests();
@@ -196,7 +196,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 
             var item = default(Item);
             var requestBuilder = context.Client.Drive.Items[target.Value];
-            if (content.Length <= LARGE_FILE_THRESHOLD) {
+            if (content.Length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
                 item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await requestBuilder.Content.Request().PutAsync<Item>(stream), RETRIES);
             } else {
@@ -249,7 +249,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 
             var item = default(Item);
             var requestBuilder = context.Client.Drive.Items[parent.Value].ItemWithPath(name);
-            if (content.Length <= LARGE_FILE_THRESHOLD) {
+            if (content.Length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
                 item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await requestBuilder.Content.Request().PutAsync<Item>(stream), RETRIES);
             } else {
@@ -259,7 +259,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
                 item = await ChunkedUploadAsync(provider, progress, RETRIES);
             }
 
-            return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0), item.Size ?? -1, item.File.Hashes.Sha1Hash.ToLowerInvariant());
+            return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0), (FileSize)(item.Size ?? -1), item.File.Hashes.Sha1Hash.ToLowerInvariant());
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

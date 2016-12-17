@@ -190,6 +190,6 @@ namespace IgorSoft.CloudFS.GatewayTests
             }
         }
 
-        public byte[] GetArbitraryBytes(int size) => cache.GetOrAdd(size.ToString(CultureInfo.InvariantCulture), () => Enumerable.Range(0, size).Select(i => (byte)(i % 251 + 1)).ToArray());
+        public byte[] GetArbitraryBytes(FileSize bytes) => cache.GetOrAdd(bytes.ToString(), () => Enumerable.Range(0, (int)bytes).Select(i => (byte)(i % 251 + 1)).ToArray());
     }
 }

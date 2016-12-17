@@ -196,7 +196,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
             var item = await AsyncFunc.RetryAsync<pCloudFile, pCloudException>(async () => await context.Client.CopyFileAsync(ToId(fileSource), ToId(destination), WebUtility.UrlEncode(copyName)), RETRIES);
 
-            return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
+            return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
         }
 
         public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
@@ -214,7 +214,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             if (fileSource != null) {
                 var item = await context.Client.RenameFileAsync(ToId(fileSource), ToId(destination), WebUtility.UrlEncode(moveName));
 
-                return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
+                return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ItemTypeNotSupported, source.GetType().Name));
@@ -239,7 +239,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             var stream = progress != null ? new ProgressStream(content, progress) : content;
             var item = await AsyncFunc.RetryAsync<pCloudFile, pCloudException>(async () => await context.Client.UploadFileAsync(stream, ToId(parent), WebUtility.UrlEncode(name), CancellationToken.None), RETRIES);
 
-            return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
+            return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
@@ -281,7 +281,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
                 var locator = locatorResolver();
                 var item = await context.Client.RenameFileAsync(ToId(fileTarget), ToId(locator.ParentId), newName);
 
-                return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, item.Size, null);
+                return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.ItemTypeNotSupported, target.GetType().Name));

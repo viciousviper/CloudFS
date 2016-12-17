@@ -206,7 +206,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             var stream = progress != null ? new ProgressStream(content, progress) : content;
             var item = await AsyncFunc.RetryAsync<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(parent.Value, name, stream, true), RETRIES);
 
-            return new FileInfoContract(item.Id, item.Name, item.DateLastSynced, FileSystemExtensions.Later(item.DateLastSynced, item.ModifiedTime), item.Size, null);
+            return new FileInfoContract(item.Id, item.Name, item.DateLastSynced, FileSystemExtensions.Later(item.DateLastSynced, item.ModifiedTime), (FileSize)item.Size, null);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

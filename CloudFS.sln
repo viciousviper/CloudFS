@@ -52,6 +52,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.GatewayTests", "Clo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Interface", "CloudFS.Interface\CloudFS.Interface.csproj", "{3C92BDC3-AE94-4269-8FC6-9114A90184AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.InterfaceTests", "CloudFS.InterfaceTests\CloudFS.InterfaceTests.csproj", "{AFAE0CF4-8128-4F8E-BD25-0411ECCD4511}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{20C61427-573E-4493-9DE4-22E7A07CCD88}"
 	ProjectSection(SolutionItems) = preProject
 		Appveyor.yml = Appveyor.yml
@@ -196,6 +198,12 @@ Global
 		{3C92BDC3-AE94-4269-8FC6-9114A90184AC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C92BDC3-AE94-4269-8FC6-9114A90184AC}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
 		{3C92BDC3-AE94-4269-8FC6-9114A90184AC}.Signed|Any CPU.Build.0 = Signed|Any CPU
+		{AFAE0CF4-8128-4F8E-BD25-0411ECCD4511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFAE0CF4-8128-4F8E-BD25-0411ECCD4511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFAE0CF4-8128-4F8E-BD25-0411ECCD4511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFAE0CF4-8128-4F8E-BD25-0411ECCD4511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFAE0CF4-8128-4F8E-BD25-0411ECCD4511}.Signed|Any CPU.ActiveCfg = Signed|Any CPU
+		{AFAE0CF4-8128-4F8E-BD25-0411ECCD4511}.Signed|Any CPU.Build.0 = Signed|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

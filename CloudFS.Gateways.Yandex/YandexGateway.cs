@@ -233,7 +233,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             await context.Client.Files.UploadAsync(link, stream, CancellationToken.None);
             var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
 
-            return new FileInfoContract(item.Path, item.Name, item.Created, item.Modified, item.Size, item.Md5);
+            return new FileInfoContract(item.Path, item.Name, item.Created, item.Modified, (FileSize)item.Size, item.Md5);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

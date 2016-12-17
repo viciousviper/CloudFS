@@ -37,21 +37,21 @@ namespace IgorSoft.CloudFS.AuthenticationTests
         private const string plainText = "PlainText";
         private const string passPhrase = "PassPhrase";
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Encrypt_WherePassPhraseIsEmpty_Throws()
         {
             StringCipher.Encrypt(plainText, string.Empty);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Decrypt_WherePassPhraseIsEmpty_Throws()
         {
             StringCipher.Decrypt(plainText, string.Empty);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void Encrypt_WherePassPhraseIsSet_Succeeds()
         {
             var cipherText = StringCipher.Encrypt(plainText, passPhrase);
@@ -60,7 +60,7 @@ namespace IgorSoft.CloudFS.AuthenticationTests
             StringAssert.DoesNotMatch(cipherText, new Regex($".*{plainText}.*"), "Encrypted text contains plain text");
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void Encrypt_WherePassPhraseIsSetAndPlainTextIsEmpty_Succeeds()
         {
             var cipherText = StringCipher.Encrypt(string.Empty, passPhrase);
@@ -68,7 +68,7 @@ namespace IgorSoft.CloudFS.AuthenticationTests
             Assert.IsNotNull(cipherText, "Encrypted text is null");
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void Decrypt_WherePassPhraseMatches_Succeeds()
         {
             var cipherText = StringCipher.Encrypt(plainText, passPhrase);
@@ -78,7 +78,7 @@ namespace IgorSoft.CloudFS.AuthenticationTests
             Assert.AreEqual(plainText, decryptedText, "Decrypted text is different from plain text");
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(CryptographicException))]
         public void Decrypt_WherePassPhraseDiffers_Fails()
         {
@@ -89,7 +89,7 @@ namespace IgorSoft.CloudFS.AuthenticationTests
             Assert.AreEqual(plainText, decryptedText, "Decrypted text is different from plain text");
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void Encrypt_WherePassPhraseIsSet_IsSaltedCorrectly()
         {
             var cipherText1 = StringCipher.Encrypt(plainText, passPhrase);

@@ -27,13 +27,13 @@ using SemanticTypes;
 
 namespace IgorSoft.CloudFS.Interface.IO
 {
-#pragma warning disable CS3009 // Basistyp ist nicht CLS-kompatibel
     /// <summary>
     /// The unique identifier of a cloud file system object.
     /// </summary>
     /// <seealso cref="SemanticType{string}" />
+#pragma warning disable CS3009 // Base type is not CLS-compliant
     public abstract class FileSystemId : SemanticType<string>
-#pragma warning restore CS3009 // Basistyp ist nicht CLS-kompatibel
+#pragma warning restore CS3009 // Base type is not CLS-compliant
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSystemId"/> class.

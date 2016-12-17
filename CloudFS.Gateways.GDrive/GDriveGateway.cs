@@ -231,7 +231,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var upload = await AsyncFunc.RetryAsync<IUploadProgress, GoogleApiException>(async () => await insert.UploadAsync(), RETRIES);
             var item = insert.ResponseBody;
 
-            return new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), item.Size.Value, item.Md5Checksum);
+            return new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), (FileSize)item.Size.Value, item.Md5Checksum);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

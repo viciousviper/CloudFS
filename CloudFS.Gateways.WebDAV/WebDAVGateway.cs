@@ -284,7 +284,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var item = propFindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == path);
 
-            return new FileInfoContract(WebUtility.UrlDecode(path), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), item.ContentLength ?? -1, item.ETag);
+            return new FileInfoContract(WebUtility.UrlDecode(path), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), (FileSize)(item.ContentLength ?? -1), item.ETag);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

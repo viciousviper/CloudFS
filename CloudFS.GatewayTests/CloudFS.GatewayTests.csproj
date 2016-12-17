@@ -44,7 +44,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Signed|AnyCPU' ">
     <OutputPath>bin\Signed\</OutputPath>
-    <DefineConstants>TRACE;SIGNED</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS;SIGNED</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>

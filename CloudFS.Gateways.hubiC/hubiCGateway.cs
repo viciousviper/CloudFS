@@ -54,13 +54,13 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         private const int RETRIES = 3;
 
-        private const int LARGE_FILE_THRESHOLD = 30 * 1 << 20;
-
-        private const int MAX_CHUNK_SIZE = 5 * 1 << 20;
-
         private const string PARAMETER_CONTAINER = "container";
 
         private const string DEFAULT_CONTAINER = "default";
+
+        private static readonly FileSize LargeFileThreshold = new FileSize("30MB");
+
+        private static readonly FileSize MaxChunkSize = new FileSize("5MB");
 
         private class hubiCContext
         {
@@ -100,16 +100,16 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         private async Task<SwiftResponse> ChunkedUpload(hubiCContext context, string objectId, Stream content, IProgress<ProgressValue> progress)
         {
-            var readBuffer = new byte[MAX_CHUNK_SIZE];
+            var readBuffer = new byte[MaxChunkSize.Value];
             var bytesTransferred = 0;
             var bytesTotal = (int)content.Length;
             progress?.Report(new ProgressValue(bytesTransferred, bytesTotal));
 
-            var chunks = (content.Length - 1) / MAX_CHUNK_SIZE + 1;
+            var chunks = (content.Length - 1) / MaxChunkSize.Value + 1;
             var item = default(SwiftResponse);
             for (var i = 0; i < chunks; ++i) {
-                var chunkSize = await content.ReadAsync(readBuffer, 0, MAX_CHUNK_SIZE);
-                item = await context.Client.PutObjectChunk(context.Container, objectId, chunkSize == MAX_CHUNK_SIZE ? readBuffer : readBuffer.Take(chunkSize).ToArray(), i);
+                var chunkSize = await content.ReadAsync(readBuffer, 0, (int)MaxChunkSize);
+                item = await context.Client.PutObjectChunk(context.Container, objectId, chunkSize == MaxChunkSize ? readBuffer : readBuffer.Take(chunkSize).ToArray(), i);
                 if (!item.IsSuccess)
                     throw new ApplicationException(item.Reason);
 
@@ -195,7 +195,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var context = await RequireContextAsync(root);
 
             var item = default(SwiftResponse);
-            if (content.Length <= LARGE_FILE_THRESHOLD) {
+            if (content.Length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
                 item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await context.Client.PutObject(context.Container, target.Value, stream), RETRIES);
             } else {
@@ -219,7 +219,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var item = await context.Client.HeadObject(context.Container, targetId);
 
             var creationTime = DateTime.Parse(item.Headers["Date"]);
-            return new FileInfoContract(targetId, targetName, creationTime, creationTime, item.ContentLength, item.Headers["ETag"]);
+            return new FileInfoContract(targetId, targetName, creationTime, creationTime, (FileSize)item.ContentLength, item.Headers["ETag"]);
         }
 
         public Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
@@ -252,7 +252,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var length = content.Length;
 
             var item = default(SwiftResponse);
-            if (length <= LARGE_FILE_THRESHOLD) {
+            if (length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
                 item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await context.Client.PutObject(context.Container, objectId, stream), RETRIES);
                 if (!item.IsSuccess)
@@ -262,7 +262,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             }
 
             var creationTime = DateTime.Parse(item.Headers["Date"]);
-            return new FileInfoContract(objectId, name, creationTime, creationTime, length, item.Headers["ETag"]);
+            return new FileInfoContract(objectId, name, creationTime, creationTime, (FileSize)length, item.Headers["ETag"]);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

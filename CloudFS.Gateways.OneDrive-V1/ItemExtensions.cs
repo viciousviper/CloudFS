@@ -32,6 +32,6 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_V1
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this Item item) => item.Folder != null
                 ? new DirectoryInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0)) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0), item.Size ?? -1, item.File.Hashes.Sha1Hash.ToLowerInvariant()) as FileSystemInfoContract;
+                : new FileInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0), (FileSize)(item.Size ?? -1), item.File.Hashes.Sha1Hash.ToLowerInvariant()) as FileSystemInfoContract;
     }
 }

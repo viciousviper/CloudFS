@@ -58,7 +58,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
         private const string MIME_TYPE_FILE = "application/octet-stream";
 
-        private const long FREE_SPACE = 5 * 1L << 30;
+        private static readonly long FREE_SPACE = new FileSize("5GB");
 
         private class GoogleCloudStorageContext
         {
@@ -252,7 +252,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
             var item = await context.Client.UploadObjectAsync(parentObjectId.Bucket, $"{parentObjectId.Path}{name}", MIME_TYPE_FILE, content, progress: uploadProgress);
 
-            return new FileInfoContract(item.Id, item.Name.Substring(parentObjectId.Path.Length), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value), (long)item.Size.Value, item.Md5Hash);
+            return new FileInfoContract(item.Id, item.Name.Substring(parentObjectId.Path.Length), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value), (FileSize)(long)item.Size.Value, item.Md5Hash);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

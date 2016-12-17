@@ -33,6 +33,6 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this StorageItem item) => item is Folder
                 ? new DirectoryInfoContract(item.Id, WebUtility.UrlDecode(item.Name), item.Created, item.Modified) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, WebUtility.UrlDecode(item.Name), item.Created, item.Modified, ((File)item).Size, null) as FileSystemInfoContract;
+                : new FileInfoContract(item.Id, WebUtility.UrlDecode(item.Name), item.Created, item.Modified, (FileSize)((File)item).Size, null) as FileSystemInfoContract;
     }
 }

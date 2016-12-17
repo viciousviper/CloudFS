@@ -35,6 +35,6 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
         public static FileSystemInfoContract ToFileSystemInfoContract(this SwiftObjectModel item, DirectoryId parent) => item.ContentType == directoryContentType
             ? new DirectoryInfoContract(item.Object, parent.GetObjectName(item.Object), item.LastModified, item.LastModified) as FileSystemInfoContract
-            : new FileInfoContract(item.Object, parent.GetObjectName(item.Object), item.LastModified, item.LastModified, item.Bytes, item.Hash) as FileSystemInfoContract;
+            : new FileInfoContract(item.Object, parent.GetObjectName(item.Object), item.LastModified, item.LastModified, (FileSize)item.Bytes, item.Hash) as FileSystemInfoContract;
     }
 }

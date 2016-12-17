@@ -200,7 +200,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_V1
 
             var item = await AsyncFunc.RetryAsync<Item, OneDriveException>(async () => await context.Client.Drive.Items[parent.Value].ItemWithPath(name).Content.Request().PutAsync<Item>(content), RETRIES);
 
-            return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0), item.Size ?? -1, item.File.Hashes.Sha1Hash.ToLowerInvariant());
+            return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0), (FileSize)(item.Size ?? -1), item.File.Hashes.Sha1Hash.ToLowerInvariant());
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)

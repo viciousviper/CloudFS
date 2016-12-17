@@ -98,7 +98,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         private TimeSpan GetUploadTimeout(long uploadSize)
         {
-            return TimeSpan.FromSeconds(UploadTimeoutPerMegabyte.Seconds * (uploadSize / (1 << 20) + 1));
+            return TimeSpan.FromSeconds(UploadTimeoutPerMegabyte.Seconds * (uploadSize / new FileSize("1MB").Value + 1));
         }
 
         public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
@@ -188,7 +188,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
                 var request = new BoxFileRequest() { Id = source.Value, Name = copyName, Parent = new BoxRequestEntity() { Id = destination.Value } };
                 var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.CopyAsync(request, boxFileFields), RETRIES);
 
-                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
             }
         }
 
@@ -206,7 +206,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
                 var request = new BoxFileRequest() { Id = source.Value, Parent = new BoxRequestEntity() { Id = destination.Value, Type = BoxType.file }, Name = moveName };
                 var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UpdateInformationAsync(request, fields: boxFileFields), RETRIES);
 
-                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
             }
         }
 
@@ -231,7 +231,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
             var stream = progress != null ? new ProgressStream(content, progress) : content;
             var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadAsync(request, stream, boxFileFields, timeout: GetUploadTimeout(content.Length)), RETRIES);
 
-            return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+            return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
@@ -259,7 +259,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
                 var request = new BoxFileRequest() { Id = target.Value, Name = newName };
                 var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UpdateInformationAsync(request, fields: boxFileFields), RETRIES);
 
-                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
             }
         }
 

@@ -112,7 +112,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             var directory = new DirectoryInfo(effectivePath);
             if (directory.Exists)
                 return directory.EnumerateDirectories().Select(d => new DirectoryInfoContract(GetRelativePath(rootPath, d.FullName), d.Name, d.CreationTime, d.LastWriteTime)).Cast<FileSystemInfoContract>().Concat(
-                    directory.EnumerateFiles().Select(f => new FileInfoContract(GetRelativePath(rootPath, f.FullName), f.Name, f.CreationTime, f.LastWriteTime, f.Length, null)).Cast<FileSystemInfoContract>());
+                    directory.EnumerateFiles().Select(f => new FileInfoContract(GetRelativePath(rootPath, f.FullName), f.Name, f.CreationTime, f.LastWriteTime, (FileSize)f.Length, null)).Cast<FileSystemInfoContract>());
             else
                 return Array.Empty<FileSystemInfoContract>();
         }
@@ -217,7 +217,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             var file = new FileInfo(effectivePath);
             if (file.Exists) {
                 var fileCopy = file.CopyTo(effectiveCopyPath);
-                return new FileInfoContract(GetRelativePath(rootPath, fileCopy.FullName), fileCopy.Name, fileCopy.CreationTime, fileCopy.LastWriteTime, fileCopy.Length, null);
+                return new FileInfoContract(GetRelativePath(rootPath, fileCopy.FullName), fileCopy.Name, fileCopy.CreationTime, fileCopy.LastWriteTime, (FileSize)fileCopy.Length, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PathNotFound, source.Value));
@@ -251,7 +251,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             var file = new FileInfo(effectivePath);
             if (file.Exists) {
                 file.MoveTo(effectiveMovePath);
-                return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
+                return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, (FileSize)file.Length, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PathNotFound, source.Value));
@@ -302,7 +302,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             }
 
             file.Refresh();
-            return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
+            return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, (FileSize)file.Length, null);
         }
 
         public void RemoveItem(RootName root, FileSystemId target, bool recurse)
@@ -354,7 +354,7 @@ namespace IgorSoft.CloudFS.Gateways.File
             var file = new FileInfo(effectivePath);
             if (file.Exists) {
                 file.MoveTo(newPath);
-                return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, file.Length, null);
+                return new FileInfoContract(GetRelativePath(rootPath, file.FullName), file.Name, file.CreationTime, file.LastWriteTime, (FileSize)file.Length, null);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.PathNotFound, target.Value));

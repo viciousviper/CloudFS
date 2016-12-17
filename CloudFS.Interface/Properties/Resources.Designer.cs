@@ -63,6 +63,16 @@ namespace IgorSoft.CloudFS.Interface.Properties {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to {0} must be specified in format '<value>({1})'.
+        /// </summary>
+        internal static string InvalidFormat
+        {
+            get {
+                return ResourceManager.GetString("InvalidFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Task failed too many times. See InnerException property for a list of Exceptions that occured.
         /// </summary>
         internal static string RetriesExhausted

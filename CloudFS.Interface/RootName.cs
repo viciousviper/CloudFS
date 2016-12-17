@@ -36,9 +36,9 @@ namespace IgorSoft.CloudFS.Interface
     /// </summary>
     /// <seealso cref="SemanticType{string}" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-#pragma warning disable CS3009 // Basistyp ist nicht CLS-kompatibel
+#pragma warning disable CS3009 // Base type is not CLS-compliant
     public sealed class RootName : SemanticType<string>
-#pragma warning restore CS3009 // Basistyp ist nicht CLS-kompatibel
+#pragma warning restore CS3009 // Base type is not CLS-compliant
     {
         private const string rootNamePattern = @"^(?<Schema>[a-z][_a-z0-9]*)(@(?<UserName>[_a-zA-Z0-9]+))?(\|(?<Root>.+))?$";
 

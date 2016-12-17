@@ -204,7 +204,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var uploadOptions = progress != null ? new ItemUploadOptions() { ProgressReporter = (complete, transfered, total) => progress.Report(new ProgressValue(complete, (int)transfered, (int)total)) } : ItemUploadOptions.Default;
             var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.PutNewFileToParentItemAsync(itemReference, name, content, uploadOptions), RETRIES);
 
-            return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime, item.Size, item.File.Hashes.Sha1.ToLowerInvariant());
+            return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime, (FileSize)item.Size, item.File.Hashes.Sha1.ToLowerInvariant());
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
