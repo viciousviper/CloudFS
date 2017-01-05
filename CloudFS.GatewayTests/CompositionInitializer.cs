@@ -81,11 +81,12 @@ namespace IgorSoft.CloudFS.GatewayTests
                 throw new ArgumentNullException(nameof(path));
 
             var assemblies = new List<Assembly>();
-
-            var directory = new DirectoryInfo(path);
-            if (directory.Exists)
-                foreach (var file in directory.EnumerateFiles(searchPattern))
-                    assemblies.Add(Assembly.LoadFrom(file.FullName));
+            foreach (var part in path.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+                var directory = new DirectoryInfo(part);
+                if (directory.Exists)
+                    foreach (var file in directory.EnumerateFiles(searchPattern))
+                        assemblies.Add(Assembly.LoadFrom(file.FullName));
+            }
 
             host = InitializeHost(assemblies);
             OnHostInitialized();

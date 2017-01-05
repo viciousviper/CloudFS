@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>CloudFS-Legacy</id>
+    <version>1.0.10.1-beta</version>
+    <title>CloudFS</title>
+    <authors>IgorSoft</authors>
+    <owners>IgorSoft</owners>
+    <projectUrl>https://github.com/viciousviper/CloudFS</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The CloudFS-Legacy library is a collection of legacy versions of .NET assemblies as gateways to various publicly accessible Cloud storage services.</description>
+    <releaseNotes>
+      - First release of legacy gateways
+    </releaseNotes>
+    <copyright>Copyright © 2016</copyright>
+	<tags>Cloud Filesystem Copy GoogleDrive OneDrive</tags>
+    <dependencies>
+        <group targetFramework="net46">
+          <dependency id="Microsoft.AspNet.WebApi.Client" version="5.2.3" />
+          <dependency id="Microsoft.Composition" version="1.0.30" />
+          <dependency id="Microsoft.IdentityModel.Clients.ActiveDirectory" version="3.13.8" />
+          <dependency id="Newtonsoft.Json" version="9.0.1" />
+          <dependency id="SemanticTypes" version="1.0.1" />
+          <dependency id="CopyRestApi" version="1.1.0" />
+          <dependency id="Google.Apis.Drive.v2" version="1.20.0.700" />
+          <dependency id="Microsoft.OneDriveSDK" version="[1.2.0]" />
+        </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="CloudFS.GatewayTests\bin\Release\IgorSoft.AppDomainResolver.dll" target="lib\net46\IgorSoft.AppDomainResolver.dll" />
+    <file src="CloudFS.GatewayTests\bin\Release\IgorSoft.CloudFS.Authentication.dll" target="lib\net46\IgorSoft.CloudFS.Authentication.dll" />
+    <file src="CloudFS.GatewayTests\bin\Release\IgorSoft.CloudFS.Interface.dll" target="lib\net46\IgorSoft.CloudFS.Interface.dll" />
+    <file src="CloudFS.GatewayTests\bin\Release\LegacyGateways\IgorSoft.CloudFS.Gateways.*.dll" target="lib\net46\Gateways" />
+    <file src="CloudFS.GatewayTests\bin\Release\LegacyGateways\IgorSoft.CloudFS.Gateways.*.dll.config" target="lib\net46\Gateways" />
+    <file src="Library\OneDriveSDK-Legacy.dll" target="lib\net46\LegacyGateways\OneDriveSDK-Legacy.dll" />
+    <file src="Library\OneDriveSDK-Legacy.LICENSE" target="lib\net46\LegacyGateways\OneDriveSDK-Legacy.LICENSE" />
+  </files>
+</package>
