@@ -159,8 +159,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-rem for %25%25f in ($(TargetFileName) $(TargetFileName).config bouncy_castle_hmac_sha_pcl.dll CopyRestAPI.dll Newtonsoft.Json.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\</PostBuildEvent>
+    <PostBuildEvent>rem if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\
+rem for %25%25f in ($(TargetFileName) $(TargetFileName).config bouncy_castle_hmac_sha_pcl.dll CopyRestAPI.dll Newtonsoft.Json.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -54,6 +54,7 @@
       <ItemGroup>
         <Reference Include="OneDriveSDK-Legacy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
           <HintPath>..\Library\OneDriveSDK-Legacy.dll</HintPath>
+          <Private>True</Private>
         </Reference>
       </ItemGroup>
     </When>
@@ -140,8 +141,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll OneDriveSDK-Legacy.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
+if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\
+for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll OneDriveSDK-Legacy.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

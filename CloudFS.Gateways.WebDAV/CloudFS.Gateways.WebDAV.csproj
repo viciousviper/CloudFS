@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WebDav.Client, Version=1.0.4.0, Culture=neutral, PublicKeyToken=daed9acc7deb9472, processorArchitecture=MSIL">
       <HintPath>..\packages\WebDav.Client.1.0.4.0\lib\net45\WebDav.Client.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

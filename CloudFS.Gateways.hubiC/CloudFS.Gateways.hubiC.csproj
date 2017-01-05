@@ -54,12 +54,12 @@
           <Private>True</Private>
         </Reference>
       </ItemGroup>
-	</When>
+    </When>
     <Otherwise>
       <ItemGroup>
         <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+          <SpecificVersion>False</SpecificVersion>
           <HintPath>..\SignedLibrary\SwiftClient.dll</HintPath>
-          <Private>True</Private>
         </Reference>
       </ItemGroup>
     </Otherwise>
@@ -67,6 +67,7 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
