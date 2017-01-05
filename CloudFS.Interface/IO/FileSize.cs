@@ -70,12 +70,12 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <summary>
         /// The undefined file size.
         /// </summary>
-        public static FileSize Undefined = new FileSize(-1);
+        public static readonly FileSize Undefined = new FileSize(-1);
 
         /// <summary>
         /// The empty file size.
         /// </summary>
-        public static FileSize Empty = new FileSize(0);
+        public static readonly FileSize Empty = new FileSize(0);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSize"/> class.
@@ -116,7 +116,7 @@ namespace IgorSoft.CloudFS.Interface.IO
 
             var match = regex.Match(size);
             if (!match.Success)
-                throw new FormatException(string.Format(Properties.Resources.InvalidFormat, nameof(FileSize), string.Join("|", multipliers.Keys)));
+                throw new FormatException(string.Format(Properties.Resources.InvalidFormat, nameof(FileSize), string.Join("|", multipliers.Keys), CultureInfo.CurrentCulture));
 
             var units = decimal.Parse(match.Groups["units"].Value);
             var multiplier = match.Groups["multiplier"].Value;
@@ -129,7 +129,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// </summary>
         /// <param name="fileSize">The <see cref="FileSize"/> instance to convert.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator long(FileSize fileSize) => fileSize.Value;
+        public static implicit operator long(FileSize fileSize) => (fileSize ?? Undefined).Value;
 
         /// <summary>
         /// Performs an implicit conversion from <see cref="long"/> to <see cref="FileSize"/>.
@@ -141,105 +141,131 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <summary>
         /// Implements the operator +.
         /// </summary>
-        /// <param name="f1">A <see cref="FileSize"/>.</param>
-        /// <param name="f2">A <see cref="FileSize"/>.</param>
-        /// <returns>A <see cref="FileSize"/> representing the sum of <paramref name="f1"/> and <paramref name="f2"/>.</returns>
-        public static FileSize operator +(FileSize f1, FileSize f2)
+        /// <param name="fileSize1">A <see cref="FileSize"/>.</param>
+        /// <param name="fileSize2">A <see cref="FileSize"/>.</param>
+        /// <returns>A <see cref="FileSize"/> representing the sum of <paramref name="fileSize1"/> and <paramref name="fileSize2"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1013:OverloadOperatorEqualsOnOverloadingAddAndSubtract")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator +(FileSize fileSize1, FileSize fileSize2)
         {
-            if (f1 == Undefined)
-                throw new ArgumentException(nameof(f1));
-            if (f2 == Undefined)
-                throw new ArgumentException(nameof(f2));
+            if (fileSize1 == null)
+                throw new ArgumentNullException(nameof(fileSize1));
+            if (fileSize2 == null)
+                throw new ArgumentNullException(nameof(fileSize2));
+            if (fileSize1 == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize1), CultureInfo.CurrentCulture));
+            if (fileSize2 == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize2), CultureInfo.CurrentCulture));
 
-            return new FileSize(f1.Value + f2.Value);
+            return new FileSize(fileSize1.Value + fileSize2.Value);
         }
 
         /// <summary>
         /// Implements the operator -.
         /// </summary>
-        /// <param name="f1">A <see cref="FileSize"/>.</param>
-        /// <param name="f2">A <see cref="FileSize"/>.</param>
-        /// <returns>A <see cref="FileSize"/> representing the difference of <paramref name="f1"/> and <paramref name="f2"/>.</returns>
-        public static FileSize operator -(FileSize f1, FileSize f2)
+        /// <param name="fileSize1">A <see cref="FileSize"/>.</param>
+        /// <param name="fileSize2">A <see cref="FileSize"/>.</param>
+        /// <returns>A <see cref="FileSize"/> representing the difference of <paramref name="fileSize1"/> and <paramref name="fileSize2"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1013:OverloadOperatorEqualsOnOverloadingAddAndSubtract")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator -(FileSize fileSize1, FileSize fileSize2)
         {
-            if (f1 == Undefined)
-                throw new ArgumentException(nameof(f1));
-            if (f2 == Undefined)
-                throw new ArgumentException(nameof(f2));
+            if (fileSize1 == null)
+                throw new ArgumentNullException(nameof(fileSize1));
+            if (fileSize2 == null)
+                throw new ArgumentNullException(nameof(fileSize2));
+            if (fileSize1 == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize1), CultureInfo.CurrentCulture));
+            if (fileSize2 == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize2), CultureInfo.CurrentCulture));
 
-            return new FileSize(f1.Value - f2.Value);
+            return new FileSize(fileSize1.Value - fileSize2.Value);
         }
 
         /// <summary>
         /// Implements the operator *.
         /// </summary>
-        /// <param name="f">The base <see cref="FileSize"/>.</param>
+        /// <param name="fileSize">The base <see cref="FileSize"/>.</param>
         /// <param name="scale">The scale.</param>
-        /// <returns>A <see cref="FileSize"/> representing <paramref name="f"/> multiplied by <paramref name="scale"/>.</returns>
-        public static FileSize operator *(FileSize f, decimal scale)
+        /// <returns>A <see cref="FileSize"/> representing <paramref name="fileSize"/> multiplied by <paramref name="scale"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator *(FileSize fileSize, decimal scale)
         {
-            if (f == Undefined)
-                throw new ArgumentException(nameof(f));
+            if (fileSize == null)
+                throw new ArgumentNullException(nameof(fileSize));
+            if (fileSize == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
 
-            return new FileSize(f.Value * scale);
-        }
-
-        /// <summary>
-        /// Implements the operator *.
-        /// </summary>
-        /// <param name="scale">The scale.</param>
-        /// <param name="f">The base <see cref="FileSize"/>.</param>
-        /// <returns>A <see cref="FileSize"/> representing <paramref name="f"/> multiplied by <paramref name="scale"/>.</returns>
-        public static FileSize operator *(decimal scale, FileSize f) => f * scale;
-
-        /// <summary>
-        /// Implements the operator *.
-        /// </summary>
-        /// <param name="f">The base <see cref="FileSize"/>.</param>
-        /// <param name="scale">The scale.</param>
-        /// <returns>A <see cref="FileSize"/> representing <paramref name="f"/> multiplied by <paramref name="scale"/>.</returns>
-        public static FileSize operator *(FileSize f, long scale)
-        {
-            if (f == Undefined)
-                throw new ArgumentException(nameof(f));
-
-            return new FileSize(f.Value * scale);
+            return new FileSize(fileSize.Value * scale);
         }
 
         /// <summary>
         /// Implements the operator *.
         /// </summary>
         /// <param name="scale">The scale.</param>
-        /// <param name="f">The base <see cref="FileSize"/>.</param>
-        /// <returns>A <see cref="FileSize"/> representing <paramref name="f"/> multiplied by <paramref name="scale"/>.</returns>
-        public static FileSize operator *(long scale, FileSize f) => f * scale;
+        /// <param name="fileSize">The base <see cref="FileSize"/>.</param>
+        /// <returns>A <see cref="FileSize"/> representing <paramref name="fileSize"/> multiplied by <paramref name="scale"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator *(decimal scale, FileSize fileSize) => fileSize * scale;
+
+        /// <summary>
+        /// Implements the operator *.
+        /// </summary>
+        /// <param name="fileSize">The base <see cref="FileSize"/>.</param>
+        /// <param name="scale">The scale.</param>
+        /// <returns>A <see cref="FileSize"/> representing <paramref name="fileSize"/> multiplied by <paramref name="scale"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator *(FileSize fileSize, long scale)
+        {
+            if (fileSize == null)
+                throw new ArgumentNullException(nameof(fileSize));
+            if (fileSize == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
+
+            return new FileSize(fileSize.Value * scale);
+        }
+
+        /// <summary>
+        /// Implements the operator *.
+        /// </summary>
+        /// <param name="scale">The scale.</param>
+        /// <param name="fileSize">The base <see cref="FileSize"/>.</param>
+        /// <returns>A <see cref="FileSize"/> representing <paramref name="fileSize"/> multiplied by <paramref name="scale"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator *(long scale, FileSize fileSize) => fileSize * scale;
 
         /// <summary>
         /// Implements the operator /.
         /// </summary>
-        /// <param name="f">The base <see cref="FileSize"/>.</param>
+        /// <param name="fileSize">The base <see cref="FileSize"/>.</param>
         /// <param name="scale">The scale.</param>
-        /// <returns>A <see cref="FileSize"/> representing <paramref name="f"/> multiplied by <paramref name="scale"/>.</returns>
-        public static FileSize operator /(FileSize f, decimal scale)
+        /// <returns>A <see cref="FileSize"/> representing <paramref name="fileSize"/> multiplied by <paramref name="scale"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator /(FileSize fileSize, decimal scale)
         {
-            if (f == Undefined)
-                throw new ArgumentException(nameof(f));
+            if (fileSize == null)
+                throw new ArgumentNullException(nameof(fileSize));
+            if (fileSize == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
 
-            return new FileSize(f.Value / scale);
+            return new FileSize(fileSize.Value / scale);
         }
 
         /// <summary>
         /// Implements the operator /.
         /// </summary>
-        /// <param name="f">The base <see cref="FileSize"/>.</param>
+        /// <param name="fileSize">The base <see cref="FileSize"/>.</param>
         /// <param name="scale">The scale.</param>
-        /// <returns>A <see cref="FileSize"/> representing <paramref name="f"/> multiplied by <paramref name="scale"/>.</returns>
-        public static FileSize operator /(FileSize f, long scale)
+        /// <returns>A <see cref="FileSize"/> representing <paramref name="fileSize"/> multiplied by <paramref name="scale"/>.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2225:OperatorOverloadsHaveNamedAlternates")]
+        public static FileSize operator /(FileSize fileSize, long scale)
         {
-            if (f == Undefined)
-                throw new ArgumentException(nameof(f));
+            if (fileSize == null)
+                throw new ArgumentNullException(nameof(fileSize));
+            if (fileSize == Undefined)
+                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
 
-            return new FileSize((decimal)f.Value / scale);
+            return new FileSize((decimal)fileSize.Value / scale);
         }
 
         /// <summary>
