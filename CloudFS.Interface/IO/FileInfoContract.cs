@@ -56,6 +56,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// Gets the mode of the file.
         /// </summary>
         /// <value>The <see cref="string" /> containing the mode.</value>
+        [Obsolete("Unused property will be removed in a future version of this library.")]
         public override string Mode => "-----";
 
         /// <summary>
@@ -87,6 +88,16 @@ namespace IgorSoft.CloudFS.Interface.IO
 
             Size = size;
             Hash = hash;
+        }
+
+        /// <summary>
+        /// Initializes a new placeholder instance of the <see cref="FileInfoContract"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
+        /// <param name="name">The name.</param>
+        protected FileInfoContract(string id, string name) : base(new FileId(id), name, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0))
+        {
+            Size = FileSize.Undefined;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
