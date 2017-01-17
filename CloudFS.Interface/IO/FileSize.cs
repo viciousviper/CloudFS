@@ -68,11 +68,6 @@ namespace IgorSoft.CloudFS.Interface.IO
         };
 
         /// <summary>
-        /// The undefined file size.
-        /// </summary>
-        public static readonly FileSize Undefined = new FileSize(-1);
-
-        /// <summary>
         /// The empty file size.
         /// </summary>
         public static readonly FileSize Empty = new FileSize(0);
@@ -81,7 +76,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// Initializes a new instance of the <see cref="FileSize"/> class.
         /// </summary>
         /// <param name="bytes">The file size in bytes.</param>
-        public FileSize(long bytes) : base(b => b >= -1, bytes)
+        public FileSize(long bytes) : base(b => b >= 0, bytes)
         {
         }
 
@@ -89,7 +84,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// Initializes a new instance of the <see cref="FileSize"/> class.
         /// </summary>
         /// <param name="bytes">The file size in bytes.</param>
-        public FileSize(decimal bytes) : base(b => b >= -1, EnsureIntegral(bytes))
+        public FileSize(decimal bytes) : base(b => b >= 0, EnsureIntegral(bytes))
         {
         }
 
@@ -97,7 +92,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// Initializes a new instance of the <see cref="FileSize"/> class.
         /// </summary>
         /// <param name="size">The file size as <see cref="string"/>.</param>
-        public FileSize(string size) : base(b => b >= -1, Parse(size))
+        public FileSize(string size) : base(b => b >= 0, Parse(size))
         {
         }
 
@@ -111,8 +106,8 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         private static long Parse(string size)
         {
-            if (size == nameof(Undefined))
-                return -1;
+            if (size == nameof(Empty))
+                return 0;
 
             var match = regex.Match(size);
             if (!match.Success)
@@ -129,7 +124,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// </summary>
         /// <param name="fileSize">The <see cref="FileSize"/> instance to convert.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator long(FileSize fileSize) => (fileSize ?? Undefined).Value;
+        public static implicit operator long(FileSize fileSize) => fileSize.Value;
 
         /// <summary>
         /// Performs an implicit conversion from <see cref="long"/> to <see cref="FileSize"/>.
@@ -152,10 +147,6 @@ namespace IgorSoft.CloudFS.Interface.IO
                 throw new ArgumentNullException(nameof(fileSize1));
             if (fileSize2 == null)
                 throw new ArgumentNullException(nameof(fileSize2));
-            if (fileSize1 == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize1), CultureInfo.CurrentCulture));
-            if (fileSize2 == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize2), CultureInfo.CurrentCulture));
 
             return new FileSize(fileSize1.Value + fileSize2.Value);
         }
@@ -174,10 +165,6 @@ namespace IgorSoft.CloudFS.Interface.IO
                 throw new ArgumentNullException(nameof(fileSize1));
             if (fileSize2 == null)
                 throw new ArgumentNullException(nameof(fileSize2));
-            if (fileSize1 == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize1), CultureInfo.CurrentCulture));
-            if (fileSize2 == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize2), CultureInfo.CurrentCulture));
 
             return new FileSize(fileSize1.Value - fileSize2.Value);
         }
@@ -193,8 +180,6 @@ namespace IgorSoft.CloudFS.Interface.IO
         {
             if (fileSize == null)
                 throw new ArgumentNullException(nameof(fileSize));
-            if (fileSize == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
 
             return new FileSize(fileSize.Value * scale);
         }
@@ -219,8 +204,6 @@ namespace IgorSoft.CloudFS.Interface.IO
         {
             if (fileSize == null)
                 throw new ArgumentNullException(nameof(fileSize));
-            if (fileSize == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
 
             return new FileSize(fileSize.Value * scale);
         }
@@ -245,8 +228,6 @@ namespace IgorSoft.CloudFS.Interface.IO
         {
             if (fileSize == null)
                 throw new ArgumentNullException(nameof(fileSize));
-            if (fileSize == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
 
             return new FileSize(fileSize.Value / scale);
         }
@@ -262,8 +243,6 @@ namespace IgorSoft.CloudFS.Interface.IO
         {
             if (fileSize == null)
                 throw new ArgumentNullException(nameof(fileSize));
-            if (fileSize == Undefined)
-                throw new ArgumentException(string.Format(Properties.Resources.FileSizeArgumentUndefined, nameof(fileSize), CultureInfo.CurrentCulture));
 
             return new FileSize((decimal)fileSize.Value / scale);
         }
@@ -274,9 +253,6 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <returns>A <see cref="string"/> that represents this instance.</returns>
         public override string ToString()
         {
-            if (Value == -1)
-                return nameof(Undefined);
-
             foreach (var multiplier in multipliers.Reverse())
                 if (Value >= multiplier.Value && Value % ((decimal)multiplier.Value / 1000) == 0)
                     return $"{Value / (decimal)multiplier.Value}{multiplier.Key}".ToString(CultureInfo.CurrentCulture);

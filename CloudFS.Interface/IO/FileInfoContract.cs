@@ -83,9 +83,6 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <exception cref="ArgumentException">The size is negative.</exception>
         public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, FileSize size, string hash) : base(new FileId(id), name, created, updated)
         {
-            if (size == FileSize.Undefined)
-                throw new ArgumentException($"{nameof(size)} == {nameof(FileSize.Undefined)}", nameof(size));
-
             Size = size;
             Hash = hash;
         }
@@ -97,7 +94,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <param name="name">The name.</param>
         protected FileInfoContract(string id, string name) : base(new FileId(id), name, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0))
         {
-            Size = FileSize.Undefined;
+            Size = FileSize.Empty;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

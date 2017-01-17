@@ -54,14 +54,6 @@ namespace CloudFS.InterfaceTests.IO
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
-        public void CreateNew_WhereSizeIsMinusOne_ReturnsFileSizeUndefined()
-        {
-            var sut = new FileSize(-1);
-
-            Assert.AreEqual(FileSize.Undefined, sut);
-        }
-
-        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateNew_WhereSizeIsNegative_Throws()
         {
