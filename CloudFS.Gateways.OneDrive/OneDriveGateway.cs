@@ -30,6 +30,7 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
 using Microsoft.Graph;
 using Microsoft.OneDrive.Sdk;
 using Microsoft.OneDrive.Sdk.Helpers;
@@ -56,8 +57,6 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
 
         private const string API = "OneDriveSDK";
 
-        private const int RETRIES = 3;
-
         private static readonly FileSize LargeFileThreshold = new FileSize("50MB");
 
         private static readonly FileSize MaxChunkSize = new FileSize("5MB");
@@ -73,6 +72,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         }
 
         private readonly IDictionary<RootName, OneDriveContext> contextCache = new Dictionary<RootName, OneDriveContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<ServiceException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -101,29 +102,26 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             return result;
         }
 
-        private async Task<Item> ChunkedUploadAsync(ChunkedUploadProvider provider, IProgress<ProgressValue> progress, int retries)
+        private async Task<Item> ChunkedUploadAsync(ChunkedUploadProvider provider, IProgress<ProgressValue> progress)
         {
             var readBuffer = new byte[MaxChunkSize];
             var exceptions = new List<Exception>();
-            do {
-                var uploadChunkRequests = provider.GetUploadChunkRequests();
-                var bytesTransferred = 0;
-                var bytesTotal = uploadChunkRequests.Sum(u => u.RangeLength);
-                progress?.Report(new ProgressValue(bytesTransferred, bytesTotal));
 
-                foreach (var currentChunkRequest in uploadChunkRequests) {
-                    var uploadChunkResult = await provider.GetChunkRequestResponseAsync(currentChunkRequest, readBuffer, exceptions);
-                    progress?.Report(new ProgressValue(bytesTransferred += currentChunkRequest.RangeLength, bytesTotal));
+            var uploadChunkRequests = provider.GetUploadChunkRequests();
+            var bytesTransferred = 0;
+            var bytesTotal = uploadChunkRequests.Sum(u => u.RangeLength);
+            progress?.Report(new ProgressValue(bytesTransferred, bytesTotal));
 
-                    if (uploadChunkResult.UploadSucceeded) {
-                        return uploadChunkResult.ItemResponse;
-                    }
+            foreach (var currentChunkRequest in uploadChunkRequests) {
+                var uploadChunkResult = await retryPolicy.ExecuteAsync(() => provider.GetChunkRequestResponseAsync(currentChunkRequest, readBuffer, exceptions));
+                progress?.Report(new ProgressValue(bytesTransferred += currentChunkRequest.RangeLength, bytesTotal));
+
+                if (uploadChunkResult.UploadSucceeded) {
+                    return uploadChunkResult.ItemResponse;
                 }
+            }
 
-                await provider.UpdateSessionStatusAsync();
-
-                await Task.Delay((1 << (exceptions.Count - 1)) * 1000).ConfigureAwait(false);
-            } while (--retries >= 0);
+            await retryPolicy.ExecuteAsync(() => provider.UpdateSessionStatusAsync());
 
             throw new TaskCanceledException(Properties.Resources.RetriesExhausted, new AggregateException(exceptions));
         }
@@ -142,7 +140,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<Drive, ServiceException>(async () => await context.Client.Drive.Request().GetAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Request().GetAsync());
 
             return new DriveInfoContract(item.Id, item.Quota.Remaining, item.Quota.Used);
         }
@@ -151,7 +149,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await context.Client.Drive.Root.Request().GetAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Root.Request().GetAsync());
 
             return new RootDirectoryInfoContract(item.Id, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0));
         }
@@ -160,7 +158,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root);
 
-            var pagedCollection = await AsyncFunc.RetryAsync<IItemChildrenCollectionPage, ServiceException>(async () => await context.Client.Drive.Items[parent.Value].Children.Request().GetAsync(), RETRIES);
+            var pagedCollection = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[parent.Value].Children.Request().GetAsync());
 
             var items = pagedCollection.CurrentPage.ToList();
 
@@ -176,7 +174,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await context.Client.Drive.Items[target.Value].Content.Request().PutAsync<Item>(Stream.Null), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[target.Value].Content.Request().PutAsync<Item>(Stream.Null));
 
             return true;
         }
@@ -185,7 +183,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root);
 
-            var stream = await AsyncFunc.RetryAsync<Stream, ServiceException>(async () => await context.Client.Drive.Items[source.Value].Content.Request().GetAsync(), RETRIES);
+            var stream = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[source.Value].Content.Request().GetAsync());
 
             return stream;
         }
@@ -198,12 +196,14 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             var requestBuilder = context.Client.Drive.Items[target.Value];
             if (content.Length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
-                item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await requestBuilder.Content.Request().PutAsync<Item>(stream), RETRIES);
+                var retryPolicyWithAction = Policy.Handle<ServiceException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+                item = await retryPolicyWithAction.ExecuteAsync(() => requestBuilder.Content.Request().PutAsync<Item>(stream));
             } else {
                 var session = await requestBuilder.CreateSession().Request().PostAsync();
                 var provider = new ChunkedUploadProvider(session, context.Client, content);
 
-                item = await ChunkedUploadAsync(provider, progress, RETRIES);
+                item = await ChunkedUploadAsync(provider, progress);
             }
 
             return true;
@@ -213,9 +213,9 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root);
 
-            var asyncStatus = await context.Client.Drive.Items[source.Value].Copy(copyName, new ItemReference { Id = destination.Value }).Request(RespondAsyncWorkaroundHeaders).PostAsync();
+            var asyncStatus = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[source.Value].Copy(copyName, new ItemReference { Id = destination.Value }).Request(RespondAsyncWorkaroundHeaders).PostAsync());
 
-            var item = await asyncStatus.PollForOperationCompletionAsync(null, CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => asyncStatus.PollForOperationCompletionAsync(null, CancellationToken.None));
 
             return item.ToFileSystemInfoContract();
         }
@@ -225,7 +225,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             var context = await RequireContextAsync(root);
 
             var destinationPathReference = new ItemReference { Id = destination.Value };
-            var item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await context.Client.Drive.Items[source.Value].Request().UpdateAsync(new Item { ParentReference = destinationPathReference, Name = moveName }), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[source.Value].Request().UpdateAsync(new Item { ParentReference = destinationPathReference, Name = moveName }));
 
             return item.ToFileSystemInfoContract();
         }
@@ -235,7 +235,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             var context = await RequireContextAsync(root);
 
             var folder = new Item() { Folder = new Folder() };
-            var item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await context.Client.Drive.Items[parent.Value].ItemWithPath(name).Request().CreateAsync(folder), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[parent.Value].ItemWithPath(name).Request().CreateAsync(folder));
 
             return new DirectoryInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0));
         }
@@ -251,12 +251,14 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
             var requestBuilder = context.Client.Drive.Items[parent.Value].ItemWithPath(name);
             if (content.Length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
-                item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await requestBuilder.Content.Request().PutAsync<Item>(stream), RETRIES);
+                var retryPolicyWithAction = Policy.Handle<ServiceException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                    (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+                item = await retryPolicyWithAction.ExecuteAsync(() => requestBuilder.Content.Request().PutAsync<Item>(stream));
             } else {
                 var session = await requestBuilder.CreateSession().Request().PostAsync();
                 var provider = new ChunkedUploadProvider(session, context.Client, content);
 
-                item = await ChunkedUploadAsync(provider, progress, RETRIES);
+                item = await ChunkedUploadAsync(provider, progress);
             }
 
             return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDateTime ?? DateTimeOffset.FromFileTime(0), (FileSize)(item.Size ?? -1), item.File.Hashes.Sha1Hash.ToLowerInvariant());
@@ -266,7 +268,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root);
 
-            await AsyncFunc.RetryAsync<ServiceException>(async () => await context.Client.Drive.Items[target.Value].Request().DeleteAsync(), RETRIES);
+            await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[target.Value].Request().DeleteAsync());
 
             return true;
         }
@@ -275,7 +277,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive
         {
             var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.RetryAsync<Item, ServiceException>(async () => await context.Client.Drive.Items[target.Value].Request().UpdateAsync(new Item() { Name = newName }), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.Drive.Items[target.Value].Request().UpdateAsync(new Item() { Name = newName }));
 
             return item.ToFileSystemInfoContract();
         }

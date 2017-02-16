@@ -30,6 +30,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Polly;
 using SwiftClient;
 using IgorSoft.CloudFS.Gateways.hubiC.OAuth;
 using IgorSoft.CloudFS.Interface;
@@ -51,8 +52,6 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         private const GatewayCapabilities CAPABILITIES = GatewayCapabilities.All ^ GatewayCapabilities.CopyDirectoryItem ^ GatewayCapabilities.MoveItems ^ GatewayCapabilities.RenameItems ^ GatewayCapabilities.ItemId;
 
         private const string URL = "https://hubic.com";
-
-        private const int RETRIES = 3;
 
         private const string PARAMETER_CONTAINER = "container";
 
@@ -76,6 +75,8 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         }
 
         private readonly IDictionary<RootName, hubiCContext> contextCache = new Dictionary<RootName, hubiCContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -140,7 +141,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
             var context = await RequireContextAsync(root, apiKey, container);
 
-            var item = await context.Client.GetAccount();
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.GetAccount());
 
             var totalSpace = long.Parse(item.Headers[string.Format(CultureInfo.InvariantCulture, SwiftHeaderKeys.AccountMetaFormat, "Quota")]);
             var usedSpace = long.Parse(item.Headers[SwiftHeaderKeys.AccountBytesUsed]);
@@ -167,7 +168,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             else
                 queryParameters.Add("delimiter", "/");
 
-            var item = await context.Client.GetContainer(context.Container, queryParams: queryParameters);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.GetContainer(context.Container, queryParams: queryParameters));
 
             return item.Objects.Where(i => !string.IsNullOrEmpty(i.ContentType)).Select(i => i.ToFileSystemInfoContract(parent));
         }
@@ -176,7 +177,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         {
             var context = await RequireContextAsync(root);
 
-            var response = await context.Client.PutObject(context.Container, target.Value, Array.Empty<byte>());
+            var response = await retryPolicy.ExecuteAsync(() => context.Client.PutObject(context.Container, target.Value, Array.Empty<byte>()));
 
             return response.IsSuccess;
         }
@@ -185,7 +186,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
         {
             var context = await RequireContextAsync(root);
 
-            var item = await context.Client.GetObject(context.Container, source.Value);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.GetObject(context.Container, source.Value));
 
             return item.Stream;
         }
@@ -195,11 +196,13 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var context = await RequireContextAsync(root);
 
             var item = default(SwiftResponse);
+            var retryPolicyWithAction = Policy.Handle<Exception>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
             if (content.Length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
-                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await context.Client.PutObject(context.Container, target.Value, stream), RETRIES);
+                item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.PutObject(context.Container, target.Value, stream));
             } else {
-                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await ChunkedUpload(context, target.Value, content, progress), RETRIES);
+                item = await retryPolicyWithAction.ExecuteAsync(() => ChunkedUpload(context, target.Value, content, progress));
             }
 
             return item.IsSuccess;
@@ -216,7 +219,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var targetId = destination.GetObjectId(targetName);
 
             await context.Client.CopyObject(context.Container, source.Value, context.Container, targetId);
-            var item = await context.Client.HeadObject(context.Container, targetId);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.HeadObject(context.Container, targetId));
 
             var creationTime = DateTime.Parse(item.Headers["Date"]);
             return new FileInfoContract(targetId, targetName, creationTime, creationTime, (FileSize)item.ContentLength, item.Headers["ETag"]);
@@ -233,7 +236,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
 
             var objectId = parent.GetObjectId(name);
 
-            var item = await context.Client.PutPseudoDirectory(context.Container, objectId);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.PutPseudoDirectory(context.Container, objectId));
             if (!item.IsSuccess)
                 throw new ApplicationException(item.Reason);
 
@@ -252,13 +255,15 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
             var length = content.Length;
 
             var item = default(SwiftResponse);
+            var retryPolicyWithAction = Policy.Handle<Exception>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
             if (length <= LargeFileThreshold) {
                 var stream = progress != null ? new ProgressStream(content, progress) : content;
-                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await context.Client.PutObject(context.Container, objectId, stream), RETRIES);
+                item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.PutObject(context.Container, objectId, stream));
                 if (!item.IsSuccess)
                     throw new ApplicationException(item.Reason);
             } else {
-                item = await AsyncFunc.RetryAsync<SwiftResponse, Exception>(async () => await ChunkedUpload(context, objectId, content, progress), RETRIES);
+                item = await retryPolicyWithAction.ExecuteAsync(() => ChunkedUpload(context, objectId, content, progress));
             }
 
             var creationTime = DateTime.Parse(item.Headers["Date"]);
@@ -277,11 +282,11 @@ namespace IgorSoft.CloudFS.Gateways.hubiC
                     ["end_marker"] = directoryId + '0'
                 };
 
-                var container = await context.Client.GetContainer(context.Container, queryParams: queryParameters);
+                var container = await retryPolicy.ExecuteAsync(() => context.Client.GetContainer(context.Container, queryParams: queryParameters));
 
-                response = await context.Client.DeleteObjects(context.Container, container.Objects.Select(i => i.Object).Concat(new[] { directoryId }));
+                response = await retryPolicy.ExecuteAsync(() => context.Client.DeleteObjects(context.Container, container.Objects.Select(i => i.Object).Concat(new[] { directoryId })));
             } else {
-                response = await context.Client.DeleteObject(context.Container, target.Value.TrimEnd('/'));
+                response = await retryPolicy.ExecuteAsync(() => context.Client.DeleteObject(context.Container, target.Value.TrimEnd('/')));
             }
 
             return response.IsSuccess;

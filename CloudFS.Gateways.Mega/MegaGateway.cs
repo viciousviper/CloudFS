@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Polly;
 using CG.Web.MegaApiClient;
 using IgorSoft.CloudFS.Gateways.Mega.Auth;
 using IgorSoft.CloudFS.Interface;
@@ -53,8 +54,6 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
         private const string API = "MegaApiClient";
 
-        private const int RETRIES = 3;
-
         private class MegaContext
         {
             public MegaApiClient Client { get; }
@@ -66,6 +65,8 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         }
 
         private readonly IDictionary<RootName, MegaContext> contextCache = new Dictionary<RootName, MegaContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<ApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -102,7 +103,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var accountInformation = await context.Client.GetAccountInformationAsync();
+            var accountInformation = await retryPolicy.ExecuteAsync(() => context.Client.GetAccountInformationAsync());
 
             return new DriveInfoContract(root.Value, accountInformation.TotalQuota - accountInformation.UsedQuota, accountInformation.UsedQuota);
         }
@@ -111,7 +112,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var nodes = await context.Client.GetNodesAsync();
+            var nodes = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync());
             var item = nodes.Single(n => n.Type == NodeType.Root);
 
             return new RootDirectoryInfoContract(item.Id, DateTimeOffset.FromFileTime(0), item.LastModificationDate);
@@ -121,9 +122,9 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         {
             var context = await RequireContextAsync(root);
 
-            var nodes = await context.Client.GetNodesAsync();
+            var nodes = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync());
             var parentItem = nodes.Single(n => n.Id == parent.Value);
-            var items = await context.Client.GetNodesAsync(parentItem);
+            var items = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync(parentItem));
 
             return items.Select(i => i.ToFileSystemInfoContract());
         }
@@ -137,9 +138,9 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         {
             var context = await RequireContextAsync(root);
 
-            var nodes = await context.Client.GetNodesAsync();
+            var nodes = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync());
             var item = nodes.Single(n => n.Id == source.Value);
-            var stream = await context.Client.DownloadAsync(item, new Progress<double>());
+            var stream = await retryPolicy.ExecuteAsync(() => context.Client.DownloadAsync(item, new Progress<double>()));
 
             return stream;
         }
@@ -158,10 +159,10 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         {
             var context = await RequireContextAsync(root);
 
-            var nodes = await context.Client.GetNodesAsync();
+            var nodes = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync());
             var sourceItem = nodes.Single(n => n.Id == source.Value);
             var destinationParentItem = nodes.Single(n => n.Id == destination.Value);
-            var item = await context.Client.MoveAsync(sourceItem, destinationParentItem);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MoveAsync(sourceItem, destinationParentItem));
 
             return item.ToFileSystemInfoContract();
         }
@@ -170,9 +171,9 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         {
             var context = await RequireContextAsync(root);
 
-            var nodes = await context.Client.GetNodesAsync();
+            var nodes = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync());
             var parentItem = nodes.Single(n => n.Id == parent.Value);
-            var item = await context.Client.CreateFolderAsync(name, parentItem);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.CreateFolderAsync(name, parentItem));
 
             return new DirectoryInfoContract(item.Id, item.Name, item.LastModificationDate, item.LastModificationDate);
         }
@@ -184,10 +185,12 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
             var context = await RequireContextAsync(root);
 
-            var nodes = await context.Client.GetNodesAsync();
+            var nodes = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync());
             var parentItem = nodes.Single(n => n.Id == parent.Value);
             var contentLength = content.Length;
-            var item = await context.Client.UploadAsync(content, name, parentItem, new Progress<double>(d => progress?.Report(new ProgressValue((int)(contentLength * d), (int)contentLength))));
+            var retryPolicyWithAction = Policy.Handle<ApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.UploadAsync(content, name, parentItem, new Progress<double>(d => progress?.Report(new ProgressValue((int)(contentLength * d), (int)contentLength)))));
 
             return new FileInfoContract(item.Id, item.Name, item.LastModificationDate, item.LastModificationDate, (FileSize)item.Size, null);
         }
@@ -198,7 +201,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
 
             var nodes = await context.Client.GetNodesAsync();
             var item = nodes.Single(n => n.Id == target.Value);
-            await context.Client.DeleteAsync(item);
+            await retryPolicy.ExecuteAsync(() => context.Client.DeleteAsync(item));
 
             return true;
         }
@@ -207,9 +210,9 @@ namespace IgorSoft.CloudFS.Gateways.Mega
         {
             var context = await RequireContextAsync(root);
 
-            var nodes = await context.Client.GetNodesAsync();
+            var nodes = await retryPolicy.ExecuteAsync(() => context.Client.GetNodesAsync());
             var targetItem = nodes.Single(n => n.Id == target.Value);
-            var item = await context.Client.RenameAsync(targetItem, newName);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.RenameAsync(targetItem, newName));
 
             return item.ToFileSystemInfoContract();
         }

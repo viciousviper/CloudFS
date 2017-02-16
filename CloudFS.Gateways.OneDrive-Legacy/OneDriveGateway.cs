@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Polly;
 using OneDrive;
 using IgorSoft.CloudFS.Gateways.OneDrive_Legacy.OAuth;
 using IgorSoft.CloudFS.Interface;
@@ -53,8 +54,6 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
         private const string API = "OneDriveSDK";
 
-        private const int RETRIES = 3;
-
         private class OneDriveContext
         {
             public ODConnection Connection { get; }
@@ -69,6 +68,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
         }
 
         private readonly IDictionary<RootName, OneDriveContext> contextCache = new Dictionary<RootName, OneDriveContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<ODException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -106,7 +107,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<ODDrive, ODException>(async () => await context.Connection.GetDrive(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Connection.GetDrive());
 
             return new DriveInfoContract(item.Id, item.Quota.Remaining, item.Quota.Used);
         }
@@ -115,7 +116,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.GetRootItemAsync(ItemRetrievalOptions.Default), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Connection.GetRootItemAsync(ItemRetrievalOptions.Default));
 
             return new RootDirectoryInfoContract(item.Id, item.CreatedDateTime, item.LastModifiedDateTime);
         }
@@ -125,7 +126,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var context = await RequireContextAsync(root);
 
             var itemReference = ODConnection.ItemReferenceForItemId(parent.Value, context.Drive.Id);
-            var items = await AsyncFunc.RetryAsync<ODItemCollection, ODException>(async () => await context.Connection.GetChildrenOfItemAsync(itemReference, ChildrenRetrievalOptions.Default), RETRIES);
+            var items = await retryPolicy.ExecuteAsync(() => context.Connection.GetChildrenOfItemAsync(itemReference, ChildrenRetrievalOptions.Default));
 
             return items.Collection.Select(i => i.ToFileSystemInfoContract());
         }
@@ -140,7 +141,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var context = await RequireContextAsync(root);
 
             var itemReference = ODConnection.ItemReferenceForItemId(source.Value, context.Drive.Id);
-            var stream = await AsyncFunc.RetryAsync<Stream, ODException>(async () => await context.Connection.DownloadStreamForItemAsync(itemReference, StreamDownloadOptions.Default), RETRIES);
+            var stream = await retryPolicy.ExecuteAsync(() => context.Connection.DownloadStreamForItemAsync(itemReference, StreamDownloadOptions.Default));
 
             return stream;
         }
@@ -151,7 +152,9 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
             var itemReference = ODConnection.ItemReferenceForItemId(target.Value, context.Drive.Id);
             var uploadOptions = progress != null ? new ItemUploadOptions() { ProgressReporter = (complete, transfered, total) => progress.Report(new ProgressValue(complete, (int)transfered, (int)total)) } : ItemUploadOptions.Default;
-            var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.PutContentsAsync(itemReference, content, uploadOptions), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<ODException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Connection.PutContentsAsync(itemReference, content, uploadOptions));
 
             return true;
         }
@@ -162,7 +165,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
             var itemReference = ODConnection.ItemReferenceForItemId(source.Value, context.Drive.Id);
             var destinationPathReference = ODConnection.ItemReferenceForItemId(destination.Value, context.Drive.Id);
-            var task = await context.Connection.CopyItemAsync(itemReference, destinationPathReference, copyName);
+            var task = await retryPolicy.ExecuteAsync(() => context.Connection.CopyItemAsync(itemReference, destinationPathReference, copyName));
 
             while (task.Status.Status != AsyncJobStatus.Complete) {
                 await Task.Delay(20);
@@ -178,7 +181,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
             var itemReference = ODConnection.ItemReferenceForItemId(source.Value, context.Drive.Id);
             var destinationPathReference = ODConnection.ItemReferenceForItemId(destination.Value, context.Drive.Id);
-            var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.PatchItemAsync(itemReference, new ODItem() { ParentReference = destinationPathReference , Name = moveName }), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Connection.PatchItemAsync(itemReference, new ODItem() { ParentReference = destinationPathReference , Name = moveName }));
 
             return item.ToFileSystemInfoContract();
         }
@@ -188,7 +191,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var context = await RequireContextAsync(root);
 
             var itemReference = ODConnection.ItemReferenceForItemId(parent.Value, context.Drive.Id);
-            var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.CreateFolderAsync(itemReference, name), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Connection.CreateFolderAsync(itemReference, name));
 
             return new DirectoryInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime);
         }
@@ -202,7 +205,9 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
 
             var itemReference = ODConnection.ItemReferenceForItemId(parent.Value, context.Drive.Id);
             var uploadOptions = progress != null ? new ItemUploadOptions() { ProgressReporter = (complete, transfered, total) => progress.Report(new ProgressValue(complete, (int)transfered, (int)total)) } : ItemUploadOptions.Default;
-            var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.PutNewFileToParentItemAsync(itemReference, name, content, uploadOptions), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<ODException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Connection.PutNewFileToParentItemAsync(itemReference, name, content, uploadOptions));
 
             return new FileInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime, (FileSize)item.Size, item.File.Hashes.Sha1.ToLowerInvariant());
         }
@@ -212,7 +217,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var context = await RequireContextAsync(root);
 
             var itemReference = ODConnection.ItemReferenceForItemId(target.Value, context.Drive.Id);
-            var success = await AsyncFunc.RetryAsync<bool, ODException>(async () => await context.Connection.DeleteItemAsync(itemReference, ItemDeleteOptions.Default), RETRIES);
+            var success = await retryPolicy.ExecuteAsync(() => context.Connection.DeleteItemAsync(itemReference, ItemDeleteOptions.Default));
 
             return success;
         }
@@ -222,7 +227,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var context = await RequireContextAsync(root);
 
             var itemReference = ODConnection.ItemReferenceForItemId(target.Value, context.Drive.Id);
-            var item = await AsyncFunc.RetryAsync<ODItem, ODException>(async () => await context.Connection.PatchItemAsync(itemReference, new ODItem() { Name = newName }), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Connection.PatchItemAsync(itemReference, new ODItem() { Name = newName }));
 
             return item.ToFileSystemInfoContract();
         }

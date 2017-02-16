@@ -33,6 +33,7 @@ using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
 using MediaFireSDK;
 using MediaFireSDK.Model;
 using MediaFireSDK.Model.Errors;
@@ -58,8 +59,6 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         private const string URL = "https://www.mediafire.com";
 
-        private const int RETRIES = 3;
-
         private class MediaFireContext
         {
             public MediaFireAgent Agent { get; }
@@ -71,6 +70,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
         }
 
         private readonly IDictionary<RootName, MediaFireContext> contextCache = new Dictionary<RootName, MediaFireContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<MediaFireApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -107,8 +108,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<MediaFireGetUserInfoResponse, MediaFireApiException>(async ()
-                => await context.Agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo));
 
             return new DriveInfoContract(item.UserDetails.Email, item.UserDetails.StorageLimit - item.UserDetails.UsedStorageSize, item.UserDetails.UsedStorageSize);
         }
@@ -186,7 +186,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             //})).DoUpload;
 
             if (!upload.IsSuccess)
-                throw new MediaFireException(string.Format(System.Globalization.CultureInfo.CurrentCulture, MediaFireErrorMessages.UploadErrorFormat, upload.Result));
+                throw new MediaFireException(string.Format(CultureInfo.CurrentCulture, MediaFireErrorMessages.UploadErrorFormat, upload.Result));
             while (!(upload.IsComplete && upload.IsSuccess)) {
                 await Task.Delay(100);
                 upload = await context.Agent.Upload.PollUpload(upload.Key);

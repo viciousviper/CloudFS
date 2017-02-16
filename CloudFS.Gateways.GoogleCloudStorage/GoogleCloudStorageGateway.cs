@@ -29,6 +29,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Polly;
+using Google;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Upload;
 using Google.Cloud.Storage.V1;
@@ -93,6 +95,8 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
         private readonly IDictionary<RootName, GoogleCloudStorageContext> contextCache = new Dictionary<RootName, GoogleCloudStorageContext>();
 
+        private readonly Policy retryPolicy = Policy.Handle<GoogleApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "apiKey")]
         private async Task<GoogleCloudStorageContext> RequireContextAsync(RootName root, string apiKey = null, string bucket = null)
         {
@@ -136,7 +140,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
         {
             var context = await RequireContextAsync(root, apiKey, parameters[PARAMETER_BUCKET]);
 
-            var item = await context.Client.GetBucketAsync(context.Bucket);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.GetBucketAsync(context.Bucket));
 
             return new RootDirectoryInfoContract($"{item.Id}//{item.Metageneration.Value}", new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value));
         }
@@ -146,11 +150,11 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             var context = await RequireContextAsync(root);
 
             var parentObjectId = new StorageObjectId(parent.Value);
-            var items = await context.Client.ListObjectsAsync(parentObjectId.Bucket, parentObjectId.Path).Where(i =>
+            var items = await retryPolicy.ExecuteAsync(() => context.Client.ListObjectsAsync(parentObjectId.Bucket, parentObjectId.Path).Where(i =>
             {
                 var childName = i.Name.Substring(parentObjectId.Path.Length).TrimEnd(Path.AltDirectorySeparatorChar);
                 return !string.IsNullOrEmpty(childName) && !childName.Contains(Path.AltDirectorySeparatorChar);
-            }).ToList();
+            }).ToList());
 
             return items.Select(i => i.ToFileSystemInfoContract());
         }
@@ -160,7 +164,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             var context = await RequireContextAsync(root);
 
             var targetObjectId = new StorageObjectId(target.Value);
-            await context.Client.UploadObjectAsync(targetObjectId.Bucket, targetObjectId.Path, MIME_TYPE_FILE, new MemoryStream());
+            await retryPolicy.ExecuteAsync(() => context.Client.UploadObjectAsync(targetObjectId.Bucket, targetObjectId.Path, MIME_TYPE_FILE, new MemoryStream()));
 
             return true;
         }
@@ -171,7 +175,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
             var sourceObjectId = new StorageObjectId(source.Value);
             var stream = new MemoryStream();
-            await context.Client.DownloadObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, stream);
+            await retryPolicy.ExecuteAsync(() => context.Client.DownloadObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, stream));
 
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
@@ -182,10 +186,10 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             var context = await RequireContextAsync(root);
 
             var targetObjectId = new StorageObjectId(target.Value);
-
             var uploadProgress = progress != null ? new UploadProgress(progress, (int)content.Length) : null;
-
-            await context.Client.UploadObjectAsync(targetObjectId.Bucket, targetObjectId.Path, MIME_TYPE_FILE, content, progress: uploadProgress);
+            var retryPolicyWithAction = Policy.Handle<GoogleApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            await retryPolicyWithAction.ExecuteAsync(() => context.Client.UploadObjectAsync(targetObjectId.Bucket, targetObjectId.Path, MIME_TYPE_FILE, content, progress: uploadProgress));
 
             return true;
         }
@@ -199,7 +203,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
             var sourceObjectId = new StorageObjectId(source.Value);
             var destinationObjectId = new StorageObjectId(destination.Value);
-            var item = await context.Client.CopyObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, destinationObjectId.Bucket, $"{destinationObjectId.Path}{copyName}");
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.CopyObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, destinationObjectId.Bucket, $"{destinationObjectId.Path}{copyName}"));
 
             return item.ToFileSystemInfoContract();
         }
@@ -216,15 +220,15 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             if (directorySource != null)
                 moveName += Path.AltDirectorySeparatorChar;
 
-            var item = await context.Client.CopyObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, destinationObjectId.Bucket, $"{destinationObjectId.Path}{moveName}");
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.CopyObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, destinationObjectId.Bucket, $"{destinationObjectId.Path}{moveName}"));
 
             if (directorySource != null) {
                 var subDestination = new DirectoryId(item.Id);
                 foreach (var subItem in await GetChildItemAsync(root, directorySource))
-                    await MoveItemAsync(root, subItem.Id, subItem.Name, subDestination, locatorResolver);
+                    await retryPolicy.ExecuteAsync(() => MoveItemAsync(root, subItem.Id, subItem.Name, subDestination, locatorResolver));
             }
 
-            await context.Client.DeleteObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path);
+            await retryPolicy.ExecuteAsync(() => context.Client.DeleteObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path));
 
             return item.ToFileSystemInfoContract();
         }
@@ -234,7 +238,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             var context = await RequireContextAsync(root);
 
             var parentObjectId = new StorageObjectId(parent.Value);
-            var item = await context.Client.UploadObjectAsync(parentObjectId.Bucket, $"{parentObjectId.Path}{name}/", null, new MemoryStream());
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.UploadObjectAsync(parentObjectId.Bucket, $"{parentObjectId.Path}{name}/", null, new MemoryStream()));
 
             return new DirectoryInfoContract(item.Id, item.Name.Substring(parentObjectId.Path.Length), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value));
         }
@@ -247,10 +251,10 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             var context = await RequireContextAsync(root);
 
             var parentObjectId = new StorageObjectId(parent.Value);
-
             var uploadProgress = progress != null ? new UploadProgress(progress, (int)content.Length) : null;
-
-            var item = await context.Client.UploadObjectAsync(parentObjectId.Bucket, $"{parentObjectId.Path}{name}", MIME_TYPE_FILE, content, progress: uploadProgress);
+            var retryPolicyWithAction = Policy.Handle<GoogleApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.UploadObjectAsync(parentObjectId.Bucket, $"{parentObjectId.Path}{name}", MIME_TYPE_FILE, content, progress: uploadProgress));
 
             return new FileInfoContract(item.Id, item.Name.Substring(parentObjectId.Path.Length), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value), (FileSize)(long)item.Size.Value, item.Md5Hash);
         }
@@ -263,9 +267,9 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
             if (recurse)
                 foreach (var childItem in await GetChildItemAsync(root, (DirectoryId)target))
-                    await RemoveItemAsync(root, childItem.Id, childItem is DirectoryInfoContract);
+                    await retryPolicy.ExecuteAsync(() => RemoveItemAsync(root, childItem.Id, childItem is DirectoryInfoContract));
 
-            await context.Client.DeleteObjectAsync(targetObjectId.Bucket, targetObjectId.Path);
+            await retryPolicy.ExecuteAsync(() => context.Client.DeleteObjectAsync(targetObjectId.Bucket, targetObjectId.Path));
 
             return true;
         }

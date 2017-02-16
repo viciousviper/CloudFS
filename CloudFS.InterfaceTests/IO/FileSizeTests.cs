@@ -57,7 +57,7 @@ namespace CloudFS.InterfaceTests.IO
         [ExpectedException(typeof(ArgumentException))]
         public void CreateNew_WhereSizeIsNegative_Throws()
         {
-            var sut = new FileSize(-2);
+            var sut = new FileSize(-1);
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]

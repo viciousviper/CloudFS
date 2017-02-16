@@ -32,13 +32,12 @@ using System.Net;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
 using pCloud.NET;
 using IgorSoft.CloudFS.Gateways.pCloud.Auth;
 using IgorSoft.CloudFS.Interface;
 using IgorSoft.CloudFS.Interface.Composition;
 using IgorSoft.CloudFS.Interface.IO;
-
-using pCloudFile = pCloud.NET.File;
 
 namespace IgorSoft.CloudFS.Gateways.pCloud
 {
@@ -58,8 +57,6 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
         private const string API = "pCloud.NET SDK";
 
-        private const int RETRIES = 3;
-
         private class pCloudContext
         {
             public pCloudClient Client { get; }
@@ -71,6 +68,8 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         }
 
         private readonly IDictionary<RootName, pCloudContext> contextCache = new Dictionary<RootName, pCloudContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<pCloudException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -123,7 +122,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<UserInfo, pCloudException>(async () => await context.Client.GetUserInfoAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.GetUserInfoAsync());
 
             return new DriveInfoContract(item.UserId, item.Quota - item.UsedQuota, item.UsedQuota);
         }
@@ -132,7 +131,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<ListedFolder, pCloudException>(async () => await context.Client.ListFolderAsync(0), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.ListFolderAsync(0));
 
             return new RootDirectoryInfoContract(item.Id, item.Created, item.Modified);
         }
@@ -141,7 +140,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         {
             var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.RetryAsync<ListedFolder, pCloudException>(async () => await context.Client.ListFolderAsync(ToId(parent)), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.ListFolderAsync(ToId(parent)));
             var items = item.Contents;
 
             return items.Select(i => i.ToFileSystemInfoContract());
@@ -155,7 +154,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             var context = await RequireContextAsync(root);
 
             var locator = locatorResolver();
-            await context.Client.UploadFileAsync(Stream.Null, ToId(locator.ParentId), locator.Name, CancellationToken.None);
+            await retryPolicy.ExecuteAsync(() => context.Client.UploadFileAsync(Stream.Null, ToId(locator.ParentId), locator.Name, CancellationToken.None));
 
             return true;
         }
@@ -165,8 +164,9 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             var context = await RequireContextAsync(root);
 
             var stream = new MemoryStream();
-            //await AsyncFunc.Retry<Stream, pCloudException>(async () => await context.Client.DownloadFileAsync(ToId(source), stream, tokenSource.Token), RETRIES);
-            await context.Client.DownloadFileAsync(ToId(source), stream, CancellationToken.None);
+            var retryPolicyWithAction = Policy.Handle<pCloudException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => stream = new MemoryStream());
+            await retryPolicyWithAction.ExecuteAsync(() => context.Client.DownloadFileAsync(ToId(source), stream, CancellationToken.None));
             stream.Seek(0, SeekOrigin.Begin);
 
             return stream;
@@ -181,7 +181,9 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
             var locator = locatorResolver();
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            await context.Client.UploadFileAsync(stream, ToId(locator.ParentId), locator.Name, CancellationToken.None);
+            var retryPolicyWithAction = Policy.Handle<pCloudException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            await retryPolicyWithAction.ExecuteAsync(() => context.Client.UploadFileAsync(stream, ToId(locator.ParentId), locator.Name, CancellationToken.None));
 
             return true;
         }
@@ -194,7 +196,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
             var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.RetryAsync<pCloudFile, pCloudException>(async () => await context.Client.CopyFileAsync(ToId(fileSource), ToId(destination), WebUtility.UrlEncode(copyName)), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.CopyFileAsync(ToId(fileSource), ToId(destination), WebUtility.UrlEncode(copyName)));
 
             return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
         }
@@ -205,14 +207,14 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
             var directorySource = source as DirectoryId;
             if (directorySource != null) {
-                var item = await context.Client.RenameFolderAsync(ToId(directorySource), ToId(destination), WebUtility.UrlEncode(moveName));
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.RenameFolderAsync(ToId(directorySource), ToId(destination), WebUtility.UrlEncode(moveName)));
 
                 return new DirectoryInfoContract(item.Id, item.Name, item.Created, item.Modified);
             }
 
             var fileSource = source as FileId;
             if (fileSource != null) {
-                var item = await context.Client.RenameFileAsync(ToId(fileSource), ToId(destination), WebUtility.UrlEncode(moveName));
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.RenameFileAsync(ToId(fileSource), ToId(destination), WebUtility.UrlEncode(moveName)));
 
                 return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
             }
@@ -224,7 +226,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
         {
             var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.RetryAsync<Folder, pCloudException>(async () => await context.Client.CreateFolderAsync(ToId(parent), WebUtility.UrlEncode(name)), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.CreateFolderAsync(ToId(parent), WebUtility.UrlEncode(name)));
 
             return new DirectoryInfoContract(item.Id, item.Name, item.Created, item.Modified);
         }
@@ -237,7 +239,9 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             var context = await RequireContextAsync(root);
 
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.RetryAsync<pCloudFile, pCloudException>(async () => await context.Client.UploadFileAsync(stream, ToId(parent), WebUtility.UrlEncode(name), CancellationToken.None), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<pCloudException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.UploadFileAsync(stream, ToId(parent), WebUtility.UrlEncode(name), CancellationToken.None));
 
             return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
         }
@@ -248,13 +252,13 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
 
             var directoryTarget = target as DirectoryId;
             if (directoryTarget != null) {
-                await context.Client.DeleteFolderAsync(ToId(directoryTarget), recurse);
+                await retryPolicy.ExecuteAsync(() => context.Client.DeleteFolderAsync(ToId(directoryTarget), recurse));
                 return true;
             }
 
             var fileTarget = target as FileId;
             if (fileTarget != null) {
-                await context.Client.DeleteFileAsync(ToId(fileTarget));
+                await retryPolicy.ExecuteAsync(() => context.Client.DeleteFileAsync(ToId(fileTarget)));
                 return true;
             }
 
@@ -271,7 +275,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             var directoryTarget = target as DirectoryId;
             if (directoryTarget != null) {
                 var locator = locatorResolver();
-                var item = await context.Client.RenameFolderAsync(ToId(directoryTarget), ToId(locator.ParentId), newName);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.RenameFolderAsync(ToId(directoryTarget), ToId(locator.ParentId), newName));
 
                 return new DirectoryInfoContract(item.Id, item.Name, item.Created, item.Modified);
             }
@@ -279,7 +283,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             var fileTarget = target as FileId;
             if (fileTarget != null) {
                 var locator = locatorResolver();
-                var item = await context.Client.RenameFileAsync(ToId(fileTarget), ToId(locator.ParentId), newName);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.RenameFileAsync(ToId(fileTarget), ToId(locator.ParentId), newName));
 
                 return new FileInfoContract(item.Id, item.Name, item.Created, item.Modified, (FileSize)item.Size, null);
             }

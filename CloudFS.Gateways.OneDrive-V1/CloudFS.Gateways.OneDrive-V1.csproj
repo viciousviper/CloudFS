@@ -71,6 +71,10 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Polly, Version=5.0.6.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly-Signed.5.0.6\lib\net45\Polly.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
       <HintPath>..\packages\SemanticTypes.1.0.1\lib\net35\SemanticTypes.dll</HintPath>
       <Private>True</Private>
@@ -148,7 +152,7 @@ if $(ConfigurationName) == Signed (
   <PropertyGroup>
     <PostBuildEvent>
 if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll OneDriveSDK.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\
+for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll OneDriveSDK.dll Polly.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)LegacyGateways\
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

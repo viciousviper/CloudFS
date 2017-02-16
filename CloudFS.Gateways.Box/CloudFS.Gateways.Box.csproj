@@ -53,8 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Box.V2, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ddda8fe64dde1ac3, processorArchitecture=MSIL">
-      <HintPath>..\packages\Box.V2.2.13.0\lib\portable-net40+sl50+win+wp80\Box.V2.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Box.V2.2.14.0\lib\portable-net40+sl50+win+wp80\Box.V2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -84,6 +83,10 @@
     </Reference>
     <Reference Include="Nito.AsyncEx.Enlightenment, Version=2.1.3.0, Culture=neutral, PublicKeyToken=09d695329ca273b7, processorArchitecture=MSIL">
       <HintPath>..\packages\Nito.AsyncEx.2.1.3\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Polly, Version=5.0.6.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly-Signed.5.0.6\lib\net45\Polly.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationFramework" />
@@ -167,7 +170,7 @@
   <PropertyGroup>
     <PostBuildEvent>
 if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config Box.V2.dll Microsoft.Threading.Tasks.dll Nito.AsyncEx.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
+for %25%25f in ($(TargetFileName) $(TargetFileName).config Box.V2.dll Microsoft.Threading.Tasks.dll Nito.AsyncEx.dll Polly.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

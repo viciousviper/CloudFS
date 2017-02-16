@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Polly;
 using CopyRestAPI;
 using CopyRestAPI.Helpers;
 using CopyRestAPI.Models;
@@ -53,8 +54,6 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
         private const string URL = "https://www.copy.com";
 
-        private const int RETRIES = 3;
-
         private class CopyContext
         {
             public CopyClient Client { get; }
@@ -66,6 +65,8 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         }
 
         private readonly IDictionary<RootName, CopyContext> contextCache = new Dictionary<RootName, CopyContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<ServerException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -102,7 +103,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<User, ServerException>(async () => await context.Client.UserManager.GetUserAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.UserManager.GetUserAsync());
 
             return new DriveInfoContract(item.Id, item.Storage.Quota - item.Storage.Used, item.Storage.Used);
         }
@@ -111,8 +112,8 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<FileSystem, ServerException>(async () => await context.Client.GetRootFolder(), RETRIES);
-            var user = await AsyncFunc.RetryAsync<User, ServerException>(async () => await context.Client.UserManager.GetUserAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.GetRootFolder());
+            var user = await retryPolicy.ExecuteAsync(() => context.Client.UserManager.GetUserAsync());
 
             return new RootDirectoryInfoContract(item.Id, DateTimeOffset.FromFileTime(Math.Max(0, user.CreatedTime)), DateTimeOffset.FromFileTime(Math.Max(0, item.ModifiedTime.Ticks)));
         }
@@ -121,7 +122,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         {
             var context = await RequireContextAsync(root);
 
-            var items = await AsyncFunc.RetryAsync<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.GetFileSystemInformationAsync(parent.Value), RETRIES);
+            var items = await retryPolicy.ExecuteAsync(() => context.Client.FileSystemManager.GetFileSystemInformationAsync(parent.Value));
 
             return items.Children.Select(i => i.ToFileSystemInfoContract());
         }
@@ -134,7 +135,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             var context = await RequireContextAsync(root);
 
             var locator = locatorResolver();
-            var item = await AsyncFunc.RetryAsync<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, Stream.Null, true), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, Stream.Null, true));
 
             return true;
         }
@@ -144,8 +145,9 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             var context = await RequireContextAsync(root);
 
             var stream = new MemoryStream();
-            //await AsyncFunc.Retry<ServerException>(() => context.Client.FileSystemManager.DownloadFileStreamAsync(source.Value, stream), RETRIES);
-            await context.Client.FileSystemManager.DownloadFileStreamAsync(source.Value, stream);
+            var retryPolicyWithAction = Policy.Handle<ServerException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => stream = new MemoryStream());
+            await retryPolicyWithAction.ExecuteAsync(() => context.Client.FileSystemManager.DownloadFileStreamAsync(source.Value, stream));
             stream.Seek(0, SeekOrigin.Begin);
 
             return stream;
@@ -160,7 +162,9 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
             var locator = locatorResolver();
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.RetryAsync<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, stream, true), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<ServerException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.FileSystemManager.UploadNewFileStreamAsync(locator.ParentId.Value, locator.Name, stream, true));
 
             return true;
         }
@@ -191,7 +195,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         {
             var context = await RequireContextAsync(root);
 
-            var item = await AsyncFunc.RetryAsync<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.CreateNewFolderAsync(parent.Value, name, false), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.FileSystemManager.CreateNewFolderAsync(parent.Value, name, false));
 
             return new DirectoryInfoContract(item.Id, item.Name, item.DateLastSynced, FileSystemExtensions.Later(item.DateLastSynced, item.ModifiedTime));
         }
@@ -204,7 +208,9 @@ namespace IgorSoft.CloudFS.Gateways.Copy
             var context = await RequireContextAsync(root);
 
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.RetryAsync<FileSystem, ServerException>(async () => await context.Client.FileSystemManager.UploadNewFileStreamAsync(parent.Value, name, stream, true), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<ServerException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.FileSystemManager.UploadNewFileStreamAsync(parent.Value, name, stream, true));
 
             return new FileInfoContract(item.Id, item.Name, item.DateLastSynced, FileSystemExtensions.Later(item.DateLastSynced, item.ModifiedTime), (FileSize)item.Size, null);
         }
@@ -213,7 +219,7 @@ namespace IgorSoft.CloudFS.Gateways.Copy
         {
             var context = await RequireContextAsync(root);
 
-            var success = await AsyncFunc.RetryAsync<bool, ServerException>(async () => await context.Client.FileSystemManager.DeleteAsync(target.Value), RETRIES);
+            var success = await retryPolicy.ExecuteAsync(() => context.Client.FileSystemManager.DeleteAsync(target.Value));
 
             return success;
         }
