@@ -167,12 +167,13 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
             var destinationPathReference = ODConnection.ItemReferenceForItemId(destination.Value, context.Drive.Id);
             var task = await retryPolicy.ExecuteAsync(() => context.Connection.CopyItemAsync(itemReference, destinationPathReference, copyName));
 
-            while (task.Status.Status != AsyncJobStatus.Complete) {
+            while (task.Status.Status != AsyncJobStatus.Completed) {
                 await Task.Delay(20);
                 await task.Refresh(context.Connection);
             }
 
-            return task.FinishedItem.ToFileSystemInfoContract();
+            var destinationPathItems = await retryPolicy.ExecuteAsync(() => context.Connection.GetChildrenOfItemAsync(destinationPathReference, ChildrenRetrievalOptions.Default));
+            return destinationPathItems.Collection.Single(item => item.Name == copyName).ToFileSystemInfoContract();
         }
 
         public async Task<FileSystemInfoContract> MoveItemAsync(RootName root, FileSystemId source, string moveName, DirectoryId destination, Func<FileSystemInfoLocator> locatorResolver)
