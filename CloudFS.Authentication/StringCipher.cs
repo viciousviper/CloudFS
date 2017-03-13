@@ -65,7 +65,7 @@ namespace IgorSoft.CloudFS.Authentication
         /// <returns>The plain text, if a suitable pass phrase is specified; otherwise the unmodified cipher text.</returns>
         public static string DecryptUsing(this string cipherText, string passPhrase)
         {
-            if (string.IsNullOrEmpty(passPhrase) || cipherText?.Length < Keysize / 8 + BlockSize / 8)
+            if (string.IsNullOrEmpty(passPhrase) || (cipherText?.Length ?? 0) < Keysize / 8 + BlockSize / 8)
                 return cipherText;
 
             try {
