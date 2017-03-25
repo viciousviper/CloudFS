@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudFS.Authentication", "CloudFS.Authentication\CloudFS.Authentication.csproj", "{F4B1D5E1-04BB-4B01-9079-FC2685E71434}"
 EndProject
@@ -76,6 +76,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{1B8C
 		Library\OneDriveSDK-Legacy.pdb = Library\OneDriveSDK-Legacy.pdb
 		Library\pCloud.NET SDK.dll = Library\pCloud.NET SDK.dll
 		Library\pCloud.NET SDK.pdb = Library\pCloud.NET SDK.pdb
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SignedLibrary", "SignedLibrary", "{A1ABF9CA-E9DC-4566-87E5-7CAF6671C361}"
+	ProjectSection(SolutionItems) = preProject
+		SignedLibrary\bouncy_castle_hmac_sha_pcl.dll = SignedLibrary\bouncy_castle_hmac_sha_pcl.dll
+		SignedLibrary\CopyRestAPI.dll = SignedLibrary\CopyRestAPI.dll
+		SignedLibrary\IgorSoft.AppDomainResolver.dll = SignedLibrary\IgorSoft.AppDomainResolver.dll
+		SignedLibrary\LazyCache.dll = SignedLibrary\LazyCache.dll
+		SignedLibrary\MediaFireSDK.dll = SignedLibrary\MediaFireSDK.dll
+		SignedLibrary\MediaFireSDK.LICENSE = SignedLibrary\MediaFireSDK.LICENSE
+		SignedLibrary\OneDriveSDK-Legacy.dll = SignedLibrary\OneDriveSDK-Legacy.dll
+		SignedLibrary\OneDriveSDK-Legacy.LICENSE = SignedLibrary\OneDriveSDK-Legacy.LICENSE
+		SignedLibrary\pCloud.NET SDK.dll = SignedLibrary\pCloud.NET SDK.dll
+		SignedLibrary\SwiftClient.dll = SignedLibrary\SwiftClient.dll
+		SignedLibrary\YandexDisk.Client.dll = SignedLibrary\YandexDisk.Client.dll
 	EndProjectSection
 EndProject
 Global

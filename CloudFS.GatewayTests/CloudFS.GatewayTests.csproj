@@ -149,6 +149,7 @@
     </None>
     <None Include="App.Signed.config">
       <DependentUpon>App.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
