@@ -49,12 +49,17 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MegaApiClient, Version=1.2.2.209, Culture=neutral, PublicKeyToken=0480d311efbeb4e2, processorArchitecture=MSIL">
-      <HintPath>..\packages\MegaApiClient.1.2.2\lib\net45\MegaApiClient.dll</HintPath>
+    <Reference Include="MegaApiClient, Version=1.3.1.269, Culture=neutral, PublicKeyToken=0480d311efbeb4e2, processorArchitecture=MSIL">
+      <HintPath>..\packages\MegaApiClient.1.3.1\lib\net45\MegaApiClient.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Polly, Version=5.0.6.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly-Signed.5.0.6\lib\net45\Polly.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
@@ -127,7 +132,7 @@
   <PropertyGroup>
     <PostBuildEvent>
 if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config MegaApiClient.dll Newtonsoft.Json.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
+for %25%25f in ($(TargetFileName) $(TargetFileName).config MegaApiClient.dll Newtonsoft.Json.dll Polly.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
 </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

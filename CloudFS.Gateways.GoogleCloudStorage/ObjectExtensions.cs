@@ -36,7 +36,7 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
         {
             return item.Name.EndsWith(Path.AltDirectorySeparatorChar.ToString())
                 ? new DirectoryInfoContract(item.Id, PathToName(item.Name.TrimEnd(Path.AltDirectorySeparatorChar)), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value)) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, PathToName(item.Name), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value), (long)item.Size.Value, item.Md5Hash);
+                : new FileInfoContract(item.Id, PathToName(item.Name), new DateTimeOffset(item.TimeCreated.Value), new DateTimeOffset(item.Updated.Value), (FileSize)(long)item.Size.Value, item.Md5Hash);
         }
     }
 }

@@ -30,6 +30,7 @@ using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using LazyCache;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IgorSoft.AppDomainResolver;
 using IgorSoft.CloudFS.Interface;
@@ -43,6 +44,8 @@ namespace IgorSoft.CloudFS.GatewayTests
     public class GatewayTestsFixture
     {
         private static TestSection testSection;
+
+        private static IAppCache cache = new CachingService();
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly", Justification = "Required for MEF composition")]
@@ -186,5 +189,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             } catch (AggregateException ex) when (capabilityExcluded && ex.InnerExceptions.Count == 1 && ex.InnerException is NotSupportedException) {
             }
         }
+
+        public byte[] GetArbitraryBytes(FileSize bytes) => cache.GetOrAdd(bytes.ToString(), () => Enumerable.Range(0, (int)bytes).Select(i => (byte)(i % 251 + 1)).ToArray());
     }
 }

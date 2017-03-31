@@ -213,9 +213,11 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                 }
 
                 response = await RedeemAccessTokenAsync(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, code);
+                if (response == null)
+                    throw new AuthenticationException();
             }
 
-            SaveRefreshToken(account, response?.RefreshToken ?? refreshToken, settingsPassPhrase);
+            SaveRefreshToken(account, response.RefreshToken ?? refreshToken, settingsPassPhrase);
 
             var authManager = new SwiftAuthManager() { Credentials = new SwiftCredentials() { Password = response.AccessToken }, Authenticate = (user, password, endpoint) => AuthenticateAsync(password) };
             authManager.SetEndpoints(new[] { "http://localhost:8080" }.ToList());

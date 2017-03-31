@@ -31,6 +31,7 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
 using YandexDisk.Client;
 using YandexDisk.Client.Clients;
 using YandexDisk.Client.Protocol;
@@ -55,8 +56,6 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
         private const string URL = "https://www.yandex.com";
 
-        private const int RETRIES = 3;
-
         private class YandexContext
         {
             public IDiskApi Client { get; }
@@ -68,6 +67,8 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
         }
 
         private readonly IDictionary<RootName, YandexContext> contextCache = new Dictionary<RootName, YandexContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<YandexApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -118,8 +119,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            //var item = await AsyncFunc.Retry<Disk, YandexApiException>(async () => await context.Client.MetaInfo.GetDiskInfoAsync(CancellationToken.None), RETRIES);
-            var item = await context.Client.MetaInfo.GetDiskInfoAsync(CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MetaInfo.GetDiskInfoAsync(CancellationToken.None));
 
             return new DriveInfoContract(root.Value, item.TotalSpace - item.UsedSpace, item.UsedSpace);
         }
@@ -129,8 +129,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var context = await RequireContextAsync(root, apiKey);
 
             var request = new ResourceRequest() { Path = "/" };
-            //var item = await AsyncFunc.Retry<Resource, YandexApiException>(async () => await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None), RETRIES);
-            var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None));
 
             return new RootDirectoryInfoContract(item.Path, item.Created, item.Modified);
         }
@@ -140,8 +139,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var context = await RequireContextAsync(root);
 
             var request = new ResourceRequest() { Path = parent.Value };
-            //var item = await AsyncFunc.Retry<Resource, YandexApiException>(async () => await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None), RETRIES);
-            var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None));
 
             return item.Embedded.Items.Select(i => i.ToFileSystemInfoContract());
         }
@@ -150,8 +148,8 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
         {
             var context = await RequireContextAsync(root);
 
-            var link = await context.Client.Files.GetUploadLinkAsync(target.Value, true, CancellationToken.None);
-            await context.Client.Files.UploadAsync(link, Stream.Null, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Files.GetUploadLinkAsync(target.Value, true, CancellationToken.None));
+            await retryPolicy.ExecuteAsync(() => context.Client.Files.UploadAsync(link, Stream.Null, CancellationToken.None));
 
             return true;
         }
@@ -160,8 +158,8 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
         {
             var context = await RequireContextAsync(root);
 
-            var link = await context.Client.Files.GetDownloadLinkAsync(source.Value, CancellationToken.None);
-            var stream = await context.Client.Files.DownloadAsync(link, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Files.GetDownloadLinkAsync(source.Value, CancellationToken.None));
+            var stream = await retryPolicy.ExecuteAsync(() => context.Client.Files.DownloadAsync(link, CancellationToken.None));
 
             return stream;
         }
@@ -170,9 +168,11 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
         {
             var context = await RequireContextAsync(root);
 
-            var link = await context.Client.Files.GetUploadLinkAsync(target.Value, true, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Files.GetUploadLinkAsync(target.Value, true, CancellationToken.None));
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            await context.Client.Files.UploadAsync(link, stream, CancellationToken.None);
+            var retryPolicyWithAction = Policy.Handle<YandexApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            await retryPolicyWithAction.ExecuteAsync(() => context.Client.Files.UploadAsync(link, stream, CancellationToken.None));
 
             return true;
         }
@@ -183,11 +183,11 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
             var path = !string.IsNullOrEmpty(copyName) ? destination.Value.TrimEnd('/') + '/' + copyName : destination.Value;
             var copyRequest = new CopyFileRequest() { From = source.Value, Path = path };
-            var link = await context.Client.Commands.CopyAsync(copyRequest, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Commands.CopyAsync(copyRequest, CancellationToken.None));
             if (!await OperationProgressAsync(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.CopyAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.CopyAsync)));
             var request = new ResourceRequest() { Path = path };
-            var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None));
 
             return item.ToFileSystemInfoContract();
         }
@@ -198,11 +198,11 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
 
             var path = !string.IsNullOrEmpty(moveName) ? destination.Value.TrimEnd('/') + '/' + moveName : destination.Value;
             var moveRequest = new MoveFileRequest() { From = source.Value, Path = path };
-            var link = await context.Client.Commands.MoveAsync(moveRequest, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Commands.MoveAsync(moveRequest, CancellationToken.None));
             if (!await OperationProgressAsync(context, link))
-                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(YandexDisk.Client.Clients.ICommandsClient.MoveAsync)));
+                throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.MoveAsync)));
             var request = new ResourceRequest() { Path = path };
-            var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None));
 
             return item.ToFileSystemInfoContract();
         }
@@ -212,10 +212,10 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var context = await RequireContextAsync(root);
 
             var request = new ResourceRequest() { Path = parent.Value.TrimEnd('/') + '/' + name };
-            var link = await context.Client.Commands.CreateDictionaryAsync(request.Path, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Commands.CreateDictionaryAsync(request.Path, CancellationToken.None));
             if (!await OperationProgressAsync(context, link))
                 throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.CreateDictionaryAsync)));
-            var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None));
 
             return new DirectoryInfoContract(item.Path, item.Name, item.Created, item.Modified);
         }
@@ -228,12 +228,14 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var context = await RequireContextAsync(root);
 
             var request = new ResourceRequest() { Path = parent.Value.TrimEnd('/') + '/' + name };
-            var link = await context.Client.Files.GetUploadLinkAsync(request.Path, false, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Files.GetUploadLinkAsync(request.Path, false, CancellationToken.None));
             var stream = progress != null ? new ProgressStream(content, progress) : content;
+            var retryPolicyWithAction = Policy.Handle<YandexApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
             await context.Client.Files.UploadAsync(link, stream, CancellationToken.None);
-            var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None));
 
-            return new FileInfoContract(item.Path, item.Name, item.Created, item.Modified, item.Size, item.Md5);
+            return new FileInfoContract(item.Path, item.Name, item.Created, item.Modified, (FileSize)item.Size, item.Md5);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
@@ -241,7 +243,7 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var context = await RequireContextAsync(root);
 
             var request = new DeleteFileRequest() { Path = target.Value };
-            var link = await context.Client.Commands.DeleteAsync(request, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Commands.DeleteAsync(request, CancellationToken.None));
             if (!await OperationProgressAsync(context, link))
                 throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.DeleteAsync)));
 
@@ -255,11 +257,11 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
             var indexOfName = target.Value.LastIndexOf('/');
             var path = target.Value.Substring(0, indexOfName + 1) + newName;
             var moveRequest = new MoveFileRequest() { From = target.Value, Path = path };
-            var link = await context.Client.Commands.MoveAsync(moveRequest, CancellationToken.None);
+            var link = await retryPolicy.ExecuteAsync(() => context.Client.Commands.MoveAsync(moveRequest, CancellationToken.None));
             if (!await OperationProgressAsync(context, link))
                 throw new ApplicationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.OperationFailed, nameof(ICommandsClient.MoveAsync)));
             var request = new ResourceRequest() { Path = path };
-            var item = await context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.MetaInfo.GetInfoAsync(request, CancellationToken.None));
 
             return item.ToFileSystemInfoContract();
         }

@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License(MIT)
 
-Copyright(c) 2015 IgorSoft
+Copyright(c) 2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IgorSoft.CloudFS.Gateways.OneDrive.Properties.Resources", typeof(Resources).Assembly);
@@ -52,7 +53,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
         }
 
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
             get {
                 return resourceCulture;
             }
@@ -62,9 +64,20 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.Properties
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Task failed too many times. See InnerException property for a list of Exceptions that occured.
+        /// </summary>
+        internal static string RetriesExhausted
+        {
+            get {
+                return ResourceManager.GetString("RetriesExhausted", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Please retrieve an authentication code from the following Uri: {0}.
         /// </summary>
-        internal static string RetrieveAuthenticationCodeFromUri {
+        internal static string RetrieveAuthenticationCodeFromUri
+        {
             get {
                 return ResourceManager.GetString("RetrieveAuthenticationCodeFromUri", resourceCulture);
             }

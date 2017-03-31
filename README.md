@@ -24,31 +24,33 @@ Consideration of a cloud storage service as a target for CloudFS depends on thes
 
 Currently the following cloud storage services are supported in CloudFS via the specified API libraries:
 
-| Cloud storage service                                            | API library                                                             | version    | sync/async | origin    | status |
-| :--------------------------------------------------------------- | :---------------------------------------------------------------------- | :--------: | :--------: | :-------: | :----: |
-| *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable |
-| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.16.0.630 | async      | official  | stable |
-| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.12.1     | async      | official  | stable |
-| [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 2.0.0-beta-0010| async      | 3<sup>rd</sup> party | stable |
-| [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.3    | async      | 3<sup>rd</sup> party / local build | experimental |
-| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.2.2      | async      | 3<sup>rd</sup> party | stable |
-| [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A        | async      | 3<sup>rd</sup> party | stable |
-| WebDAV<sup id="a3">[4](#f4)</sup>                                | [WebDAV Client](https://github.com/skazantsev/WebDavClient)             | 1.0.4      | async      | 3<sup>rd</sup> party / local build | stable |
-| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.8      | async      | 3<sup>rd</sup> party | stable |
+| Cloud storage service                                            | API library                                                             | version    | sync/async | origin    | status | max. file size<sup id="a1">[1](#f1)</sup> |
+| :--------------------------------------------------------------- | :---------------------------------------------------------------------- | :--------: | :--------: | :-------: | :----: | :------------: |
+| *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable | *N/A*          |
+| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.24.1.809 | async      | official  | stable | >= 256 MB      |
+| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.14.0     | async      | official  | stable | 128 MB         |
+| [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 2.0.0-beta-0010| async      | 3<sup>rd</sup> party | stable | 160 MB         |
+| [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.3    | async      | 3<sup>rd</sup> party / local build | experimental | **12 MB**      |
+| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.3.1      | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
+| [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A        | async      | 3<sup>rd</sup> party | stable | **16 MB**      |
+| WebDAV<sup id="a5">[5](#f5)</sup>                                | [WebDAV Client](https://github.com/skazantsev/WebDavClient)             | 1.0.4      | async      | 3<sup>rd</sup> party / local build | stable | >= 256 MB      |
+| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.8      | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
 | **Degraded services**                                            |
-| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")      | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 1.2.0      | async      | official  | stable |
+| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")<sup id="a2">[2](#f2)</sup> | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 2.0.6      | async      | official  | stable | >= 256 MB      |
 | **Included by community request**                                |
-| [Google Cloud Storage](https://cloud.google.com// "Google Cloud Storage") | [Google Cloud Libraries for .NET](https://github.com/GoogleCloudPlatform/google-cloud-dotnet) | 1.0.0-beta02 | async      | official  | experimental |
+| [Google Cloud Storage](https://cloud.google.com// "Google Cloud Storage") | [Google Cloud Libraries for .NET](https://github.com/GoogleCloudPlatform/google-cloud-dotnet) | 1.0.1 | async      | official  | experimental | >= 256 MB      |
 | **Superseded services**                                          |
-| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive-Legacy")<sup id="a1">[1](#f1)</sup> | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a2">[2](#f2)</sup> | N/A        | async      | inofficial  | obsolete |
-| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.16.0.630 | async      | official  | stable |
+| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive V1")   | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 1.2.0      | async      | official  | stable | **48 MB**      |
+| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive-Legacy") | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a3">[3](#f3)</sup> | N/A        | async      | inofficial  | obsolete | **48 MB**      |
+| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.24.1.809 | async      | official  | stable | >= 256 MB      |
 | **Obsolete services**                                            |
-| *[Copy](https://www.copy.com/ "Copy")*<sup id="a3">[3](#f3)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* |
+| *[Copy](https://www.copy.com/ "Copy")*<sup id="a4">[4](#f4)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* | *N/A*          |
 
-> <sup><b id="f1">1</b></sup> Following Microsoft's November 2<sup>nd</sup>, 2015 announcement of its "[OneDrive storage plans change in pursuit of productivity and collaboration](https://blog.onedrive.com/onedrive_changes/)" the OneDrive cloud storage service will fail to meet the requirements for support in CloudFS as stated above after mid-July 2016.<br/> Despite this unprecedented and highly objectionable degradation of service quality, OneDrive will continue to be supported by CloudFS for historical reasons. [^](#a1)<br/>
-> <sup><b id="f2">2</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. [^](#a2)<br/>
-> <sup><b id="f3">3</b></sup> The Copy cloud storage service was discontinued as of May 1<sup>st</sup> 2016 according to this [announcement](https://www.copy.com/page/home;cs_login:login;;section:plans).<br/>The Copy gateway has therefore been retired from CloudFS. [^](#a3)<br/>
-> <sup><b id="f4">4</b></sup> WebDAV-based cloud storage is available through various public cloud providers or by self-hosting an [OwnCloud](https://github.com/owncloud) private cloud. [^](#a4)<br/>
+> <sup><b id="f1">1</b></sup> Maximum supported file size for upload through the respective cloud API.<br/>This is a non-authoritative value determined through unit tests. [^](#a1)<br/>
+> <sup><b id="f2">2</b></sup> Following Microsoft's November 2<sup>nd</sup>, 2015 announcement of its "[OneDrive storage plans change in pursuit of productivity and collaboration](https://blog.onedrive.com/onedrive_changes/)" the OneDrive cloud storage service will fail to meet the above stated requirements for support in CloudFS after mid-July 2016.<br/>Despite this unprecedented and highly objectionable degradation of service quality, OneDrive will continue to be supported by CloudFS for historical reasons. [^](#a2)<br/>
+> <sup><b id="f3">3</b></sup> This version of OneDriveSDK has been deprecated by Microsoft. [^](#a3)<br/>
+> <sup><b id="f4">4</b></sup> The Copy cloud storage service was discontinued as of May 1<sup>st</sup> 2016 according to this [announcement](https://www.copy.com/page/home;cs_login:login;;section:plans).<br/>The Copy gateway has therefore been retired from CloudFS. [^](#a4)<br/>
+> <sup><b id="f5">5</b></sup> WebDAV-based cloud storage is available through various public cloud providers or by self-hosting an [OwnCloud](https://github.com/owncloud) private cloud. [^](#a5)<br/>
 
 
 ## System Requirements
@@ -57,7 +59,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
   - .NET 4.6
 - Operating system
   - tested on Windows 8.1 x64 and Windows Server 2012 R2 (until version 1.0.0-alpha) /<br/>Windows 10 x64 (from version 1.0.1-alpha)
-  - expected to run on Windows 7/8/8.1/10 and Windows Server 2008(R2)/2012(R2)
+  - expected to run on Windows 7/8/8.1/10 and Windows Server 2008(R2)/2012(R2)/2016
 
 ## Local compilation
 
@@ -88,7 +90,8 @@ At the time of writing this Readme, the following URLs provided access to applic
 
 | Date       | Version     | Comments                                                                       |
 | :--------- | :---------- | :----------------------------------------------------------------------------- |
-| 2016-10-05 | 1.0.10.1-alpha | - Fixed NuGet packages.                                                     |
+| 2017-03-31 | 1.0.11-beta | - Version updates to API libraries for various cloud services.<br/>- Moved legacy gateways to separate NuGet package.<br/>- Switched to [Polly](https://github.com/App-vNext/Polly) for error retry functionality in gateways. |
+| 2016-10-05 | 1.0.10.1-beta | - Fixed NuGet packages.                                                     |
 | 2016-10-01 | 1.0.10-beta | - New gateway for Google Cloud Storage added.<br/>- Fixed drive free space calculation for Yandex gateway.<br/>- Version update to API libraries for Box, Google Drive, and Yandex.Disk. |
 | 2016-08-31 | 1.0.9.1-alpha | - Fixed NuGet packages.                                                      |
 | 2016-08-29 | 1.0.9-alpha | - Implemented settings purge function in gateways.<br/>- Version updates to API libraries for Box and OneDrive. |

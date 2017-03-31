@@ -34,6 +34,6 @@ namespace IgorSoft.CloudFS.Gateways.Copy
 
         public static FileSystemInfoContract ToFileSystemInfoContract(this FileSystem item) => item.Type == FileSystemType.Dir
                 ? new DirectoryInfoContract(item.Id, item.Name, item.DateLastSynced, Later(item.DateLastSynced, item.ModifiedTime)) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, item.DateLastSynced, Later(item.DateLastSynced, item.ModifiedTime), item.Size, null) as FileSystemInfoContract;
+                : new FileInfoContract(item.Id, item.Name, item.DateLastSynced, Later(item.DateLastSynced, item.ModifiedTime), (FileSize)item.Size, null) as FileSystemInfoContract;
     }
 }

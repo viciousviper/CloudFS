@@ -54,19 +54,23 @@
           <Private>True</Private>
         </Reference>
       </ItemGroup>
-	</When>
+    </When>
     <Otherwise>
       <ItemGroup>
         <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
+          <SpecificVersion>False</SpecificVersion>
           <HintPath>..\SignedLibrary\SwiftClient.dll</HintPath>
-          <Private>True</Private>
         </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Polly, Version=5.0.6.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly-Signed.5.0.6\lib\net45\Polly.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
@@ -150,7 +154,7 @@ if $(ConfigurationName) == Signed (
   <PropertyGroup>
     <PostBuildEvent>
 if not exist $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\ md $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
-for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll SwiftClient.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
+for %25%25f in ($(TargetFileName) $(TargetFileName).config NewtonSoft.Json.dll Polly.dll SwiftClient.dll) do xcopy /D /Y %25%25f $(SolutionDir)CloudFS.GatewayTests\$(OutDir)Gateways\
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

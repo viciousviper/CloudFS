@@ -56,13 +56,14 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// Gets the mode of the file.
         /// </summary>
         /// <value>The <see cref="string" /> containing the mode.</value>
+        [Obsolete("Unused property will be removed in a future version of this library.")]
         public override string Mode => "-----";
 
         /// <summary>
         /// Gets or sets the size, in bytes, of the current file.
         /// </summary>
         /// <value>The size of the current file in bytes.</value>
-        public long Size { get; set; }
+        public FileSize Size { get; set; }
 
         /// <summary>
         /// Gets the cryptographic hash of the current file.
@@ -80,17 +81,24 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <param name="size">The file size in bytes.</param>
         /// <param name="hash">The cryptographic hash.</param>
         /// <exception cref="ArgumentException">The size is negative.</exception>
-        public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, long size, string hash) : base(new FileId(id), name, created, updated)
+        public FileInfoContract(string id, string name, DateTimeOffset created, DateTimeOffset updated, FileSize size, string hash) : base(new FileId(id), name, created, updated)
         {
-            if (size < 0)
-                throw new ArgumentException($"{nameof(size)} is < 0", nameof(size));
-
             Size = size;
             Hash = hash;
         }
 
+        /// <summary>
+        /// Initializes a new placeholder instance of the <see cref="FileInfoContract"/> class.
+        /// </summary>
+        /// <param name="id">The unique identifier.</param>
+        /// <param name="name">The name.</param>
+        protected FileInfoContract(string id, string name) : base(new FileId(id), name, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0))
+        {
+            Size = FileSize.Empty;
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(FileInfoContract)} {Id} ({Name})".ToString(CultureInfo.CurrentCulture);
+        private string DebuggerDisplay() => $"{nameof(FileInfoContract)} {Id} ({Name}) [{Size}]".ToString(CultureInfo.CurrentCulture);
     }
 }

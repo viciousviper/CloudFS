@@ -33,9 +33,9 @@ namespace IgorSoft.CloudFS.Interface.IO
     /// </summary>
     /// <seealso cref="SemanticType{string}" />
     [System.Diagnostics.DebuggerDisplay("{DebuggerDisplay(),nq}")]
-#pragma warning disable CS3009 // Basistyp ist nicht CLS-kompatibel
+#pragma warning disable CS3009 // Base type is not CLS-compliant
     public sealed class DriveId : SemanticType<string>
-#pragma warning restore CS3009 // Basistyp ist nicht CLS-kompatibel
+#pragma warning restore CS3009 // Base type is not CLS-compliant
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DriveId"/> class.

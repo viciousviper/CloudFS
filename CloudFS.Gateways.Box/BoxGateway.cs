@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Polly;
 using Box.V2;
 using Box.V2.Exceptions;
 using Box.V2.Models;
@@ -55,11 +56,13 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
         private const string API = "Box.V2";
 
-        private const int RETRIES = 3;
+        private static TimeSpan UploadTimeoutPerMegabyte = TimeSpan.FromSeconds(30);
 
         private static readonly List<string> boxFileFields = new List<string>(new[] { BoxItem.FieldName, BoxItem.FieldCreatedAt, BoxItem.FieldModifiedAt, BoxItem.FieldSize, BoxFile.FieldSha1 });
 
         private static readonly List<string> boxFolderFields = new List<string>(new[] { BoxItem.FieldName, BoxItem.FieldCreatedAt, BoxItem.FieldModifiedAt });
+
+        private readonly Policy retryPolicy = Policy.Handle<BoxException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private class BoxContext
         {
@@ -94,6 +97,11 @@ namespace IgorSoft.CloudFS.Gateways.Box
             return result;
         }
 
+        private TimeSpan GetUploadTimeout(long uploadSize)
+        {
+            return TimeSpan.FromSeconds(UploadTimeoutPerMegabyte.Seconds * (uploadSize / new FileSize("1MB").Value + 1));
+        }
+
         public async Task<bool> TryAuthenticateAsync(RootName root, string apiKey, IDictionary<string, string> parameters)
         {
             try {
@@ -108,7 +116,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<BoxUser, BoxException>(async () => await context.Client.UsersManager.GetCurrentUserInformationAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.UsersManager.GetCurrentUserInformationAsync());
 
             return new DriveInfoContract(item.Id, item.SpaceAmount.Value - item.SpaceUsed.Value, item.SpaceUsed.Value);
         }
@@ -117,7 +125,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<BoxFolder, BoxException>(async () => await context.Client.FoldersManager.GetInformationAsync("0", boxFolderFields), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.FoldersManager.GetInformationAsync("0", boxFolderFields));
 
             return new RootDirectoryInfoContract(item.Id, DateTimeOffset.FromFileTime(0), DateTimeOffset.FromFileTime(0));
         }
@@ -126,7 +134,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
         {
             var context = await RequireContextAsync(root);
 
-            var items = await AsyncFunc.RetryAsync<BoxCollection<BoxItem>, BoxException>(async () => await context.Client.FoldersManager.GetFolderItemsAsync(parent.Value, 1000, fields:boxFileFields), RETRIES);
+            var items = await retryPolicy.ExecuteAsync(() => context.Client.FoldersManager.GetFolderItemsAsync(parent.Value, 1000, fields:boxFileFields));
 
             return items.Entries.Select(i => i.ToFileSystemInfoContract());
         }
@@ -139,7 +147,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
             var context = await RequireContextAsync(root);
 
             var locator = locatorResolver();
-            await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, Stream.Null), RETRIES);
+            await retryPolicy.ExecuteAsync(() => context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, Stream.Null));
 
             return true;
         }
@@ -148,7 +156,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
         {
             var context = await RequireContextAsync(root);
 
-            var stream = await AsyncFunc.RetryAsync<Stream, BoxException>(async () => await context.Client.FilesManager.DownloadStreamAsync(source.Value), RETRIES);
+            var stream = await retryPolicy.ExecuteAsync(() => context.Client.FilesManager.DownloadStreamAsync(source.Value));
 
             return stream;
         }
@@ -162,7 +170,9 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var locator = locatorResolver();
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, stream), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<BoxException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.FilesManager.UploadNewVersionAsync(locator.Name, target.Value, stream, timeout: GetUploadTimeout(content.Length)));
 
             return true;
         }
@@ -173,15 +183,15 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             if (source is DirectoryId) {
                 var request = new BoxFolderRequest() { Id = source.Value, Name = copyName, Parent = new BoxRequestEntity() { Id = destination.Value } };
-                var item = await AsyncFunc.RetryAsync<BoxFolder, BoxException>(async () => await context.Client.FoldersManager.CopyAsync(request, boxFolderFields), RETRIES);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.FoldersManager.CopyAsync(request, boxFolderFields));
 
                 return new DirectoryInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value);
             }
             else {
                 var request = new BoxFileRequest() { Id = source.Value, Name = copyName, Parent = new BoxRequestEntity() { Id = destination.Value } };
-                var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.CopyAsync(request, boxFileFields), RETRIES);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.FilesManager.CopyAsync(request, boxFileFields));
 
-                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
             }
         }
 
@@ -191,15 +201,15 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             if (source is DirectoryId) {
                 var request = new BoxFolderRequest() { Id = source.Value, Parent = new BoxRequestEntity() { Id = destination.Value, Type = BoxType.folder }, Name = moveName };
-                var item = await AsyncFunc.RetryAsync<BoxFolder, BoxException>(async () => await context.Client.FoldersManager.UpdateInformationAsync(request, fields: boxFolderFields), RETRIES);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.FoldersManager.UpdateInformationAsync(request, fields: boxFolderFields));
 
                 return new DirectoryInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value);
             }
             else {
                 var request = new BoxFileRequest() { Id = source.Value, Parent = new BoxRequestEntity() { Id = destination.Value, Type = BoxType.file }, Name = moveName };
-                var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UpdateInformationAsync(request, fields: boxFileFields), RETRIES);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.FilesManager.UpdateInformationAsync(request, fields: boxFileFields));
 
-                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
             }
         }
 
@@ -208,7 +218,7 @@ namespace IgorSoft.CloudFS.Gateways.Box
             var context = await RequireContextAsync(root);
 
             var request = new BoxFolderRequest() { Name = name, Parent = new BoxRequestEntity() { Id = parent.Value } };
-            var item = await AsyncFunc.RetryAsync<BoxFolder, BoxException>(async () => await context.Client.FoldersManager.CreateAsync(request, boxFolderFields), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Client.FoldersManager.CreateAsync(request, boxFolderFields));
 
             return new DirectoryInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value);
         }
@@ -222,9 +232,11 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             var request = new BoxFileRequest() { Name = name, Parent = new BoxRequestEntity() { Id = parent.Value } };
             var stream = progress != null ? new ProgressStream(content, progress) : content;
-            var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UploadAsync(request, stream, boxFileFields), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<BoxException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var item = await retryPolicyWithAction.ExecuteAsync(() => context.Client.FilesManager.UploadAsync(request, stream, boxFileFields, timeout: GetUploadTimeout(content.Length)));
 
-            return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+            return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
@@ -232,8 +244,8 @@ namespace IgorSoft.CloudFS.Gateways.Box
             var context = await RequireContextAsync(root);
 
             var success = target is DirectoryId
-                ? await AsyncFunc.RetryAsync<bool, BoxException>(async () => await context.Client.FoldersManager.DeleteAsync(target.Value, recurse), RETRIES)
-                : await AsyncFunc.RetryAsync<bool, BoxException>(async () => await context.Client.FilesManager.DeleteAsync(target.Value), RETRIES);
+                ? await retryPolicy.ExecuteAsync(() => context.Client.FoldersManager.DeleteAsync(target.Value, recurse))
+                : await retryPolicy.ExecuteAsync(() => context.Client.FilesManager.DeleteAsync(target.Value));
 
             return success;
         }
@@ -244,15 +256,15 @@ namespace IgorSoft.CloudFS.Gateways.Box
 
             if (target is DirectoryId) {
                 var request = new BoxFolderRequest() { Id = target.Value, Name = newName };
-                var item = await AsyncFunc.RetryAsync<BoxFolder, BoxException>(async () => await context.Client.FoldersManager.UpdateInformationAsync(request, fields: boxFolderFields), RETRIES);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.FoldersManager.UpdateInformationAsync(request, fields: boxFolderFields));
 
                 return new DirectoryInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value);
             }
             else {
                 var request = new BoxFileRequest() { Id = target.Value, Name = newName };
-                var item = await AsyncFunc.RetryAsync<BoxFile, BoxException>(async () => await context.Client.FilesManager.UpdateInformationAsync(request, fields: boxFileFields), RETRIES);
+                var item = await retryPolicy.ExecuteAsync(() => context.Client.FilesManager.UpdateInformationAsync(request, fields: boxFileFields));
 
-                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, item.Size.Value, item.Sha1.ToLowerInvariant());
+                return new FileInfoContract(item.Id, item.Name, item.CreatedAt.Value, item.ModifiedAt.Value, (FileSize)item.Size.Value, item.Sha1.ToLowerInvariant());
             }
         }
 

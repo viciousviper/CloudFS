@@ -32,6 +32,7 @@ using System.Net;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Polly;
 using WebDav;
 using IgorSoft.CloudFS.Gateways.WebDAV.Auth;
 using IgorSoft.CloudFS.Interface;
@@ -89,6 +90,8 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
         private readonly IDictionary<RootName, WebDAVContext> contextCache = new Dictionary<RootName, WebDAVContext>();
 
+        private readonly Policy retryPolicy = Policy.Handle<Exception>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
         private string settingsPassPhrase;
 
         [ImportingConstructor]
@@ -138,7 +141,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var context = await RequireContextAsync(root, apiKey, new Uri(baseAddress));
 
-            var propfindResponse = await context.Client.Propfind(context.AppendPrefix("/"));
+            var propfindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(context.AppendPrefix("/")));
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), "/");
 
             var item = propfindResponse.Resources.Single(r => context.RemovePrefix(r.Uri) == "/");
@@ -157,7 +160,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var context = await RequireContextAsync(root, apiKey, new Uri(baseAddress));
 
-            var propfindResponse = await context.Client.Propfind(context.AppendPrefix("/"));
+            var propfindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(context.AppendPrefix("/")));
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), "/");
 
             var item = propfindResponse.Resources.Single(r => context.RemovePrefix(r.Uri) == "/");
@@ -169,7 +172,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
         {
             var context = await RequireContextAsync(root);
 
-            var propfindResponse = await context.Client.Propfind(parent.Value);
+            var propfindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(parent.Value));
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), parent.Value);
 
             var items = propfindResponse.Resources.Where(r => WebUtility.UrlDecode(r.Uri) != parent.Value);
@@ -181,7 +184,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
         {
             var context = await RequireContextAsync(root);
 
-            var putFileResponse = await context.Client.PutFile(target.Value, Stream.Null);
+            var putFileResponse = await retryPolicy.ExecuteAsync(() => context.Client.PutFile(target.Value, Stream.Null));
 
             return putFileResponse.IsSuccessful;
         }
@@ -190,7 +193,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
         {
             var context = await RequireContextAsync(root);
 
-            var getRawFileResponse = await context.Client.GetRawFile(source.Value);
+            var getRawFileResponse = await retryPolicy.ExecuteAsync(() => context.Client.GetRawFile(source.Value));
             CheckSuccess(getRawFileResponse, nameof(WebDavClient.GetRawFile), source.Value);
 
             return getRawFileResponse.Stream;
@@ -200,7 +203,9 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
         {
             var context = await RequireContextAsync(root);
 
-            var putFileResponse = await context.Client.PutFile(target.Value, content);
+            var retryPolicyWithAction = Policy.Handle<Exception>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var putFileResponse = await retryPolicyWithAction.ExecuteAsync(() => context.Client.PutFile(target.Value, content));
 
             return putFileResponse.IsSuccessful;
         }
@@ -218,10 +223,10 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var targetName = destination.Value + copyName;
 
-            var copyResponse = await context.Client.Copy(source.Value, targetName);
+            var copyResponse = await retryPolicy.ExecuteAsync(() => context.Client.Copy(source.Value, targetName));
             CheckSuccess(copyResponse, nameof(WebDavClient.Copy), source.Value, targetName);
 
-            var propfindResponse = await context.Client.Propfind(targetName);
+            var propfindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(targetName));
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), targetName);
 
             var item = propfindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == targetName);
@@ -242,10 +247,10 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var targetName = destination.Value + moveName;
 
-            var moveResponse = await context.Client.Move(source.Value, targetName);
+            var moveResponse = await retryPolicy.ExecuteAsync(() => context.Client.Move(source.Value, targetName));
             CheckSuccess(moveResponse, nameof(WebDavClient.Move), source.Value, targetName);
 
-            var propfindResponse = await context.Client.Propfind(targetName);
+            var propfindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(targetName));
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), targetName);
 
             var item = propfindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == targetName);
@@ -259,10 +264,10 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var path = parent.Value + name + "/";
 
-            var mkColResponse = await context.Client.Mkcol(path);
+            var mkColResponse = await retryPolicy.ExecuteAsync(() => context.Client.Mkcol(path));
             CheckSuccess(mkColResponse, nameof(WebDavClient.Mkcol), path);
 
-            var propFindResponse = await context.Client.Propfind(path);
+            var propFindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(path));
             CheckSuccess(propFindResponse, nameof(WebDavClient.Propfind), path);
 
             var item = propFindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == path);
@@ -276,22 +281,24 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
             var path = parent.Value + name;
 
-            var putFileResponse = await context.Client.PutFile(path, content);
+            var retryPolicyWithAction = Policy.Handle<Exception>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var putFileResponse = await retryPolicyWithAction.ExecuteAsync(() => context.Client.PutFile(path, content));
             CheckSuccess(putFileResponse, nameof(WebDavClient.PutFile), path);
 
-            var propFindResponse = await context.Client.Propfind(path);
+            var propFindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(path));
             CheckSuccess(propFindResponse, nameof(WebDavClient.Propfind), path);
 
             var item = propFindResponse.Resources.Single(r => WebUtility.UrlDecode(r.Uri) == path);
 
-            return new FileInfoContract(WebUtility.UrlDecode(path), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), item.ContentLength ?? -1, item.ETag);
+            return new FileInfoContract(WebUtility.UrlDecode(path), WebUtility.UrlDecode(item.GetName()), item.CreationDate ?? DateTimeOffset.FromFileTime(0), item.LastModifiedDate ?? DateTimeOffset.FromFileTime(0), (FileSize)(item.ContentLength ?? -1), item.ETag);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
         {
             var context = await RequireContextAsync(root);
 
-            var deleteResponse = await context.Client.Delete(target.Value);
+            var deleteResponse = await retryPolicy.ExecuteAsync(() => context.Client.Delete(target.Value));
 
             return deleteResponse.IsSuccessful;
         }
@@ -306,10 +313,10 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             var lastSlashIndex = target.Value.TrimEnd('/').LastIndexOf('/');
             newName = target.Value.Substring(0, lastSlashIndex + 1) + newName + (target.Value.EndsWith("/") ? "/" : string.Empty);
 
-            var moveResponse = await context.Client.Move(target.Value, newName);
+            var moveResponse = await retryPolicy.ExecuteAsync(() => context.Client.Move(target.Value, newName));
             CheckSuccess(moveResponse, nameof(WebDavClient.Move), target.Value, newName);
 
-            var propfindResponse = await context.Client.Propfind(newName);
+            var propfindResponse = await retryPolicy.ExecuteAsync(() => context.Client.Propfind(newName));
             CheckSuccess(propfindResponse, nameof(WebDavClient.Propfind), newName);
 
             var item = propfindResponse.Resources.Single(r => r.Uri == newName);

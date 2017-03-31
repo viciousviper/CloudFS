@@ -28,6 +28,7 @@ using System.Composition;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Polly;
 using Google;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Auth.OAuth2.Responses;
@@ -64,8 +65,6 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
         private const string MIME_TYPE_FILE = "application/octet-stream";
 
-        private const int RETRIES = 3;
-
         private class GDriveContext
         {
             public DriveService Service { get; }
@@ -77,6 +76,8 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
         }
 
         private readonly IDictionary<RootName, GDriveContext> contextCache = new Dictionary<RootName, GDriveContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<GoogleApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "apiKey")]
         private async Task<GDriveContext> RequireContextAsync(RootName root, string apiKey = null)
@@ -109,7 +110,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var context = await RequireContextAsync(root, apiKey);
 
             var request = context.Service.About.Get().AsDrive();
-            var item = await AsyncFunc.RetryAsync<About, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => request.ExecuteAsync());
 
             var storageQuota = item.StorageQuota;
             var usedSpace = storageQuota.UsageInDrive.HasValue || storageQuota.UsageInDriveTrash.HasValue
@@ -124,7 +125,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var context = await RequireContextAsync(root, apiKey);
 
             var request = context.Service.Files.Get("root").AsRootDirectory();
-            var item = await AsyncFunc.RetryAsync<GoogleFile, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => request.ExecuteAsync());
 
             return new RootDirectoryInfoContract(item.Id, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value));
         }
@@ -134,12 +135,12 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var context = await RequireContextAsync(root);
 
             var request = context.Service.Files.List().WithFiles(parent);
-            var childReferences = await AsyncFunc.RetryAsync<FileList, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
-            var items = childReferences.Files.Select(async c => await AsyncFunc.RetryAsync<GoogleFile, GoogleApiException>(async () =>
+            var childReferences = await retryPolicy.ExecuteAsync(() => request.ExecuteAsync());
+            var items = childReferences.Files.Select(async c =>
             {
                 var childRequest = context.Service.Files.Get(c.Id).AsFileSystem();
-                return await childRequest.ExecuteAsync();
-            }, RETRIES)).ToArray();
+                return await retryPolicy.ExecuteAsync(() => childRequest.ExecuteAsync());
+            }).ToArray();
 
             Task.WaitAll(items);
 
@@ -150,7 +151,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
         {
             var context = await RequireContextAsync(root);
 
-            await AsyncFunc.RetryAsync<IUploadProgress, GoogleApiException>(async () => await context.Service.Files.Update(null, target.Value, Stream.Null, MIME_TYPE_FILE).UploadAsync(), RETRIES);
+            await retryPolicy.ExecuteAsync(() => context.Service.Files.Update(null, target.Value, Stream.Null, MIME_TYPE_FILE).UploadAsync());
 
             return true;
         }
@@ -160,7 +161,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var context = await RequireContextAsync(root);
 
             var stream = new MemoryStream();
-            await AsyncFunc.RetryAsync<GoogleApiException>(async () => await context.Service.Files.Get(source.Value).DownloadAsync(stream), RETRIES);
+            await retryPolicy.ExecuteAsync(() => context.Service.Files.Get(source.Value).DownloadAsync(stream));
 
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
@@ -173,7 +174,9 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var update = context.Service.Files.Update(new GoogleFile(), target.Value, content, MIME_TYPE_FILE);
             if (progress != null)
                 update.ProgressChanged += p => progress.Report(new ProgressValue((int)p.BytesSent, (int)content.Length));
-            await AsyncFunc.RetryAsync<IUploadProgress, GoogleApiException>(async () => await update.UploadAsync(), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<GoogleApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            await retryPolicyWithAction.ExecuteAsync(() => update.UploadAsync());
 
             return true;
         }
@@ -189,7 +192,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             if (destination != null)
                 copy.Parents = new[] { destination.Value };
             var request = context.Service.Files.Copy(copy, source.Value).AsFileSystem();
-            var item = await AsyncFunc.RetryAsync<GoogleFile, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => request.ExecuteAsync());
 
             return item.ToFileSystemInfoContract();
         }
@@ -202,7 +205,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
 
             var move = new GoogleFile() { Name = moveName };
             var request = context.Service.Files.Update(move, source.Value).AsFileSystem(parent, destination);
-            var item = await AsyncFunc.RetryAsync<GoogleFile, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => request.ExecuteAsync());
 
             return item.ToFileSystemInfoContract();
         }
@@ -212,7 +215,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var context = await RequireContextAsync(root);
 
             var file = new GoogleFile() { Name = name, MimeType = MIME_TYPE_DIRECTORY, Parents = new[] { parent.Value } };
-            var item = await AsyncFunc.RetryAsync<GoogleFile, GoogleApiException>(async () => await context.Service.Files.Create(file).AsDirectory().ExecuteAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Service.Files.Create(file).AsDirectory().ExecuteAsync());
 
             return new DirectoryInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value));
         }
@@ -228,10 +231,12 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var insert = context.Service.Files.Create(file, content, MIME_TYPE_FILE).AsFile();
             if (progress != null)
                 insert.ProgressChanged += p => progress.Report(new ProgressValue((int)p.BytesSent, (int)content.Length));
-            var upload = await AsyncFunc.RetryAsync<IUploadProgress, GoogleApiException>(async () => await insert.UploadAsync(), RETRIES);
+            var retryPolicyWithAction = Policy.Handle<GoogleApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => content.Seek(0, SeekOrigin.Begin));
+            var upload = await retryPolicyWithAction.ExecuteAsync(() => insert.UploadAsync());
             var item = insert.ResponseBody;
 
-            return new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), item.Size.Value, item.Md5Checksum);
+            return new FileInfoContract(item.Id, item.Name, new DateTimeOffset(item.CreatedTime.Value), new DateTimeOffset(item.ModifiedTime.Value), (FileSize)item.Size.Value, item.Md5Checksum);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
@@ -239,7 +244,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var context = await RequireContextAsync(root);
 
             var request = context.Service.Files.Delete(target.Value);
-            var item = await AsyncFunc.RetryAsync<string, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => request.ExecuteAsync());
 
             return true;
         }
@@ -249,7 +254,7 @@ namespace IgorSoft.CloudFS.Gateways.GDrive
             var context = await RequireContextAsync(root);
 
             var request = context.Service.Files.Update(new GoogleFile() { Name = newName }, target.Value).AsFileSystem();
-            var item = await AsyncFunc.RetryAsync<GoogleFile, GoogleApiException>(async () => await request.ExecuteAsync(), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => request.ExecuteAsync());
 
             return item.ToFileSystemInfoContract();
         }

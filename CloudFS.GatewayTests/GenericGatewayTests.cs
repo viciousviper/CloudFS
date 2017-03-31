@@ -46,7 +46,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            largeContent = new byte[12 * (1 << 20)];
+            largeContent = new byte[new FileSize("12MB")];
             for (int i = 0; i < largeContent.Length; ++i)
                 largeContent[i] = (byte)(i % 251 + 1);
         }
@@ -70,7 +70,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             fixture = null;
         }
 
-        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void Import_Gateways_MatchConfigurations()
         {
             var configuredGateways = GatewayTestsFixture.GetGatewayConfigurations(GatewayType.Sync, GatewayCapabilities.None);
@@ -164,7 +164,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                         testFile = (FileInfoContract)items.Single();
                         Assert.AreEqual("File.ext", testFile.Name, "Expected file is missing");
-                        Assert.AreEqual(0, testFile.Size, "Mismatched content size");
+                        Assert.AreEqual(FileSize.Empty, testFile.Size, "Mismatched content size");
                     });
                 }
             });

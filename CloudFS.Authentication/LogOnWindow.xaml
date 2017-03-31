@@ -54,11 +54,11 @@
 
                 <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Please enter your credentials" HorizontalAlignment="Center" FontSize="14" />
                 <Label Grid.Row="1" Grid.Column="0" Content="Account:" />
-                <TextBox x:Name="tbAccount" Grid.Row="1" Grid.Column="1" TextChanged="OnTextChanged" />
+                <TextBox x:Name="tbAccount" Grid.Row="1" Grid.Column="1" TextChanged="OnTextChanged" TabIndex="1" />
                 <Label Grid.Row="2" Grid.Column="0" Content="Password:" />
-                <PasswordBox x:Name="pbPassword" Grid.Row="2" Grid.Column="1" PasswordChanged="OnPasswordChanged" />
+                <PasswordBox x:Name="pbPassword" Grid.Row="2" Grid.Column="1" PasswordChanged="OnPasswordChanged" TabIndex="2" />
             </Grid>
-            <Button x:Name="btnAuthenticate" Grid.Row="1" Content="Authenticate" />
+            <Button x:Name="btnAuthenticate" Grid.Row="1" Content="Authenticate" TabIndex="3" />
         </Grid>
     </Grid>
 </Window>

@@ -1,7 +1,7 @@
 /*
 The MIT License(MIT)
 
-Copyright(c) 2015 IgorSoft
+Copyright(c) 2016 IgorSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.OneDrive.Sdk;
+using Microsoft.OneDrive.Sdk.Authentication;
 using IgorSoft.CloudFS.Authentication;
 
 namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
@@ -103,24 +104,23 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive.OAuth
 
             var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
-            var client = default(IOneDriveClient);
+            var authProvider = new MsaAuthenticationProvider(Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, LIVE_LOGIN_DESKTOP_URI, scopes, default(CredentialCache));
+            var oauthHelper = new OAuthHelper();
             if (!string.IsNullOrEmpty(refreshToken)) {
-                client = await OneDriveClient.GetSilentlyAuthenticatedMicrosoftAccountClient(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, Secrets.CLIENT_SECRET, refreshToken);
+                authProvider.CurrentAccountSession = await oauthHelper.RedeemRefreshTokenAsync(refreshToken, Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, LIVE_LOGIN_DESKTOP_URI, scopes);
             } else {
-                if (string.IsNullOrEmpty(code)) {
-                    client = await OneDriveClient.GetAuthenticatedMicrosoftAccountClient(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, Secrets.CLIENT_SECRET, new WebAuthenticationUi(account));
-                } else {
-                    client = OneDriveClient.GetMicrosoftAccountClient(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, Secrets.CLIENT_SECRET);
-                    client.AuthenticationProvider.CurrentAccountSession = new AccountSession() { AccessToken = code };
-                }
+                if (string.IsNullOrEmpty(code))
+                    code = await oauthHelper.GetAuthorizationCodeAsync(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, new WebAuthenticationUi(account));
 
-                await client.AuthenticateAsync();
+                authProvider.CurrentAccountSession = await oauthHelper.RedeemAuthorizationCodeAsync(code, Secrets.CLIENT_ID, Secrets.CLIENT_SECRET, LIVE_LOGIN_DESKTOP_URI, scopes);
 
-                if (!client.IsAuthenticated)
+                if (string.IsNullOrEmpty(authProvider.CurrentAccountSession?.AccessToken))
                     throw new AuthenticationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.RetrieveAuthenticationCodeFromUri, LIVE_LOGIN_AUTHORIZE_URI));
             }
 
-            SaveRefreshToken(account, client.AuthenticationProvider.CurrentAccountSession.RefreshToken, settingsPassPhrase);
+            var client = new OneDriveClient(authProvider);
+
+            SaveRefreshToken(account, authProvider.CurrentAccountSession.RefreshToken, settingsPassPhrase);
 
             return client;
         }

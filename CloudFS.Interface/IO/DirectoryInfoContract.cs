@@ -57,6 +57,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// Gets the mode of the directory.
         /// </summary>
         /// <value>The <see cref="string" /> containing the mode.</value>
+        [Obsolete("Unused property will be removed in a future version of this library.")]
         public override string Mode => "d----";
 
         /// <summary>

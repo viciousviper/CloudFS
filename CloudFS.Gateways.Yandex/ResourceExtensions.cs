@@ -32,6 +32,6 @@ namespace IgorSoft.CloudFS.Gateways.Yandex
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this Resource item) => item.Type == ResourceType.Dir
                 ? new DirectoryInfoContract(item.Path, item.Name, item.Created, item.Modified) as FileSystemInfoContract
-                : new FileInfoContract(item.Path, item.Name, item.Created, item.Modified, item.Size, item.Md5) as FileSystemInfoContract;
+                : new FileInfoContract(item.Path, item.Name, item.Created, item.Modified, (FileSize)item.Size, item.Md5) as FileSystemInfoContract;
     }
 }

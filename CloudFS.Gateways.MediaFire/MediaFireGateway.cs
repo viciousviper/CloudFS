@@ -33,6 +33,7 @@ using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
 using MediaFireSDK;
 using MediaFireSDK.Model;
 using MediaFireSDK.Model.Errors;
@@ -58,8 +59,6 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         private const string URL = "https://www.mediafire.com";
 
-        private const int RETRIES = 3;
-
         private class MediaFireContext
         {
             public MediaFireAgent Agent { get; }
@@ -71,6 +70,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
         }
 
         private readonly IDictionary<RootName, MediaFireContext> contextCache = new Dictionary<RootName, MediaFireContext>();
+
+        private readonly Policy retryPolicy = Policy.Handle<MediaFireApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 
         private string settingsPassPhrase;
 
@@ -107,8 +108,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
         {
             var context = await RequireContextAsync(root, apiKey);
 
-            var item = await AsyncFunc.RetryAsync<MediaFireGetUserInfoResponse, MediaFireApiException>(async ()
-                => await context.Agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo), RETRIES);
+            var item = await retryPolicy.ExecuteAsync(() => context.Agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo));
 
             return new DriveInfoContract(item.UserDetails.Email, item.UserDetails.StorageLimit - item.UserDetails.UsedStorageSize, item.UserDetails.UsedStorageSize);
         }
@@ -127,12 +127,12 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             var context = await RequireContextAsync(root);
 
             var foldersItem = await context.Agent.GetAsync<MediaFireGetContentResponse>(MediaFireApiFolderMethods.GetContent, new Dictionary<string, object>() {
-                { MediaFireApiParameters.FolderKey, parent.Value },
-                { MediaFireApiParameters.ContentType, MediaFireFolderContentType.Folders.ToApiParameter() }
+                [MediaFireApiParameters.FolderKey] = parent.Value,
+                [MediaFireApiParameters.ContentType] = MediaFireFolderContentType.Folders.ToApiParameter()
             });
             var filesItem = await context.Agent.GetAsync<MediaFireGetContentResponse>(MediaFireApiFolderMethods.GetContent, new Dictionary<string, object>() {
-                { MediaFireApiParameters.FolderKey, parent.Value },
-                { MediaFireApiParameters.ContentType, MediaFireFolderContentType.Files.ToApiParameter() }
+                [MediaFireApiParameters.FolderKey] = parent.Value,
+                [MediaFireApiParameters.ContentType] = MediaFireFolderContentType.Files.ToApiParameter()
             });
 
             return (foldersItem.FolderContent.Folders?.Select(f => f.ToDirectoryInfoContract()).Cast<FileSystemInfoContract>() ?? Enumerable.Empty< FileSystemInfoContract>())
@@ -149,8 +149,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             var context = await RequireContextAsync(root);
 
             var links = await context.Agent.GetAsync<MediaFireGetLinksResponse>(MediaFireApiFileMethods.GetLinks, new Dictionary<string, object>() {
-                { MediaFireApiParameters.QuickKey, source.Value },
-                { MediaFireApiParameters.LinkType, MediaFireSDK.MediaFireApiConstants.LinkTypeDirectDownload }
+                [MediaFireApiParameters.QuickKey] = source.Value,
+                [MediaFireApiParameters.LinkType] = MediaFireSDK.MediaFireApiConstants.LinkTypeDirectDownload
             });
 
             if (!links.Links.Any() && string.IsNullOrEmpty(links.Links[0].DirectDownload))
@@ -180,19 +180,19 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             var upload = await context.Agent.Upload.Simple(config, content, mediaFireProgress);
             //TODO: Fix code for direct execution of upload/update via PostStreamAsync<>()
             //var upload = (await context.Agent.PostStreamAsync<UploadResponse>(MediaFireApiUploadMethods.Update, content, new Dictionary<string, object>() {
-            //    { MediaFireApiParameters.QuickKey, target.Value }
+            //    [MediaFireApiParameters.QuickKey] = target.Value
             //},  new Dictionary<string, string>() {
-            //    { MediaFireApiConstants.ContentTypeHeader, MediaFireApiConstants.SimpleUploadContentTypeValue }
+            //    [MediaFireApiConstants.ContentTypeHeader] = MediaFireApiConstants.SimpleUploadContentTypeValue
             //})).DoUpload;
 
             if (!upload.IsSuccess)
-                throw new MediaFireException(string.Format(System.Globalization.CultureInfo.CurrentCulture, MediaFireErrorMessages.UploadErrorFormat, upload.Result));
+                throw new MediaFireException(string.Format(CultureInfo.CurrentCulture, MediaFireErrorMessages.UploadErrorFormat, upload.Result));
             while (!(upload.IsComplete && upload.IsSuccess)) {
                 await Task.Delay(100);
                 upload = await context.Agent.Upload.PollUpload(upload.Key);
             }
             var item = await context.Agent.GetAsync<MediaFireGetFileInfoResponse>(MediaFireApiFileMethods.GetInfo, new Dictionary<string, object>() {
-                { MediaFireApiParameters.QuickKey, upload.QuickKey }
+                [MediaFireApiParameters.QuickKey] = upload.QuickKey
             });
 
             return true;
@@ -205,20 +205,20 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             if (source is DirectoryId) {
                 //TODO: Fix code for copying of directories
                 //var copy = await context.Agent.GetAsync<ApiExtensions.MediaFireCopyFolderResponse>(MediaFireApiFolderMethods.Copy, new Dictionary<string, object>() {
-                //    { MediaFireApiParameters.FolderKeySource, source.Value },
-                //    { MediaFireApiParameters.FolderKeyDestination, destination.Value }
+                //    [MediaFireApiParameters.FolderKeySource] = source.Value,
+                //    [MediaFireApiParameters.FolderKeyDestination] = destination.Value
                 //});
 
                 //var newFolderKey = copy.NewFolderKeys[0];
 
                 //if (!string.IsNullOrEmpty(copyName)) {
                 //    await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Update, new Dictionary<string, object>() {
-                //        { MediaFireApiParameters.FolderKey, newFolderKey },
-                //        { MediaFireApiParameters.FolderName, copyName }
+                //        [MediaFireApiParameters.FolderKey] = newFolderKey,
+                //        [MediaFireApiParameters.FolderName] = copyName
                 //    });
                 //}
                 //var item = await context.Agent.GetAsync<MediaFireGetFolderInfoResponse>(MediaFireApiFolderMethods.GetInfo, new Dictionary<string, object>() {
-                //    { MediaFireApiParameters.FolderKey, newFolderKey }
+                //    [MediaFireApiParameters.FolderKey] = newFolderKey
                 //});
 
                 //return new DirectoryInfoContract(item.FolderInfo.FolderKey, item.FolderInfo.Name, item.FolderInfo.Created, item.FolderInfo.Created);
@@ -226,23 +226,23 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                 throw new NotSupportedException(Properties.Resources.CopyingOfDirectoriesNotSupported);
             } else {
                 var copy = await context.Agent.GetAsync<ApiExtensions.MediaFireCopyFileResponse>(MediaFireApiFileMethods.Copy, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.QuickKey, source.Value },
-                    { MediaFireApiParameters.FolderKey, destination.Value }
+                    [MediaFireApiParameters.QuickKey] = source.Value,
+                    [MediaFireApiParameters.FolderKey] = destination.Value
                 });
 
                 var newQuickKey = copy.NewQuickKeys[0];
 
                 if (!string.IsNullOrEmpty(copyName))
                     await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFileMethods.Update, new Dictionary<string, object>() {
-                        { MediaFireApiParameters.QuickKey, newQuickKey },
-                        { MediaFireApiParameters.FileName, WebUtility.UrlEncode(copyName) }
+                        [MediaFireApiParameters.QuickKey] = newQuickKey,
+                        [MediaFireApiParameters.FileName] = WebUtility.UrlEncode(copyName)
                     });
 
                 var item = await context.Agent.GetAsync<MediaFireGetFileInfoResponse>(MediaFireApiFileMethods.GetInfo, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.QuickKey, newQuickKey }
+                    [MediaFireApiParameters.QuickKey] = newQuickKey
                 });
 
-                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
             }
         }
 
@@ -252,38 +252,38 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
             if (source is DirectoryId) {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Move, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.FolderKeySource, source.Value },
-                    { MediaFireApiParameters.FolderKeyDestination, destination.Value }
+                    [MediaFireApiParameters.FolderKeySource] = source.Value,
+                    [MediaFireApiParameters.FolderKeyDestination] = destination.Value
                 });
 
                 if (!string.IsNullOrEmpty(moveName)) {
                     await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Update, new Dictionary<string, object>() {
-                        { MediaFireApiParameters.FolderKey, source.Value },
-                        { MediaFireApiParameters.FolderName, WebUtility.UrlEncode(moveName) }
+                        [MediaFireApiParameters.FolderKey] = source.Value,
+                        [MediaFireApiParameters.FolderName] = WebUtility.UrlEncode(moveName)
                     });
                 }
                 var item = await context.Agent.GetAsync<MediaFireGetFolderInfoResponse>(MediaFireApiFolderMethods.GetInfo, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.FolderKey, source.Value }
+                    [MediaFireApiParameters.FolderKey] = source.Value
                 });
 
                 return new DirectoryInfoContract(item.FolderInfo.FolderKey, WebUtility.UrlDecode(item.FolderInfo.Name), item.FolderInfo.Created, item.FolderInfo.Created);
             } else {
                 var copy = await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFileMethods.Move, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.QuickKey, source.Value },
-                    { MediaFireApiParameters.FolderKey, destination.Value }
+                    [MediaFireApiParameters.QuickKey] = source.Value,
+                    [MediaFireApiParameters.FolderKey] = destination.Value
                 });
 
                 if (!string.IsNullOrEmpty(moveName))
                     await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFileMethods.Update, new Dictionary<string, object>() {
-                        { MediaFireApiParameters.QuickKey, source.Value },
-                        { MediaFireApiParameters.FileName, WebUtility.UrlEncode(moveName) }
+                        [MediaFireApiParameters.QuickKey] = source.Value,
+                        [MediaFireApiParameters.FileName] = WebUtility.UrlEncode(moveName)
                     });
 
                 var item = await context.Agent.GetAsync<MediaFireGetFileInfoResponse>(MediaFireApiFileMethods.GetInfo, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.QuickKey, source.Value }
+                    [MediaFireApiParameters.QuickKey] = source.Value
                 });
 
-                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+                return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
             }
         }
 
@@ -292,8 +292,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             var context = await RequireContextAsync(root);
 
             var item = await context.Agent.GetAsync<MediaFireCreateFolderResponse>(MediaFireApiFolderMethods.Create, new Dictionary<string, object>() {
-                { MediaFireApiParameters.ParentKey, parent.Value },
-                { MediaFireApiParameters.FolderName, WebUtility.UrlEncode(name) }
+                [MediaFireApiParameters.ParentKey] = parent.Value,
+                [MediaFireApiParameters.FolderName] = WebUtility.UrlEncode(name)
             });
 
             return new DirectoryInfoContract(item.FolderKey, name, DateTimeOffset.Now, DateTimeOffset.Now);
@@ -315,10 +315,10 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
                 upload = await context.Agent.Upload.PollUpload(upload.Key);
             }
             var item = await context.Agent.GetAsync<MediaFireGetFileInfoResponse>(MediaFireApiFileMethods.GetInfo, new Dictionary<string, object>() {
-                { MediaFireApiParameters.QuickKey, upload.QuickKey }
+                [MediaFireApiParameters.QuickKey] = upload.QuickKey
             });
 
-            return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+            return new FileInfoContract(item.FileInfo.QuickKey, WebUtility.UrlDecode(item.FileInfo.Name), item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
         }
 
         public async Task<bool> RemoveItemAsync(RootName root, FileSystemId target, bool recurse)
@@ -327,11 +327,11 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
             if (target is DirectoryId) {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Delete, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.FolderKey, target.Value }
+                    [MediaFireApiParameters.FolderKey] = target.Value
                 });
             } else {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFileMethods.Delete, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.QuickKey, target.Value }
+                    [MediaFireApiParameters.QuickKey] = target.Value
                 });
             }
 
@@ -344,24 +344,24 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
             if (target is DirectoryId) {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFolderMethods.Update, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.FolderKey, target.Value },
-                    { MediaFireApiParameters.FolderName, newName }
+                    [MediaFireApiParameters.FolderKey] = target.Value,
+                    [MediaFireApiParameters.FolderName] = newName
                 });
                 var item = await context.Agent.GetAsync<MediaFireGetFolderInfoResponse>(MediaFireApiFolderMethods.GetInfo, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.FolderKey, target.Value }
+                    [MediaFireApiParameters.FolderKey] = target.Value
                 });
 
                 return new DirectoryInfoContract(item.FolderInfo.FolderKey, item.FolderInfo.Name, item.FolderInfo.Created, item.FolderInfo.Created);
             } else {
                 await context.Agent.GetAsync<MediaFireEmptyResponse>(MediaFireApiFileMethods.Update, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.QuickKey, target.Value },
-                    { MediaFireApiParameters.FileName, newName }
+                    [MediaFireApiParameters.QuickKey] = target.Value,
+                    [MediaFireApiParameters.FileName] = newName
                 });
                 var item = await context.Agent.GetAsync<MediaFireGetFileInfoResponse>(MediaFireApiFileMethods.GetInfo, new Dictionary<string, object>() {
-                    { MediaFireApiParameters.QuickKey, target.Value }
+                    [MediaFireApiParameters.QuickKey] = target.Value
                 });
 
-                return new FileInfoContract(item.FileInfo.QuickKey, item.FileInfo.Name, item.FileInfo.Created, item.FileInfo.Created, item.FileInfo.Size, item.FileInfo.Hash);
+                return new FileInfoContract(item.FileInfo.QuickKey, item.FileInfo.Name, item.FileInfo.Created, item.FileInfo.Created, (FileSize)item.FileInfo.Size, item.FileInfo.Hash);
             }
         }
 

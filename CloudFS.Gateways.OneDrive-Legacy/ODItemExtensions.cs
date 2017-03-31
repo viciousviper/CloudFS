@@ -32,6 +32,6 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_Legacy
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this ODItem item) => item.CanHaveChildren()
                 ? new DirectoryInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime, item.Size, item.File.Hashes.Sha1.ToLowerInvariant()) as FileSystemInfoContract;
+                : new FileInfoContract(item.Id, item.Name, item.CreatedDateTime, item.LastModifiedDateTime, (FileSize)item.Size, item.File.Hashes.Sha1.ToLowerInvariant()) as FileSystemInfoContract;
     }
 }

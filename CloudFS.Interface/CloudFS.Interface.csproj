@@ -74,7 +74,6 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AsyncFunc.cs" />
     <Compile Include="Composition\ExportAsAsyncCloudGatewayAttribute.cs" />
     <Compile Include="Composition\ExportAsCloudGatewayAttribute.cs" />
     <Compile Include="Composition\CloudGatewayMetadata.cs" />
@@ -85,6 +84,7 @@
     <Compile Include="IO\DirectoryId.cs" />
     <Compile Include="IO\DriveId.cs" />
     <Compile Include="IO\FileId.cs" />
+    <Compile Include="IO\FileSize.cs" />
     <Compile Include="IO\ProxyFileInfoContract.cs" />
     <Compile Include="IO\FileSystemId.cs" />
     <Compile Include="IO\FileSystemInfoLocator.cs" />
@@ -98,12 +98,23 @@
     <Compile Include="IO\ProgressValue.cs" />
     <Compile Include="IPersistGatewaySettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="RootName.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
