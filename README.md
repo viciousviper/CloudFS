@@ -56,7 +56,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 ## System Requirements
 
 - Platform
-  - .NET 4.6
+  - .NET 4.6.1
 - Operating system
   - tested on Windows 8.1 x64 and Windows Server 2012 R2 (until version 1.0.0-alpha) /<br/>Windows 10 x64 (from version 1.0.1-alpha)
   - expected to run on Windows 7/8/8.1/10 and Windows Server 2008(R2)/2012(R2)/2016
@@ -109,5 +109,4 @@ At the time of writing this Readme, the following URLs provided access to applic
 ## Future plans
 
 - include additional gateways for more Cloud storage services
-- improve usability of cloud service authentication dialogs
 - improve stability of large file uploads
