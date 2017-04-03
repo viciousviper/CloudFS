@@ -47,14 +47,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <Choose>
-    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
-      <ItemGroup>
-        <Reference Include="YandexDisk.Client, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\YandexDisk.Client.1.0.8\lib\net46\YandexDisk.Client.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-      </ItemGroup>
-    </When>
+    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' " />
     <Otherwise>
       <ItemGroup>
         <Reference Include="YandexDisk.Client, Version=1.0.8.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
@@ -99,6 +92,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="YandexDisk.Client, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\YandexDisk.Client.1.2.11\lib\net46\YandexDisk.Client.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
