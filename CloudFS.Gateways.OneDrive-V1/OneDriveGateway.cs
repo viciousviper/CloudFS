@@ -82,8 +82,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_V1
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
-            var result = default(OneDriveContext);
-            if (!contextCache.TryGetValue(root, out result)) {
+            if (!contextCache.TryGetValue(root, out OneDriveContext result)) {
                 var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new OneDriveContext(client));
             }

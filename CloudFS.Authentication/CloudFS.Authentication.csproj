@@ -64,6 +64,7 @@
     </Compile>
     <Compile Include="AuthenticatedEventArgs.cs" />
     <Compile Include="Configuration\SynchronizedFileSettingsProvider.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="LogOnBase.cs" />
     <Compile Include="DirectLogOn.cs" />
     <Compile Include="BrowserLogOn.cs" />

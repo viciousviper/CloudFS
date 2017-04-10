@@ -85,6 +85,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NodeExtensions.cs" />
     <Compile Include="MegaGateway.cs" />
     <Compile Include="Auth\Authenticator.cs" />

@@ -79,6 +79,7 @@
     </Compile>
     <Compile Include="Auth\Authenticator.cs" />
     <Compile Include="Auth\CredentialsSetting.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -89,15 +89,14 @@ namespace IgorSoft.CloudFS.Gateways.Box
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
-            var result = default(BoxContext);
-            if (!contextCache.TryGetValue(root, out result)) {
+            if (!contextCache.TryGetValue(root, out BoxContext result)) {
                 var client = await OAuthAuthenticator.LoginAsync(root.UserName, apiKey, settingsPassPhrase);
                 contextCache.Add(root, result = new BoxContext(client));
             }
             return result;
         }
 
-        private TimeSpan GetUploadTimeout(long uploadSize)
+        private static TimeSpan GetUploadTimeout(long uploadSize)
         {
             return TimeSpan.FromSeconds(UploadTimeoutPerMegabyte.Seconds * (uploadSize / new FileSize("1MB").Value + 1));
         }

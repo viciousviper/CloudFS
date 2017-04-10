@@ -117,6 +117,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CopyGateway.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OAuth\OAuthAuthenticator.cs" />
     <Compile Include="OAuth\RefreshTokenSetting.cs" />
     <Compile Include="FileSystemExtensions.cs" />

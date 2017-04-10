@@ -111,7 +111,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                 if (setting != null)
                     refreshTokens.Remove(setting);
             } else {
-                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                Properties.Settings.Default.RefreshTokens = refreshTokens;
             }
 
             refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, SessionToken = refreshToken.SessionToken.EncryptUsing(settingsPassPhrase), SecretKey = refreshToken.SecretKey.ToString().EncryptUsing(settingsPassPhrase), Time = refreshToken.Time.EncryptUsing(settingsPassPhrase) });
@@ -122,7 +123,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
         private static async Task<AuthenticationContext> RefreshSessionTokenAsync(IMediaFireAgent agent)
         {
             try {
-                var userInfo = await agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo);
+                await agent.GetAsync<MediaFireGetUserInfoResponse>(MediaFireApiUserMethods.GetInfo);
 
                 return agent.User.GetAuthenticationContext();
             } catch (MediaFireApiException) {
@@ -154,8 +155,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
 
             var agent = new MediaFireAgent(new MediaFireApiConfiguration(Secrets.API_KEY, Secrets.APP_ID, useHttpV1: true, automaticallyRenewToken: false));
 
-            var synchronizationContext = default(SynchronizationContext);
-            if (contextDirectory.TryGetValue(account, out synchronizationContext)) {
+            if (contextDirectory.TryGetValue(account, out SynchronizationContext synchronizationContext)) {
                 synchronizationContext.AttachContextHolder(agent.User);
             } else {
                 var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
@@ -177,7 +177,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire.Auth
                     await agent.User.GetSessionToken(parts[0], parts[1], TokenVersion.V2);
                 }
 
-                contextDirectory.Add(account, synchronizationContext = new SynchronizationContext(agent.User, settingsPassPhrase));
+                synchronizationContext = new SynchronizationContext(agent.User, settingsPassPhrase);
+                contextDirectory.Add(account, synchronizationContext);
             }
 
             return agent;

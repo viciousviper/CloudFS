@@ -38,6 +38,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         /// Gets the passphrase used in the encryption of privacy sensitive gateway settings.
         /// </summary>
         /// <value>The settings encryption passphrase.</value>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
         [Export(ExportContracts.SettingsPassPhrase)]
         public string SettingsPassPhrase => "GatewayTestsSecret";
     }

@@ -106,6 +106,7 @@
     <Compile Include="Auth\Authenticator.cs" />
     <Compile Include="Auth\RefreshTokenSetting.cs" />
     <Compile Include="ApiExtensions\MediaFireCopyFileResponse.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MediaFireFileExtensions.cs" />
     <Compile Include="MediaFireGateway.cs" />
     <Compile Include="MediaFireFolderExtensions.cs" />

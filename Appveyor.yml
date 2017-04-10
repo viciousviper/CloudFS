@@ -4,9 +4,10 @@ branches:
   only:
   - develop
   - master
+  - codeanalysis
 
 skip_tags: true
-
+image: Visual Studio 2017
 configuration:
 - Debug
 - Release
@@ -18,6 +19,19 @@ environment:
     secure: +pKv+MoLP8CwE7a1xblzApoNDjAfAN7WzgP5hNHKaOs=
   COVERITY_EMAIL:
     secure: 6zUyb+IRQkAbWNWP0T0sHw==
+  SONARQUBE_TOKEN:
+    secure: B8SjYjO+rTDRb265vIqaCU5D9/DdbwpqD2EyzZJl3lzAqIzI/xvsva6ivN1ZHMu1
+
+install:
+- ps: >-
+    #Install-Package -Force MSBuild.SonarQube.Runner.Tool
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    (New-Object System.Net.WebClient).DownloadFile(
+      'https://repox.sonarsource.com/sonarsource-public-builds/org/sonarsource/scanner/msbuild/sonar-scanner-msbuild/2.3.0.526/sonar-scanner-msbuild-2.3.0.526.zip',
+      'C:\projects\cloudfs\sonar-scanner-msbuild-2.3.0.526.zip'
+    )
+    Expand-Archive C:\projects\cloudfs\sonar-scanner-msbuild-2.3.0.526.zip -DestinationPath C:\projects\cloudfs\SonarQube
 
 cache: packages -> **\packages.config
 
@@ -26,6 +40,13 @@ build_script:
     nuget restore
 
     cov-build --dir cov-int msbuild CloudFS.sln /p:UseSharedCompilation=false /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+    rem set SONARQUBE_PATH="C:\Program Files\PackageManagement\NuGet\Packages\MSBuild.SonarQube.Runner.Tool.1.0.0\tools"
+    set SONARQUBE_PATH=C:\projects\cloudfs\SonarQube
+    %SONARQUBE_PATH%\MSBuild.SonarQube.Runner.exe begin /o:"viciousviper-github" /k:"CloudFS" /n:"CloudFS" /v:"APPVEYOR_BUILD_VERSION" /d:"sonar.host.url=https://sonarqube.com" /d:"sonar.login=%SONARQUBE_TOKEN%"
+    msbuild CloudFS.sln /t:Rebuild /p:UseSharedCompilation=false /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll
+    %SONARQUBE_PATH%\MSBuild.SonarQube.Runner.exe end /d:"sonar.login=%SONARQUBE_TOKEN%"
+
 test:
   categories:
     except:
@@ -33,7 +54,8 @@ test:
 
 after_test:
 - cmd: >-
-    IF %APPVEYOR_REPO_BRANCH% NEQ master
+    IF %APPVEYOR_REPO_BRANCH% NEQ master EXIT
+
     IF %CONFIGURATION% NEQ Debug EXIT
 
     7z a -r coverity.zip cov-int

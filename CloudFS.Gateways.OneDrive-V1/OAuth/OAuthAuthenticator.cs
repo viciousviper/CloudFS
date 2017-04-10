@@ -88,7 +88,8 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_V1.OAuth
                 var setting = refreshTokens.SingleOrDefault(s => s.Account == account);
                     refreshTokens.Remove(setting);
             } else {
-                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
+                refreshTokens = new System.Collections.ObjectModel.Collection<OAuth.RefreshTokenSetting>();
+                Properties.Settings.Default.RefreshTokens = refreshTokens;
             }
 
             refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, RefreshToken = refreshToken.EncryptUsing(settingsPassPhrase) });
@@ -103,7 +104,7 @@ namespace IgorSoft.CloudFS.Gateways.OneDrive_V1.OAuth
 
             var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 
-            var client = default(IOneDriveClient);
+            IOneDriveClient client;
             if (!string.IsNullOrEmpty(refreshToken)) {
                 client = await OneDriveClient.GetSilentlyAuthenticatedMicrosoftAccountClient(Secrets.CLIENT_ID, LIVE_LOGIN_DESKTOP_URI, scopes, Secrets.CLIENT_SECRET, refreshToken);
             } else {

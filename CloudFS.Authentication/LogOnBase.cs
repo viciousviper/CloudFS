@@ -46,6 +46,11 @@ namespace IgorSoft.CloudFS.Authentication
 
         private readonly SynchronizationContext synchonizationContext;
 
+        /// <summary>
+        /// Occurs when the user has been authenticated.
+        /// </summary>
+        public event EventHandler<AuthenticatedEventArgs> Authenticated;
+
         protected LogOnBase(SynchronizationContext synchonizationContext)
         {
             this.synchonizationContext = synchonizationContext;
@@ -103,13 +108,19 @@ namespace IgorSoft.CloudFS.Authentication
         /// </summary>
         public void Dispose()
         {
-            waitHandle.Dispose();
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         /// <summary>
-        /// Occurs when the user has been authenticated.
+        /// Implements resource cleanup.
         /// </summary>
-        public event EventHandler<AuthenticatedEventArgs> Authenticated;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                waitHandle.Dispose();
+            }
+        }
     }
 }

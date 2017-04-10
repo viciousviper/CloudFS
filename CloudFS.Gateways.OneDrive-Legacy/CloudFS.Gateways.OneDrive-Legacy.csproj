@@ -97,6 +97,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ODItemExtensions.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="OAuth\OAuthAuthenticator.cs" />

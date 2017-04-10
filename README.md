@@ -5,6 +5,7 @@ The **CloudFS** library is a collection of .NET assemblies as gateways to variou
 [![Release](https://img.shields.io/github/tag/viciousviper/CloudFS.svg)](https://github.com/viciousviper/CloudFS/releases)
 [![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/master?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs)
 [![Code analysis](https://scan.coverity.com/projects/7864/badge.svg)](https://scan.coverity.com/projects/viciousviper-cloudfs)
+[![Quality Gate](https://sonarqube.com/api/badges/gate?key=CloudFS)](https://sonarqube.com/dashboard/index/CloudFS)
 [![Version](https://img.shields.io/nuget/v/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads](https://img.shields.io/nuget/dt/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads (signed)](https://img.shields.io/nuget/dt/CloudFS-Signed.svg)](https://www.nuget.org/packages/CloudFS-Signed)
@@ -56,7 +57,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 ## System Requirements
 
 - Platform
-  - .NET 4.6.1
+  - .NET 4.6.2
 - Operating system
   - tested on Windows 8.1 x64 and Windows Server 2012 R2 (until version 1.0.0-alpha) /<br/>Windows 10 x64 (from version 1.0.1-alpha)
   - expected to run on Windows 7/8/8.1/10 and Windows Server 2008(R2)/2012(R2)/2016

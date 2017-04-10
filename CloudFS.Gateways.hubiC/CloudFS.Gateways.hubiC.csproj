@@ -97,6 +97,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="FileSystemIdExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="hubiCGateway.cs" />
     <Compile Include="hubiCInfo.cs" />
     <Compile Include="OAuth\OAuthAuthenticator.cs" />

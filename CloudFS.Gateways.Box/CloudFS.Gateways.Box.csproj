@@ -123,6 +123,7 @@
     </Compile>
     <Compile Include="BoxGateway.cs" />
     <Compile Include="BoxItemExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OAuth\OAuthAuthenticator.cs" />
     <Compile Include="OAuth\RefreshTokenSetting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

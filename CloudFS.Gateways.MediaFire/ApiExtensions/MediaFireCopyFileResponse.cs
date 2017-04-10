@@ -28,6 +28,7 @@ using MediaFireSDK.Model.Responses;
 
 namespace IgorSoft.CloudFS.Gateways.MediaFire.ApiExtensions
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
     internal class MediaFireCopyFileResponse : MediaFireResponseBase
     {
         [JsonProperty("new_quickkeys")]

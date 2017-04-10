@@ -42,10 +42,7 @@ namespace IgorSoft.CloudFS.GatewayTests
         private GatewayTestsFixture fixture;
 
         private TestContext testContext;
-        public TestContext TestContext {
-            get { return testContext; }
-            set { testContext = value; }
-        }
+        public TestContext TestContext { get => testContext; set => testContext = value; }
 
         [ClassCleanup]
         public static void ClassCleanup()
@@ -255,9 +252,10 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                         using (var result = gateway.GetContentAsync(rootName, testFile.Id).Result) {
                             var buffer = new byte[content.Length];
-                            int position = 0, bytesRead = 0;
+                            int position = 0, bytesRead;
                             do {
-                                position += bytesRead = result.Read(buffer, position, buffer.Length - position);
+                                bytesRead = result.Read(buffer, position, buffer.Length - position);
+                                position += bytesRead;
                             } while (bytesRead != 0);
                             Assert.AreEqual(buffer.Length, position, "Truncated result content");
                             Assert.AreEqual(-1, result.ReadByte(), "Excessive result content");
@@ -558,9 +556,10 @@ namespace IgorSoft.CloudFS.GatewayTests
                         Assert.AreEqual(items.Single(i => i.Name == "File.ext").Id, newFile.Id, "Mismatched file Id");
                         using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result) {
                             var buffer = new byte[content.Length];
-                            int position = 0, bytesRead = 0;
+                            int position = 0, bytesRead;
                             do {
-                                position += bytesRead = result.Read(buffer, position, buffer.Length - position);
+                                bytesRead = result.Read(buffer, position, buffer.Length - position);
+                                position += bytesRead;
                             } while (bytesRead != 0);
                             Assert.AreEqual(buffer.Length, position, "Truncated result content");
                             Assert.AreEqual(-1, result.ReadByte(), "Excessive result content");
@@ -587,13 +586,12 @@ namespace IgorSoft.CloudFS.GatewayTests
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
                         Assert.AreEqual(1, items.Count(i => i.Name == "File.ext"), "Expected file is missing");
                         Assert.AreEqual(items.Single(i => i.Name == "File.ext").Id, newFile.Id, "Mismatched file Id");
-                        using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result)
-                        {
+                        using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result) {
                             var buffer = new byte[content.Length];
-                            int position = 0, bytesRead = 0;
-                            do
-                            {
-                                position += bytesRead = result.Read(buffer, position, buffer.Length - position);
+                            int position = 0, bytesRead;
+                            do {
+                                bytesRead = result.Read(buffer, position, buffer.Length - position);
+                                position += bytesRead;
                             } while (bytesRead != 0);
                             Assert.AreEqual(buffer.Length, position, $"Truncated result content for size {config.MaxFileSize}MB");
                             Assert.AreEqual(-1, result.ReadByte(), "Excessive result content");

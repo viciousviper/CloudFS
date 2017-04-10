@@ -83,12 +83,15 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
             public UploadProgress(IProgress<ProgressValue> progress, int bytesTotal)
             {
-                this.progress = progress;
+                this.progress = progress ?? throw new ArgumentNullException(nameof(progress));
                 this.bytesTotal = bytesTotal;
             }
 
             public void Report(IUploadProgress value)
             {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
                 progress.Report(new ProgressValue((int)value.BytesSent, bytesTotal));
             }
         }
