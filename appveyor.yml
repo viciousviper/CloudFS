@@ -22,6 +22,7 @@ environment:
 install:
 - ps: >-
     #Install-Package -Force MSBuild.SonarQube.Runner.Tool
+
     (New-Object System.Net.WebClient).DownloadFile(
       'https://repox.sonarsource.com/sonarsource-public-builds/org/sonarsource/scanner/msbuild/sonar-scanner-msbuild/2.3.0.553/sonar-scanner-msbuild-2.3.0.553.zip',
       '$PWD\sonar-scanner-msbuild.zip'
