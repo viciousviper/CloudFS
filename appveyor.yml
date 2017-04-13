@@ -12,7 +12,7 @@ branches:
 skip_tags: true
 environment:
   CODECOV_TOKEN:
-    secure: 1253r8dPEiTvtAxdeEPP24riRPa4/7G2ivnvbB/xXi2CTu+YindCPHASfuA2PF4t
+    secure: Zg1ARBneAcURcwXc1DIPjfoc2AaF+1qCUGLdEcr9G+yUgr88glwGpQJ1i+K9+OzW
   COVERITY_TOKEN:
     secure: +pKv+MoLP8CwE7a1xblzApoNDjAfAN7WzgP5hNHKaOs=
   COVERITY_EMAIL:
