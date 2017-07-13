@@ -51,8 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
-      <HintPath>..\packages\SemanticTypes.1.0.1\lib\net35\SemanticTypes.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\SemanticTypes.1.1.1\lib\net35\SemanticTypes.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Composition.AttributedModel">
