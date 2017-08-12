@@ -90,6 +90,7 @@
     <Compile Include="IO\DriveId.cs" />
     <Compile Include="IO\FileId.cs" />
     <Compile Include="IO\FileSize.cs" />
+    <Compile Include="IO\ProducerConsumerStream.cs" />
     <Compile Include="IO\ProxyFileInfoContract.cs" />
     <Compile Include="IO\FileSystemId.cs" />
     <Compile Include="IO\FileSystemInfoLocator.cs" />

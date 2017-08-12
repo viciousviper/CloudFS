@@ -67,7 +67,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IO\ProducerConsumerStreamTests.cs" />
     <Compile Include="IO\FileSizeTests.cs" />
+    <Compile Include="IO\ProducerConsumerStreamTests.Fixture.cs">
+      <DependentUpon>ProducerConsumerStreamTests.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestCategories.cs" />
   </ItemGroup>
