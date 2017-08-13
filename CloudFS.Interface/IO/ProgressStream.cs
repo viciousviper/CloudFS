@@ -89,11 +89,8 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <exception cref="ArgumentNullException">The attachedStream is <c>null</c>.</exception>
         public ProgressStream(Stream attachedStream, IProgress<ProgressValue> progress)
         {
-            if (attachedStream == null)
-                throw new ArgumentNullException(nameof(attachedStream));
-
-            this.attachedStream = attachedStream;
-            this.progress = progress;
+            this.attachedStream = attachedStream ?? throw new ArgumentNullException(nameof(attachedStream));
+            this.progress = progress ?? throw new ArgumentNullException(nameof(progress));
             bytesTotal = (int)attachedStream.Length;
         }
 
@@ -184,7 +181,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// <returns>A task that represents the asynchronous write operation.</returns>
         public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
-            await base.WriteAsync(buffer, offset, count, cancellationToken);
+            await attachedStream.WriteAsync(buffer, offset, count, cancellationToken);
             Report(count);
         }
     }

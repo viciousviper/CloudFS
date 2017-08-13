@@ -24,13 +24,13 @@ SOFTWARE.
 
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IgorSoft.CloudFS.Interface.IO;
 using IgorSoft.CloudFS.InterfaceTests;
-using System.Linq;
-using System.Threading;
 
-namespace CloudFS.InterfaceTests.IO
+namespace IgorSoft.CloudFS.InterfaceTests.IO
 {
     [TestClass]
     public sealed partial class ProducerConsumerStreamTests

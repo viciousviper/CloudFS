@@ -28,7 +28,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IgorSoft.CloudFS.Interface.IO;
 using IgorSoft.CloudFS.InterfaceTests;
 
-namespace CloudFS.InterfaceTests.IO
+namespace IgorSoft.CloudFS.InterfaceTests.IO
 {
     [TestClass]
     public sealed class FileSizeTests

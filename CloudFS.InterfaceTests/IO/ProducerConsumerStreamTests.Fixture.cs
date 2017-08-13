@@ -24,7 +24,7 @@ SOFTWARE.
 
 using IgorSoft.CloudFS.Interface.IO;
 
-namespace CloudFS.InterfaceTests.IO
+namespace IgorSoft.CloudFS.InterfaceTests.IO
 {
     public partial class ProducerConsumerStreamTests
     {
