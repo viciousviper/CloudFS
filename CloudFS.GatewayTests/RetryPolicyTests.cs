@@ -52,7 +52,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             result = new byte[FILE_SIZE];
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadStraight_ViaMemoryStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE);
@@ -68,7 +68,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEqual(content, result);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadWithRetries_ViaMemoryStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE / 10, FILE_SIZE / 5, FILE_SIZE / 2, FILE_SIZE);
@@ -84,7 +84,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEqual(content, result);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadAsyncStraight_ViaMemoryStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE);
@@ -97,7 +97,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEqual(content, result);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadAsyncWithRetries_ViaMemoryStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE / 10, FILE_SIZE / 5, FILE_SIZE / 2, FILE_SIZE);
@@ -110,7 +110,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEqual(content, result);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadStraight_ViaProducerConsumerStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE);
@@ -126,7 +126,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEqual(content, result);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadWithRetries_ViaProducerConsumerStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE / 10, FILE_SIZE / 5, FILE_SIZE / 2, FILE_SIZE);
@@ -142,7 +142,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEqual(content, result);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadAsyncStraight_ViaProducerConsumerStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE);
@@ -155,7 +155,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             CollectionAssert.AreEqual(content, result);
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void DownloadAsyncWithRetries_ViaProducerConsumerStream_Succeeds()
         {
             fixture.SetupRemoteStreamInstances(content, FILE_SIZE / 10, FILE_SIZE / 5, FILE_SIZE / 2, FILE_SIZE);
