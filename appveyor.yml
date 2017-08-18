@@ -49,7 +49,7 @@ test_script:
 - cmd: >-
     set PATH=".\packages\OpenCover.4.6.519\tools";%PATH%
 
-    OpenCover.Console.exe -register:user -target:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\MSTest.exe" -targetargs:"/noisolation /category:!Online&!Manual /resultsfile:CloudFS_testresults.trx /testcontainer:.\CloudFS.AuthenticationTests\bin\%CONFIGURATION%\IgorSoft.CloudFS.AuthenticationTests.dll /testcontainer:.\CloudFS.InterfaceTests\bin\%CONFIGURATION%\IgorSoft.CloudFS.InterfaceTests.dll" -filter:"+[IgorSoft.CloudFS*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\CloudFS_coverage.xml
+    OpenCover.Console.exe -register:user -target:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\MSTest.exe" -targetargs:"/noisolation /category:!Online&!Manual /resultsfile:CloudFS_testresults.trx /testcontainer:.\CloudFS.AuthenticationTests\bin\%CONFIGURATION%\IgorSoft.CloudFS.AuthenticationTests.dll /testcontainer:.\CloudFS.GatewayTests\bin\%CONFIGURATION%\IgorSoft.CloudFS.GatewayTests.dll" /testcontainer:.\CloudFS.InterfaceTests\bin\%CONFIGURATION%\IgorSoft.CloudFS.InterfaceTests.dll" -filter:"+[IgorSoft.CloudFS*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\CloudFS_coverage.xml
 
     MSBuild.SonarQube.Runner.exe end /d:"sonar.login=%SONARQUBE_TOKEN%
 
