@@ -216,7 +216,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             if (string.IsNullOrEmpty(copyName)) {
                 var lastSlashIndex = source.Value.TrimEnd('/').LastIndexOf('/');
                 copyName = source.Value.Substring(lastSlashIndex + 1);
-            } else if (source.Value.EndsWith("/") && !copyName.EndsWith("/")) {
+            } else if (source.Value.EndsWith("/", StringComparison.Ordinal) && !copyName.EndsWith("/", StringComparison.Ordinal)) {
                 copyName += "/";
             }
 
@@ -240,7 +240,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             if (string.IsNullOrEmpty(moveName)) {
                 var lastSlashIndex = source.Value.TrimEnd('/').LastIndexOf('/');
                 moveName = source.Value.Substring(lastSlashIndex + 1);
-            } else if (source.Value.EndsWith("/") && !moveName.EndsWith("/")) {
+            } else if (source.Value.EndsWith("/", StringComparison.Ordinal) && !moveName.EndsWith("/", StringComparison.Ordinal)) {
                 moveName += "/";
             }
 

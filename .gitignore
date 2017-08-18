@@ -223,3 +223,4 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /CloudFS.Gateways.GoogleCloudStorage/GoogleCredentials.json
+/.axoCover

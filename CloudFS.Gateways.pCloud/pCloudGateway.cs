@@ -159,15 +159,16 @@ namespace IgorSoft.CloudFS.Gateways.pCloud
             return true;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014:Await.Warning")]
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
         {
             var context = await RequireContextAsync(root);
 
-            var stream = new MemoryStream();
+            var stream = new ProducerConsumerStream();
             var retryPolicyWithAction = Policy.Handle<pCloudException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-                (ex, ts) => stream = new MemoryStream());
+                (ex, ts) => stream.Reset());
             await retryPolicyWithAction.ExecuteAsync(() => context.Client.DownloadFileAsync(ToId(source), stream, CancellationToken.None));
-            stream.Seek(0, SeekOrigin.Begin);
+            stream.Flush();
 
             return stream;
         }

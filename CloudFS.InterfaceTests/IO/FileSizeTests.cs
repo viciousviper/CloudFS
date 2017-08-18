@@ -26,7 +26,6 @@ using System;
 using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.InterfaceTests;
 
 namespace IgorSoft.CloudFS.InterfaceTests.IO
 {

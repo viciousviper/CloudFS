@@ -38,6 +38,8 @@ namespace IgorSoft.CloudFS.Interface.IO
 
         private int currentBlockIndex;
 
+        private int currentBytesWritten;
+
         public override bool CanRead => true;
 
         public override bool CanSeek => false;
@@ -69,6 +71,24 @@ namespace IgorSoft.CloudFS.Interface.IO
         }
 
         public long TotalBytesWritten { get; private set; }
+
+        private static void ValidateBufferArgs(byte[] buffer, int offset, int count)
+        {
+            if (buffer == null)
+                throw new ArgumentNullException(nameof(buffer));
+            if (offset < 0)
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+            if (buffer.Length - offset < count)
+                throw new ArgumentException($"{nameof(buffer)}.{nameof(buffer.Length)} - {nameof(offset)} < {nameof(count)}");
+        }
+
+        private void CompleteWriting()
+        {
+            if (!blocks.IsAddingCompleted)
+                blocks.CompleteAdding();
+        }
 
         public override Task CopyToAsync(Stream destination, int bufferSize, CancellationToken cancellationToken)
         {
@@ -111,6 +131,23 @@ namespace IgorSoft.CloudFS.Interface.IO
             }
         }
 
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            ValidateBufferArgs(buffer, offset, count);
+            if (cancellationToken.IsCancellationRequested)
+                return Task.FromCanceled<int>(cancellationToken);
+
+            Task<int> result;
+            try {
+                result = Task.FromResult(Read(buffer, offset, count));
+            } catch (OperationCanceledException) {
+                result = Task.FromCanceled<int>(cancellationToken);
+            } catch (Exception exception) {
+                result = Task.FromException<int>(exception);
+            }
+            return result;
+        }
+
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotSupportedException();
@@ -125,10 +162,39 @@ namespace IgorSoft.CloudFS.Interface.IO
         {
             ValidateBufferArgs(buffer, offset, count);
 
-            var newBlock = new byte[count];
-            Array.Copy(buffer, offset, newBlock, 0, count);
-            blocks.Add(newBlock);
-            TotalBytesWritten += count;
+            var effectiveCount = currentBytesWritten + count - TotalBytesWritten;
+            if (effectiveCount > 0) {
+                var effectiveOffset = offset + count - effectiveCount;
+                var newBlock = new byte[effectiveCount];
+                Array.Copy(buffer, effectiveOffset, newBlock, 0, effectiveCount);
+                blocks.Add(newBlock);
+                TotalBytesWritten += effectiveCount;
+            }
+            currentBytesWritten += count;
+        }
+
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            ValidateBufferArgs(buffer, offset, count);
+            if (cancellationToken.IsCancellationRequested)
+                return Task.FromCanceled<int>(cancellationToken);
+
+            Task result;
+            try {
+                Write(buffer, offset, count);
+                result = Task.CompletedTask;
+            } catch (OperationCanceledException) {
+                result = Task.FromCanceled(cancellationToken);
+            }
+            catch (Exception exception) {
+                result = Task.FromException(exception);
+            }
+            return result;
+        }
+
+        public void Reset()
+        {
+            currentBytesWritten = 0;
         }
 
         protected override void Dispose(bool disposing)
@@ -137,24 +203,6 @@ namespace IgorSoft.CloudFS.Interface.IO
                 blocks.Dispose();
 
             base.Dispose(disposing);
-        }
-
-        private void CompleteWriting()
-        {
-            if (!blocks.IsAddingCompleted)
-                blocks.CompleteAdding();
-        }
-
-        private static void ValidateBufferArgs(byte[] buffer, int offset, int count)
-        {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
-            if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
-            if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count));
-            if (buffer.Length - offset < count)
-                throw new ArgumentException($"{nameof(buffer)}.{nameof(buffer.Length)} - {nameof(offset)} < {nameof(count)}");
         }
     }
 }

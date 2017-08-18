@@ -235,6 +235,35 @@ namespace IgorSoft.CloudFS.InterfaceTests.IO
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void ProducerConsumerStream_ReadAsync_FromFilledStream_ReturnsContent()
+        {
+            const int count = 10;
+            var writeBuffer = Enumerable.Range(0, count).Select(i => (byte)i).ToArray();
+            var readBuffer = new byte[count];
+
+            sut.Write(writeBuffer, 0, writeBuffer.Length);
+            var result = sut.ReadAsync(readBuffer, 0, readBuffer.Length).Result;
+
+            Assert.AreEqual(count, result);
+            CollectionAssert.AreEqual(writeBuffer, readBuffer);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void ProducerConsumerStream_ReadAsync_FromStarvedStream_ReturnsContent()
+        {
+            const int count = 10;
+            var writeBuffer = Enumerable.Range(0, count).Select(i => (byte)i).ToArray();
+            var readBuffer = new byte[count + 1];
+
+            sut.Write(writeBuffer, 0, writeBuffer.Length);
+            sut.Flush();
+            var result = sut.ReadAsync(readBuffer, 0, readBuffer.Length).Result;
+
+            Assert.AreEqual(count, result);
+            CollectionAssert.AreEqual(writeBuffer, readBuffer.Take(count).ToArray());
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(NotSupportedException))]
         public void ProducerConsumerStream_Seek_Throws()
         {
@@ -291,6 +320,18 @@ namespace IgorSoft.CloudFS.InterfaceTests.IO
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void ProducerConsumerStream_WriteAsync_UpdatesTotalBytesWritten()
+        {
+            const int count = 10;
+            var writeBuffer = new byte[count];
+
+            sut.WriteAsync(writeBuffer, 0, count).Wait();
+            var result = sut.TotalBytesWritten;
+
+            Assert.AreEqual(count, result);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(InvalidOperationException))]
         public void ProducerConsumerStream_Write_ToFlushedStream_Throws()
         {
@@ -320,6 +361,42 @@ namespace IgorSoft.CloudFS.InterfaceTests.IO
                 for (var i = 0; i < count / 3; ++i) {
                     Thread.Sleep(4);
                     sut.Write(writeBuffer, 3 * i, 3);
+                }
+                sut.Flush();
+            });
+            writeThread.Start();
+
+            Assert.IsTrue(readThread.Join(200));
+            Assert.IsTrue(writeThread.Join(200));
+
+            Assert.AreEqual(count, result);
+            CollectionAssert.AreEqual(writeBuffer, readBuffer);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void ProducerConsumerStream_ConcurrentReadWrite_WithReset_Succeeds()
+        {
+            const int count = 48;
+            var writeBuffer = Enumerable.Range(0, count).Select(i => (byte)i).ToArray();
+            var readBuffer = new byte[count];
+
+            var result = 0;
+            var readThread = new Thread(() => {
+                for (var i = 0; i < count / 4; ++i) {
+                    result += sut.Read(readBuffer, 4 * i, 4);
+                    Thread.Sleep(3);
+                }
+            });
+            readThread.Start();
+            var writeThread = new Thread(() => {
+                for (var i = 0; i < count / 3 / 2; ++i) {
+                    Thread.Sleep(4);
+                    sut.Write(writeBuffer, 3 * i, 3);
+                }
+                sut.Reset();
+                for (var i = 0; i < count / 6; ++i) {
+                    Thread.Sleep(2);
+                    sut.Write(writeBuffer, 6 * i, 6);
                 }
                 sut.Flush();
             });
