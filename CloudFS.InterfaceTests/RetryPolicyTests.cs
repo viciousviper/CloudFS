@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 using IgorSoft.CloudFS.Interface.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IgorSoft.CloudFS.GatewayTests
+namespace IgorSoft.CloudFS.InterfaceTests
 {
     [TestClass]
     public sealed partial class RetryPolicyTests

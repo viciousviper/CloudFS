@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 using IgorSoft.CloudFS.Interface.IO;
 using Polly;
 
-namespace IgorSoft.CloudFS.GatewayTests
+namespace IgorSoft.CloudFS.InterfaceTests
 {
     public partial class RetryPolicyTests
     {

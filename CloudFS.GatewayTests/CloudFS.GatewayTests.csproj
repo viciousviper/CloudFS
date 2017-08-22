@@ -78,9 +78,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Reference Include="Polly, Version=5.3.1.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Polly-Signed.5.3.1\lib\net45\Polly.dll</HintPath>
-    </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
       <HintPath>..\packages\SemanticTypes.1.1.1\lib\net35\SemanticTypes.dll</HintPath>
     </Reference>
@@ -135,10 +132,6 @@
       <DependentUpon>GenericAsyncGatewayTests.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="RetryPolicyTests.cs" />
-    <Compile Include="RetryPolicyTests.Fixture.cs">
-      <DependentUpon>RetryPolicyTests.cs</DependentUpon>
-    </Compile>
     <Compile Include="Secrets.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="GenericGatewayTests.cs" />
