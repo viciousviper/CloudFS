@@ -3,12 +3,14 @@ The **CloudFS** library is a collection of .NET assemblies as gateways to variou
 
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/viciousviper/CloudFS/blob/master/LICENSE.md)
 [![Release](https://img.shields.io/github/tag/viciousviper/CloudFS.svg)](https://github.com/viciousviper/CloudFS/releases)
-[![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/master?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs)
-[![Code analysis](https://scan.coverity.com/projects/7864/badge.svg)](https://scan.coverity.com/projects/viciousviper-cloudfs)
-[![Quality Gate](https://sonarqube.com/api/badges/gate?key=CloudFS)](https://sonarqube.com/dashboard/index/CloudFS)
 [![Version](https://img.shields.io/nuget/v/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads](https://img.shields.io/nuget/dt/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads (signed)](https://img.shields.io/nuget/dt/CloudFS-Signed.svg)](https://www.nuget.org/packages/CloudFS-Signed)
+
+| Branch  | Build status | Code coverage | Code analysis | Quality gate |
+| :------ | :----------: | :-----------: | :-----------: | :----------: |
+| master  | [![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/master?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs) | [![Coverage](https://codecov.io/github/viciousviper/CloudFS/coverage.svg?branch=master)](https://codecov.io/github/viciousviper/CloudFS?branch=master) | [![Code analysis](https://scan.coverity.com/projects/7864/badge.svg)](https://scan.coverity.com/projects/viciousviper-cloudfs) |[![Quality Gate](https://sonarqube.com/api/badges/gate?key=CloudFS)](https://sonarqube.com/dashboard/index/CloudFS) |
+| develop | [![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/develop?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs) | [![Coverage](https://codecov.io/github/viciousviper/CloudFS/coverage.svg?branch=develop)](https://codecov.io/github/viciousviper/CloudFS?branch=develop) | _see above_ | _see above_ |
 
 ## Objective
 
