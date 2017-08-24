@@ -36,6 +36,7 @@ namespace IgorSoft.CloudFS.InterfaceTests.Composition
 {
     public partial class AttributeBasedCompositionTests
     {
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public abstract class AsyncCloudGatewayBase : IAsyncCloudGateway
         {
             public Task<bool> ClearContentAsync(RootName root, FileId target, Func<FileSystemInfoLocator> locatorResolver)
@@ -104,6 +105,7 @@ namespace IgorSoft.CloudFS.InterfaceTests.Composition
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         public abstract class CloudGatewayBase : ICloudGateway
         {
             public void ClearContent(RootName root, FileId target)
