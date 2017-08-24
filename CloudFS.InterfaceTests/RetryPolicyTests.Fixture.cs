@@ -59,36 +59,6 @@ namespace IgorSoft.CloudFS.InterfaceTests
                         ? base.ReadAsync(buffer, offset, count, cancellationToken)
                         : throw new IOException($"{nameof(ReadAsync)} failed for Position={Position}, count={count}");
                 }
-
-                public override long Seek(long offset, SeekOrigin loc)
-                {
-                    return offset <= limit
-                        ? base.Seek(offset, loc)
-                        : throw new IOException($"{nameof(Seek)} failed for offset={offset}");
-                }
-
-                public override void SetLength(long value)
-                {
-                    if (value <= limit)
-                        base.SetLength(value);
-                    else
-                        throw new IOException($"{nameof(SetLength)} failed for value={value}");
-                }
-
-                public override void Write(byte[] buffer, int offset, int count)
-                {
-                    if (Position + count <= limit)
-                        base.Write(buffer, offset, count);
-                    else
-                        throw new IOException($"{nameof(Write)} failed for Position={Position}, count={count}");
-                }
-
-                public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-                {
-                    return Position + count <= limit
-                        ? base.WriteAsync(buffer, offset, count, cancellationToken)
-                        : throw new IOException($"{nameof(WriteAsync)} failed for Position={Position}, count={count}");
-                }
             }
 
             private readonly Queue<Stream> streamFactory = new Queue<Stream>();
