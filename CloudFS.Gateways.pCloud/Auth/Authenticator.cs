@@ -82,7 +82,7 @@ namespace IgorSoft.CloudFS.Gateways.pCloud.Auth
             if (string.IsNullOrEmpty(account))
                 throw new ArgumentNullException(nameof(account));
 
-            var client = default(pCloudClient);
+            pCloudClient client;
 
             var refreshToken = LoadRefreshToken(account, settingsPassPhrase);
 

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IgorSoft.CloudFS.Gateways.hubiC</RootNamespace>
     <AssemblyName>IgorSoft.CloudFS.Gateways.hubiC</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -47,14 +47,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <Choose>
-    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
-      <ItemGroup>
-        <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-          <HintPath>..\packages\SwiftClient.2.0.0-beta-0010\lib\net45\SwiftClient.dll</HintPath>
-          <Private>True</Private>
-        </Reference>
-      </ItemGroup>
-    </When>
+    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' " />
     <Otherwise>
       <ItemGroup>
         <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
@@ -66,16 +59,16 @@
   </Choose>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Polly, Version=5.0.6.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Polly-Signed.5.0.6\lib\net45\Polly.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Polly, Version=5.3.1.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly-Signed.5.3.1\lib\net45\Polly.dll</HintPath>
     </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
-      <HintPath>..\packages\SemanticTypes.1.0.1\lib\net35\SemanticTypes.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\SemanticTypes.1.1.1\lib\net35\SemanticTypes.dll</HintPath>
+    </Reference>
+    <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SwiftClient.2.0.0-beta-0016\lib\net45\SwiftClient.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Composition.AttributedModel">
@@ -97,6 +90,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="FileSystemIdExtensions.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="hubiCGateway.cs" />
     <Compile Include="hubiCInfo.cs" />
     <Compile Include="OAuth\OAuthAuthenticator.cs" />
@@ -127,7 +121,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

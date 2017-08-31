@@ -116,6 +116,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             return result;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void CallTimedTestOnConfig<TGateway>(Action<TGateway, RootName, GatewayElement> test, GatewayElement config, Func<GatewayElement, TGateway> getGateway, IDictionary<string, Exception> failures)
         {
             try {
@@ -170,6 +171,7 @@ namespace IgorSoft.CloudFS.GatewayTests
             ExecuteByConfiguration(test, GatewayType.Sync, config => GetGateway(config), maxDegreeOfParallelism);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public IProgress<ProgressValue> GetProgressReporter() => new NullProgressReporter();
 
         public void OnCondition(GatewayElement config, GatewayCapabilities capability, Action action)
@@ -186,10 +188,18 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                 Assert.IsFalse(capabilityExcluded, $"Unexpected capability {capability}".ToString(CultureInfo.CurrentCulture));
             } catch (NotSupportedException) when (capabilityExcluded) {
+                // Ignore NotSupportedException
             } catch (AggregateException ex) when (capabilityExcluded && ex.InnerExceptions.Count == 1 && ex.InnerException is NotSupportedException) {
+                // Ignore AggregateException containing a single NotSupportedException
             }
         }
 
-        public byte[] GetArbitraryBytes(FileSize bytes) => cache.GetOrAdd(bytes.ToString(), () => Enumerable.Range(0, (int)bytes).Select(i => (byte)(i % 251 + 1)).ToArray());
+        public byte[] GetArbitraryBytes(FileSize bytes)
+        {
+            if (bytes == null)
+                throw new ArgumentNullException(nameof(bytes));
+
+            return cache.GetOrAdd(bytes.ToString(), () => Enumerable.Range(0, (int)bytes).Select(i => (byte)(i % 251 + 1)).ToArray());
+        }
     }
 }

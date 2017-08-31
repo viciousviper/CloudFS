@@ -75,6 +75,8 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
 
         private string settingsPassPhrase;
 
+        private readonly Lazy<HttpClient> httpClient = new Lazy<HttpClient>(LazyThreadSafetyMode.PublicationOnly);
+
         [ImportingConstructor]
         public MediaFireGateway([Import(ExportContracts.SettingsPassPhrase)] string settingsPassPhrase)
         {
@@ -156,7 +158,7 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             if (!links.Links.Any() && string.IsNullOrEmpty(links.Links[0].DirectDownload))
                 throw new MediaFireException(MediaFireErrorMessages.FileMustContainADirectLink);
 
-            var response = await new HttpClient().SendAsync(new HttpRequestMessage(HttpMethod.Get, links.Links[0].DirectDownload), HttpCompletionOption.ResponseHeadersRead, CancellationToken.None);
+            var response = await httpClient.Value.SendAsync(new HttpRequestMessage(HttpMethod.Get, links.Links[0].DirectDownload), HttpCompletionOption.ResponseHeadersRead, CancellationToken.None);
             response.EnsureSuccessStatusCode();
 
             var stream = await response.Content.ReadAsStreamAsync();
@@ -375,6 +377,9 @@ namespace IgorSoft.CloudFS.Gateways.MediaFire
             foreach (var context in contextCache)
                 Authenticator.SaveRefreshToken(context.Key.UserName, context.Value.Agent.User.GetAuthenticationContext(), settingsPassPhrase);
             contextCache.Clear();
+
+            if (httpClient.IsValueCreated)
+                httpClient.Value.Dispose();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]

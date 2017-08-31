@@ -39,10 +39,13 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
         public string Path { get; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public long Generation { get; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Directory => Path.Substring(0, indexOfName);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Name => Path.Substring(indexOfName + 1);
 
         public StorageObjectId(string id) : base(i => idRegex.IsMatch(i), id)

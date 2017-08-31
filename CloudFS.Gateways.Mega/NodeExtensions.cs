@@ -31,7 +31,7 @@ namespace IgorSoft.CloudFS.Gateways.Mega
     internal static class NodeExtensions
     {
         public static FileSystemInfoContract ToFileSystemInfoContract(this INode item) => item.Type == NodeType.Directory
-                ? new DirectoryInfoContract(item.Id, item.Name, DateTimeOffset.FromFileTime(0), item.LastModificationDate) as FileSystemInfoContract
-                : new FileInfoContract(item.Id, item.Name, DateTimeOffset.FromFileTime(0), item.LastModificationDate, (FileSize)item.Size, null) as FileSystemInfoContract;
+                ? new DirectoryInfoContract(item.Id, item.Name, item.CreationDate, item.ModificationDate ?? DateTimeOffset.FromFileTime(0)) as FileSystemInfoContract
+                : new FileInfoContract(item.Id, item.Name, item.CreationDate, item.ModificationDate ?? DateTimeOffset.FromFileTime(0), (FileSize)item.Size, null) as FileSystemInfoContract;
     }
 }

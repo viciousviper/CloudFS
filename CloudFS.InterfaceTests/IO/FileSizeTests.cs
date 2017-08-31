@@ -26,9 +26,8 @@ using System;
 using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IgorSoft.CloudFS.Interface.IO;
-using IgorSoft.CloudFS.InterfaceTests;
 
-namespace CloudFS.InterfaceTests.IO
+namespace IgorSoft.CloudFS.InterfaceTests.IO
 {
     [TestClass]
     public sealed class FileSizeTests
@@ -57,7 +56,9 @@ namespace CloudFS.InterfaceTests.IO
         [ExpectedException(typeof(ArgumentException))]
         public void CreateNew_WhereSizeIsNegative_Throws()
         {
+#pragma warning disable S1481 // Unused local variables should be removed
             var sut = new FileSize(-1);
+#pragma warning restore S1481 // Unused local variables should be removed
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
@@ -92,6 +93,24 @@ namespace CloudFS.InterfaceTests.IO
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorPlus_WhereFirstOperandIsNull_Throws()
+        {
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = default(FileSize) + FileSize.Empty;
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorPlus_WhereSecondOperandIsNull_Throws()
+        {
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = FileSize.Empty + default(FileSize);
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         public void OperatorMinus_ReturnsCorrectDifferenceFileSize()
         {
             var size1 = 100;
@@ -103,10 +122,39 @@ namespace CloudFS.InterfaceTests.IO
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
-        public void OperatorMultiplyLeft_ReturnsCorrectProductFileSize()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorMinus_WhereFirstOperandIsNull_Throws()
+        {
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = default(FileSize) - FileSize.Empty;
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorMinus_WhereSecondOperandIsNull_Throws()
+        {
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = FileSize.Empty - default(FileSize);
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorMultiplyLeft_ByLongValue_WhereOperandIsNull_Throws()
+        {
+            var factor = 5L;
+
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = factor * default(FileSize);
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void OperatorMultiplyLeft_ByLongValue_ReturnsCorrectProductFileSize()
         {
             var size = 1000;
-            var factor = 5;
+            var factor = 5L;
 
             var sut = new FileSize(size);
 
@@ -114,10 +162,43 @@ namespace CloudFS.InterfaceTests.IO
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
-        public void OperatorMultiplyRight_ReturnsCorrectProductFileSize()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorMultiplyLeft_ByDecimalValue_WhereOperandIsNull_Throws()
+        {
+            var factor = 5.5m;
+
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = factor * default(FileSize);
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void OperatorMultiplyLeft_ByDecimalValue_ReturnsCorrectProductFileSize()
         {
             var size = 1000;
-            var factor = 5;
+            var factor = 5.5m;
+
+            var sut = new FileSize(size);
+
+            Assert.AreEqual(new FileSize(factor * size), factor * sut);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorMultiplyRight_ByLongValue_WhereOperandIsNull_Throws()
+        {
+            var factor = 5L;
+
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = default(FileSize) * factor;
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void OperatorMultiplyRight_ByLongValue_ReturnsCorrectProductFileSize()
+        {
+            var size = 1000;
+            var factor = 5L;
 
             var sut = new FileSize(size);
 
@@ -125,10 +206,65 @@ namespace CloudFS.InterfaceTests.IO
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
-        public void OperatorDivideByRight_ReturnsCorrectQuotientFileSize()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorMultiplyRight_ByDecimalValue_WhereOperandIsNull_Throws()
+        {
+            var factor = 5.5m;
+
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = default(FileSize) * factor;
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void OperatorMultiplyRight_ByDecimalValue_ReturnsCorrectProductFileSize()
         {
             var size = 1000;
-            var divisor = 5;
+            var factor = 5.5m;
+
+            var sut = new FileSize(size);
+
+            Assert.AreEqual(new FileSize(size * factor), sut * factor);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorDivideRight_ByLongValue_WhereOperandIsNull_Throws()
+        {
+            var divisor = 5L;
+
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = default(FileSize) / divisor;
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void OperatorDivideRight_ByLongValue_ReturnsCorrectQuotientFileSize()
+        {
+            var size = 1000;
+            var divisor = 5L;
+
+            var sut = new FileSize(size);
+
+            Assert.AreEqual(new FileSize(size / divisor), sut / divisor);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void OperatorDivideRight_ByDecimalValue_WhereOperandIsNull_Throws()
+        {
+            var divisor = 2.5m;
+
+#pragma warning disable S1481 // Unused local variables should be removed
+            var sut = default(FileSize) / divisor;
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void OperatorDivideRight_ByDecimalValue_ReturnsCorrectQuotientFileSize()
+        {
+            var size = 1000;
+            var divisor = 2.5m;
 
             var sut = new FileSize(size);
 
@@ -143,14 +279,26 @@ namespace CloudFS.InterfaceTests.IO
         {
             var displayValue = ((string)TestContext.DataRow["DisplayValue"]).Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
 
+#pragma warning disable S1481 // Unused local variables should be removed
             var sut = new FileSize(displayValue);
+#pragma warning restore S1481 // Unused local variables should be removed
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(ArithmeticException))]
         public void Parse_WhereSizeIsNonIntegral_Throws()
         {
+#pragma warning disable S1481 // Unused local variables should be removed
             var sut = new FileSize("1.3kB".Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator));
+#pragma warning restore S1481 // Unused local variables should be removed
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void Parse_Empty_Succeeds()
+        {
+            var sut = new FileSize(nameof(FileSize.Empty));
+
+            Assert.AreEqual(0, sut.Value);
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]

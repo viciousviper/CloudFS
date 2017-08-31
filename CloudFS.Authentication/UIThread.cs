@@ -39,6 +39,7 @@ namespace IgorSoft.CloudFS.Authentication
         /// Runs a <see cref="Dispatcher"/> instance on a dedicated new <see cref="Thread"/>.
         /// </summary>
         /// <returns>The dispatcher.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public static Dispatcher GetDispatcher()
         {
             if (dispatcher == null) {

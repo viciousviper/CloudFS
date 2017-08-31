@@ -105,8 +105,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             if (root == null)
                 throw new ArgumentNullException(nameof(root));
 
-            var result = default(WebDAVContext);
-            if (!contextCache.TryGetValue(root, out result)) {
+            if (!contextCache.TryGetValue(root, out WebDAVContext result)) {
                 var client = await Authenticator.LoginAsync(root.UserName, apiKey, baseAddress, settingsPassPhrase);
                 contextCache.Add(root, result = new WebDAVContext(client, baseAddress.AbsolutePath.TrimEnd('/')));
             }
@@ -127,7 +126,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             }
         }
 
-        private void CheckSuccess(WebDavResponse response, string operation, params string[] parameters)
+        private static void CheckSuccess(WebDavResponse response, string operation, params string[] parameters)
         {
             if (!response.IsSuccessful)
                 throw new WebException($"WebDAV operation {operation}({string.Join(", ", parameters)}) failed with status {response.StatusCode}");
@@ -217,7 +216,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             if (string.IsNullOrEmpty(copyName)) {
                 var lastSlashIndex = source.Value.TrimEnd('/').LastIndexOf('/');
                 copyName = source.Value.Substring(lastSlashIndex + 1);
-            } else if (source.Value.EndsWith("/") && !copyName.EndsWith("/")) {
+            } else if (source.Value.EndsWith("/", StringComparison.Ordinal) && !copyName.EndsWith("/", StringComparison.Ordinal)) {
                 copyName += "/";
             }
 
@@ -241,7 +240,7 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
             if (string.IsNullOrEmpty(moveName)) {
                 var lastSlashIndex = source.Value.TrimEnd('/').LastIndexOf('/');
                 moveName = source.Value.Substring(lastSlashIndex + 1);
-            } else if (source.Value.EndsWith("/") && !moveName.EndsWith("/")) {
+            } else if (source.Value.EndsWith("/", StringComparison.Ordinal) && !moveName.EndsWith("/", StringComparison.Ordinal)) {
                 moveName += "/";
             }
 
@@ -331,6 +330,6 @@ namespace IgorSoft.CloudFS.Gateways.WebDAV
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Debugger Display")]
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private string DebuggerDisplay() => $"{nameof(WebDAVGateway)} rootPath=''".ToString(CultureInfo.CurrentCulture);
+        private static string DebuggerDisplay() => $"{nameof(WebDAVGateway)} rootPath=''".ToString(CultureInfo.CurrentCulture);
     }
 }

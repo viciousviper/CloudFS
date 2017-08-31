@@ -3,11 +3,14 @@ The **CloudFS** library is a collection of .NET assemblies as gateways to variou
 
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/viciousviper/CloudFS/blob/master/LICENSE.md)
 [![Release](https://img.shields.io/github/tag/viciousviper/CloudFS.svg)](https://github.com/viciousviper/CloudFS/releases)
-[![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/master?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs)
-[![Code analysis](https://scan.coverity.com/projects/7864/badge.svg)](https://scan.coverity.com/projects/viciousviper-cloudfs)
 [![Version](https://img.shields.io/nuget/v/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads](https://img.shields.io/nuget/dt/CloudFS.svg)](https://www.nuget.org/packages/CloudFS)
 [![NuGet downloads (signed)](https://img.shields.io/nuget/dt/CloudFS-Signed.svg)](https://www.nuget.org/packages/CloudFS-Signed)
+
+| Branch  | Build status | Code coverage | Code analysis | Quality gate |
+| :------ | :----------: | :-----------: | :-----------: | :----------: |
+| master  | [![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/master?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs) | [![Coverage](https://codecov.io/github/viciousviper/CloudFS/coverage.svg?branch=master)](https://codecov.io/github/viciousviper/CloudFS?branch=master) | [![Code analysis](https://scan.coverity.com/projects/7864/badge.svg)](https://scan.coverity.com/projects/viciousviper-cloudfs) |[![Quality Gate](https://sonarqube.com/api/badges/gate?key=CloudFS)](https://sonarqube.com/dashboard/index/CloudFS) |
+| develop | [![Build status](https://ci.appveyor.com/api/projects/status/wjyq2wugi651ut0x/branch/develop?svg=true)](https://ci.appveyor.com/project/viciousviper/cloudfs) | [![Coverage](https://codecov.io/github/viciousviper/CloudFS/coverage.svg?branch=develop)](https://codecov.io/github/viciousviper/CloudFS?branch=develop) | _see above_ | _see above_ |
 
 ## Objective
 
@@ -27,22 +30,22 @@ Currently the following cloud storage services are supported in CloudFS via the 
 | Cloud storage service                                            | API library                                                             | version    | sync/async | origin    | status | max. file size<sup id="a1">[1](#f1)</sup> |
 | :--------------------------------------------------------------- | :---------------------------------------------------------------------- | :--------: | :--------: | :-------: | :----: | :------------: |
 | *(local files)*                                                  | *System.IO (.NET Framework)*                                            | *N/A*      | *sync*     |           | stable | *N/A*          |
-| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.24.1.809 | async      | official  | stable | >= 256 MB      |
-| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 2.14.0     | async      | official  | stable | 128 MB         |
-| [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 2.0.0-beta-0010| async      | 3<sup>rd</sup> party | stable | 160 MB         |
+| [Google Drive](https://drive.google.com/ "Google Drive")         | [Google Apis V3](https://github.com/google/google-api-dotnet-client)    | 1.28.0.953 | async      | official  | stable | >= 256 MB      |
+| [Box](https://app.box.com/ "Box")                                | [Box.V2](https://github.com/box/box-windows-sdk-v2)                     | 3.1.0      | async      | official  | stable | 128 MB         |
+| [hubiC](https://hubic.com/ "hubiC")                              | [SwiftClient](https://github.com/vtfuture/SwiftClient)                  | 2.0.0-beta-0016 | async      | 3<sup>rd</sup> party | stable | 160 MB         |
 | [MediaFire](https://www.mediafire.com "MediaFire")               | [MediaFire SDK](https://github.com/MediaFire/mediafire-csharp-open-sdk) | 1.0.0.3    | async      | 3<sup>rd</sup> party / local build | experimental | **12 MB**      |
-| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.3.1      | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
-| [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A        | async      | 3<sup>rd</sup> party | stable | **16 MB**      |
-| WebDAV<sup id="a5">[5](#f5)</sup>                                | [WebDAV Client](https://github.com/skazantsev/WebDavClient)             | 1.0.4      | async      | 3<sup>rd</sup> party / local build | stable | >= 256 MB      |
-| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.0.8      | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
+| [MEGA](https://mega.co.nz/ "MEGA")                               | [MegaApiClient](https://github.com/gpailler/MegaApiClient)              | 1.6.0      | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
+| [pCloud](https://www.pcloud.com/ "pCloud")                       | [pCloud.NET](https://github.com/nirinchev/pCloud.NET)                   | N/A        | async      | 3<sup>rd</sup> party / local build | stable | **16 MB**      |
+| WebDAV<sup id="a5">[5](#f5)</sup>                                | [WebDAV Client](https://github.com/skazantsev/WebDavClient)             | 2.0.1      | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
+| [Yandex Disk](https://disk.yandex.com/client/disk "Yandex Disk") | [Yandex Disk API Client](https://github.com/raidenyn/yandexdisk.client) | 1.2.11     | async      | 3<sup>rd</sup> party | stable | >= 256 MB      |
 | **Degraded services**                                            |
-| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")<sup id="a2">[2](#f2)</sup> | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 2.0.6      | async      | official  | stable | >= 256 MB      |
+| [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive")<sup id="a2">[2](#f2)</sup> | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 2.0.7      | async      | official  | stable | >= 256 MB      |
 | **Included by community request**                                |
-| [Google Cloud Storage](https://cloud.google.com// "Google Cloud Storage") | [Google Cloud Libraries for .NET](https://github.com/GoogleCloudPlatform/google-cloud-dotnet) | 1.0.1 | async      | official  | experimental | >= 256 MB      |
+| [Google Cloud Storage](https://cloud.google.com// "Google Cloud Storage") | [Google Cloud Libraries for .NET](https://github.com/GoogleCloudPlatform/google-cloud-dotnet) | 2.1.0-alpha02 | async      | official  | experimental | >= 256 MB      |
 | **Superseded services**                                          |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive V1")   | [OneDrive SDK for CSharp](https://github.com/OneDrive/onedrive-sdk-csharp) | 1.2.0      | async      | official  | stable | **48 MB**      |
 | [Microsoft OneDrive](https://onedrive.live.com/ "OneDrive-Legacy") | [OneDriveSDK](https://github.com/OneDrive/onedrive-explorer-win)<sup id="a3">[3](#f3)</sup> | N/A        | async      | inofficial  | obsolete | **48 MB**      |
-| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.24.1.809 | async      | official  | stable | >= 256 MB      |
+| [Google Drive](https://drive.google.com/ "Google Drive V2")      | [Google Apis V2](https://github.com/google/google-api-dotnet-client)    | 1.28.0.953 | async      | official  | stable | >= 256 MB      |
 | **Obsolete services**                                            |
 | *[Copy](https://www.copy.com/ "Copy")*<sup id="a4">[4](#f4)</sup> | *[CopyRestAPI](https://github.com/saguiitay/CopyRestAPI)*              | *1.1.0*    | *async*    | *3<sup>rd</sup> party* | *retired* | *N/A*          |
 
@@ -56,7 +59,7 @@ Currently the following cloud storage services are supported in CloudFS via the 
 ## System Requirements
 
 - Platform
-  - .NET 4.6.1
+  - .NET 4.6.2
 - Operating system
   - tested on Windows 8.1 x64 and Windows Server 2012 R2 (until version 1.0.0-alpha) /<br/>Windows 10 x64 (from version 1.0.1-alpha)
   - expected to run on Windows 7/8/8.1/10 and Windows Server 2008(R2)/2012(R2)/2016

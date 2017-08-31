@@ -83,12 +83,15 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
 
             public UploadProgress(IProgress<ProgressValue> progress, int bytesTotal)
             {
-                this.progress = progress;
+                this.progress = progress ?? throw new ArgumentNullException(nameof(progress));
                 this.bytesTotal = bytesTotal;
             }
 
             public void Report(IUploadProgress value)
             {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
                 progress.Report(new ProgressValue((int)value.BytesSent, bytesTotal));
             }
         }
@@ -169,15 +172,18 @@ namespace IgorSoft.CloudFS.Gateways.GoogleCloudStorage
             return true;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014:Await.Warning")]
         public async Task<Stream> GetContentAsync(RootName root, FileId source)
         {
             var context = await RequireContextAsync(root);
 
             var sourceObjectId = new StorageObjectId(source.Value);
-            var stream = new MemoryStream();
-            await retryPolicy.ExecuteAsync(() => context.Client.DownloadObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, stream));
+            var stream = new ProducerConsumerStream();
+            var retryPolicyWithAction = Policy.Handle<GoogleApiException>().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+                (ex, ts) => stream.Reset());
+            await retryPolicyWithAction.ExecuteAsync(() => context.Client.DownloadObjectAsync(sourceObjectId.Bucket, sourceObjectId.Path, stream));
+            stream.Flush();
 
-            stream.Seek(0, SeekOrigin.Begin);
             return stream;
         }
 

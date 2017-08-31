@@ -49,6 +49,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
 
         private static BrowserLogOn logOn;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
         private class AppTokenResponse
         {
             [JsonProperty(Parameters.TokenType)]
@@ -67,6 +68,7 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
             public string RefreshToken { get; set; }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
         private class CredentialsResponse
         {
             [JsonProperty("token")]
@@ -94,7 +96,8 @@ namespace IgorSoft.CloudFS.Gateways.hubiC.OAuth
                 if (setting != null)
                     refreshTokens.Remove(setting);
             } else {
-                refreshTokens = Properties.Settings.Default.RefreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                refreshTokens = new System.Collections.ObjectModel.Collection<RefreshTokenSetting>();
+                Properties.Settings.Default.RefreshTokens = refreshTokens;
             }
 
             refreshTokens.Insert(0, new RefreshTokenSetting() { Account = account, Token = refreshToken.EncryptUsing(settingsPassPhrase) });

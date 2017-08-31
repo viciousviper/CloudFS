@@ -38,6 +38,53 @@ namespace IgorSoft.CloudFS.AuthenticationTests
         private const string passPhrase = "PassPhrase";
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void EncryptUsing_WherePassPhraseIsEmpty_ReturnsPlainText()
+        {
+            var cipherText = plainText.EncryptUsing(string.Empty);
+
+            Assert.AreEqual(plainText, cipherText);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void EncryptUsing_WherePassPhraseIsSet_Succeeds()
+        {
+            var cipherText = plainText.EncryptUsing(passPhrase);
+
+            Assert.IsNotNull(cipherText, "Encrypted text is null");
+            StringAssert.DoesNotMatch(cipherText, new Regex($".*{plainText}.*"), "Encrypted text contains plain text");
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void DecryptUsing_WherePassPhraseIsEmpty_ReturnsPlainText()
+        {
+            var cipherText = plainText;
+
+            var decryptedText = cipherText.DecryptUsing(string.Empty);
+
+            Assert.AreEqual(plainText, decryptedText);
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void DecryptUsing_WherePassPhraseIsMatches_Succeeds()
+        {
+            var cipherText = plainText.EncryptUsing(passPhrase);
+
+            var decryptedText = cipherText.DecryptUsing(passPhrase);
+
+            Assert.AreEqual(plainText, decryptedText, "Decrypted text is different from plain text");
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
+        public void DecryptUsing_WherePassPhraseDiffers_Fails()
+        {
+            var cipherText = plainText.EncryptUsing(passPhrase);
+
+            var decryptedText = cipherText.DecryptUsing(new string(passPhrase.Reverse().ToArray()));
+
+            Assert.AreEqual(cipherText, decryptedText, "Decrypted text is different from plain text");
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Offline))]
         [ExpectedException(typeof(ArgumentNullException))]
         public void Encrypt_WherePassPhraseIsEmpty_Throws()
         {
@@ -84,9 +131,9 @@ namespace IgorSoft.CloudFS.AuthenticationTests
         {
             var cipherText = StringCipher.Encrypt(plainText, passPhrase);
 
+#pragma warning disable S1481 // Unused local variables should be removed
             var decryptedText = StringCipher.Decrypt(cipherText, new string(passPhrase.Reverse().ToArray()));
-
-            Assert.AreEqual(plainText, decryptedText, "Decrypted text is different from plain text");
+#pragma warning restore S1481 // Unused local variables should be removed
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Offline))]

@@ -28,6 +28,8 @@ using MediaFireSDK.Model.Responses;
 
 namespace IgorSoft.CloudFS.Gateways.MediaFire.ApiExtensions
 {
+    //TODO: Fix code for copying of directories
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
     internal class MediaFireCopyFolderResponse : MediaFireResponseBase
     {
         [JsonProperty("new_folderkeys")]

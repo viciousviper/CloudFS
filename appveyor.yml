@@ -1,0 +1,83 @@
+version: 1.0.11-beta {build}
+image: Visual Studio 2017
+configuration:
+- Debug
+- Release
+platform: Any CPU
+branches:
+  only:
+  - master
+  - develop
+  - codeanalysis
+skip_tags: true
+environment:
+  CODECOV_TOKEN:
+    secure: Zg1ARBneAcURcwXc1DIPjfoc2AaF+1qCUGLdEcr9G+yUgr88glwGpQJ1i+K9+OzW
+  COVERITY_TOKEN:
+    secure: +pKv+MoLP8CwE7a1xblzApoNDjAfAN7WzgP5hNHKaOs=
+  COVERITY_EMAIL:
+    secure: 6zUyb+IRQkAbWNWP0T0sHw==
+  SONARQUBE_TOKEN:
+    secure: B8SjYjO+rTDRb265vIqaCU5D9/DdbwpqD2EyzZJl3lzAqIzI/xvsva6ivN1ZHMu1
+install:
+- ps: >-
+    #Install-Package -Force MSBuild.SonarQube.Runner.Tool
+
+    (New-Object System.Net.WebClient).DownloadFile(
+      "https://repox.sonarsource.com/sonarsource-public-builds/org/sonarsource/scanner/msbuild/sonar-scanner-msbuild/2.3.0.553/sonar-scanner-msbuild-2.3.0.553.zip",
+      "$PWD\sonar-scanner-msbuild.zip"
+    )
+
+    Expand-Archive $PWD\sonar-scanner-msbuild.zip -DestinationPath $PWD\SonarQube
+
+cache: packages -> **\packages.config
+build_script:
+- cmd: >-
+    nuget restore
+
+    cov-build --dir cov-int msbuild CloudFS.sln /p:UseSharedCompilation=false /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+    rem set PATH="C:\Program Files\PackageManagement\NuGet\Packages\MSBuild.SonarQube.Runner.Tool.1.0.0\tools"
+
+    set PATH=.\SonarQube;%PATH%
+
+    MSBuild.SonarQube.Runner.exe begin /k:"CloudFS" /o:"viciousviper-github" /n:"CloudFS" /v:"APPVEYOR_BUILD_VERSION" /d:"sonar.language=cs" /d:"sonar.cs.vstest.reportsPaths=CloudFS_testresults.trx" /d:"sonar.cs.opencover.reportsPaths=CloudFS_coverage.xml"  /d:"sonar.host.url=https://sonarqube.com" /d:"sonar.login=%SONARQUBE_TOKEN%"
+
+    MSBuild CloudFS.sln /t:Rebuild /p:UseSharedCompilation=false /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll
+
+test_script:
+- cmd: >-
+    set PATH=".\packages\OpenCover.4.6.519\tools";%PATH%
+
+    OpenCover.Console.exe -register:user -target:"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\MSTest.exe" -targetargs:"/noisolation /category:!Online&!Manual /resultsfile:CloudFS_testresults.trx /testcontainer:.\CloudFS.AuthenticationTests\bin\%CONFIGURATION%\IgorSoft.CloudFS.AuthenticationTests.dll /testcontainer:.\CloudFS.InterfaceTests\bin\%CONFIGURATION%\IgorSoft.CloudFS.InterfaceTests.dll" -filter:"+[IgorSoft.CloudFS*]*" -excludebyattribute:*.ExcludeFromCodeCoverage* -hideskipped:All -output:.\CloudFS_coverage.xml
+
+    MSBuild.SonarQube.Runner.exe end /d:"sonar.login=%SONARQUBE_TOKEN%
+
+- ps: >-
+    (New-Object System.Net.WebClient).UploadFile(
+      "https://ci.appveyor.com/api/testresults/mstest/$env:APPVEYOR_JOB_ID",
+      "$PWD\CloudFS_testresults.trx"
+    )
+
+- cmd: >-
+    set PATH="C:\Python34;C:\Python34\Scripts";%PATH%
+
+    pip install codecov
+
+    codecov -f .\CloudFS_coverage.xml -X gcov
+
+    IF %APPVEYOR_REPO_BRANCH% NEQ master EXIT
+
+    IF %CONFIGURATION% NEQ Debug EXIT
+
+    7z a -r coverity.zip cov-int
+
+    curl -F token=%COVERITY_TOKEN% -F email=%COVERITY_EMAIL% -F file=@coverity.zip -F version="1.0.11-beta" https://scan.coverity.com/builds?project=%APPVEYOR_REPO_NAME%
+
+artifacts:
+- path: cov-int/build-log.txt
+  name: Coverity Build Log
+- path: CloudFS_testresults.trx
+  name: TestResults
+- path: CloudFS_coverage.xml
+  name: Coverage

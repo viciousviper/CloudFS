@@ -124,6 +124,7 @@ namespace IgorSoft.CloudFS.Interface.IO
         /// </summary>
         /// <param name="fileSize">The <see cref="FileSize"/> instance to convert.</param>
         /// <returns>The result of the conversion.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
         public static implicit operator long(FileSize fileSize) => fileSize.Value;
 
         /// <summary>
