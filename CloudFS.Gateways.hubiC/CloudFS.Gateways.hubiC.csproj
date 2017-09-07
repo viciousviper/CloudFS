@@ -47,7 +47,14 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <Choose>
-    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' " />
+    <When Condition=" '$(Configuration)|$(Platform)' != 'Signed|AnyCPU' ">
+      <ItemGroup>
+        <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\SwiftClient.2.0.0-beta-0016\lib\net45\SwiftClient.dll</HintPath>
+          <Private>True</Private>
+        </Reference>
+      </ItemGroup>
+    </When>
     <Otherwise>
       <ItemGroup>
         <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, PublicKeyToken=1f35af1d8b0c0a75, processorArchitecture=MSIL">
@@ -66,9 +73,6 @@
     </Reference>
     <Reference Include="SemanticTypes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=742e180f6c5ccd0d, processorArchitecture=MSIL">
       <HintPath>..\packages\SemanticTypes.1.1.1\lib\net35\SemanticTypes.dll</HintPath>
-    </Reference>
-    <Reference Include="SwiftClient, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SwiftClient.2.0.0-beta-0016\lib\net45\SwiftClient.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Composition.AttributedModel">
