@@ -143,7 +143,7 @@
     <PreBuildEvent>
 if $(ConfigurationName) == Signed (
     if not exist $(SolutionDir)SignedLibrary md $(SolutionDir)SignedLibrary
-    if not exist $(SolutionDir)SignedLibrary\SwiftClient.dll cmd /c "$(SolutionDir)SignAssembly.cmd SwiftClient $(SolutionDir)packages\SwiftClient.2.0.0-beta-0010\lib\net45 $(SolutionDir)SignedLibrary"
+    if not exist $(SolutionDir)SignedLibrary\SwiftClient.dll cmd /c "$(SolutionDir)SignAssembly.cmd SwiftClient $(SolutionDir)packages\SwiftClient.2.0.0-beta-0016\lib\net45 $(SolutionDir)SignedLibrary"
 )
 </PreBuildEvent>
   </PropertyGroup>
