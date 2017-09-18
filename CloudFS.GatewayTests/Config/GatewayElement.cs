@@ -23,9 +23,11 @@ SOFTWARE.
 */
 
 using System;
+using System.ComponentModel;
 using System.Configuration;
 using System.Globalization;
 using IgorSoft.CloudFS.Interface;
+using IgorSoft.CloudFS.Interface.IO;
 
 namespace IgorSoft.CloudFS.GatewayTests.Config
 {
@@ -40,6 +42,7 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         private const string parametersPropertyName = "parameters";
         private const string exclusionsPropertyName = "exclusions";
         private const string maxFileSizePropertyName = "maxFileSize";
+        private const string maxPathLengthPropertyName = "maxPathLength";
         private const string testDirectoryPropertyName = "testDirectory";
 
         [ConfigurationProperty(schemaPropertyName, IsKey = true, IsRequired = true)]
@@ -93,10 +96,18 @@ namespace IgorSoft.CloudFS.GatewayTests.Config
         }
 
         [ConfigurationProperty(maxFileSizePropertyName)]
-        public int MaxFileSize
+        [TypeConverter(typeof(FileSizeConverter))]
+        public FileSize MaxFileSize
         {
-            get { return (int)this[maxFileSizePropertyName]; }
+            get { return (FileSize)this[maxFileSizePropertyName]; }
             set { this[maxFileSizePropertyName] = value; }
+        }
+
+        [ConfigurationProperty(maxPathLengthPropertyName)]
+        public int MaxPathLength
+        {
+            get { return (int)this[maxPathLengthPropertyName]; }
+            set { this[maxPathLengthPropertyName] = value; }
         }
 
         [ConfigurationProperty(testDirectoryPropertyName, DefaultValue = "FileSystemTests")]

@@ -125,6 +125,7 @@
     <Compile Include="Config\GatewayType.cs" />
     <Compile Include="Config\GatewayElement.cs" />
     <Compile Include="Config\GatewayElementCollection.cs" />
+    <Compile Include="Config\FileSizeConverter.cs" />
     <Compile Include="Config\TestSection.cs" />
     <Compile Include="GatewayTestsFixture.cs" />
     <Compile Include="GenericAsyncGatewayTests.cs" />
@@ -206,7 +207,7 @@ if $(ConfigurationName) == Signed (
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>-->
-  <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
   <Target Name="AfterBuild" Condition=" Exists('App.$(Configuration).config') ">
     <TransformXml Source="App.config" Destination="$(OutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />
   </Target>

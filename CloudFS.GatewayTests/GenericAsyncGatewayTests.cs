@@ -39,6 +39,12 @@ namespace IgorSoft.CloudFS.GatewayTests
     {
         private const string smallContent = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
+        private static char[] pathCharacters = Enumerable.Range(0, 10).Select(n => (char)('0' + n))
+            .Concat(Enumerable.Range(0, 26).Select(n => (char)('A' + n)))
+            .Concat(Enumerable.Range(0, 26).Select(n => (char)('a' + n)))
+            .Concat(new[] { '[', ']' })
+            .ToArray();
+
         private GatewayTestsFixture fixture;
 
         private TestContext testContext;
@@ -488,6 +494,26 @@ namespace IgorSoft.CloudFS.GatewayTests
         }
 
         [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void NewDirectoryItemAsync_WhereNameIsLong_CreatesDirectory()
+        {
+            fixture.ExecuteByConfiguration((gateway, rootName, config) => {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
+                    gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
+
+                    fixture.OnCondition(config, GatewayCapabilities.NewDirectoryItem, () =>
+                    {
+                        var directoryName = $"{new string(Enumerable.Range(0, config.MaxPathLength - config.TestDirectory.Length).Select(n => pathCharacters[n % pathCharacters.Length]).ToArray())}";
+                        var newDirectory = gateway.NewDirectoryItemAsync(rootName, testDirectory.Id, directoryName).Result;
+
+                        var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
+                        Assert.AreEqual(1, items.Count(i => i.Name == directoryName), $"Expected directory with name of length {directoryName.Length} is missing");
+                        Assert.AreEqual(items.Single(i => i.Name == directoryName).Id, newDirectory.Id, $"Mismatched directory Id for directory with name of length {directoryName.Length}");
+                    });
+                }
+            });
+        }
+
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
         public void NewFileItemAsync_CreatesFile()
         {
             fixture.ExecuteByConfiguration((gateway, rootName, config) => {
@@ -539,6 +565,30 @@ namespace IgorSoft.CloudFS.GatewayTests
             });
         }
 
+        [TestMethod, TestCategory(nameof(TestCategories.Online))]
+        public void NewFileItemAsync_WhereNameIsLong_CreatesFile()
+        {
+            fixture.ExecuteByConfiguration((gateway, rootName, config) => {
+                using (var testDirectory = TestDirectoryFixture.CreateTestDirectory(gateway, config, fixture)) {
+                    gateway.GetDriveAsync(rootName, config.ApiKey, fixture.GetParameters(config)).Wait();
+
+                    fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
+                    {
+                        var fileName = $"{new string(Enumerable.Range(0, config.MaxPathLength - config.TestDirectory.Length).Select(n => pathCharacters[n % pathCharacters.Length]).ToArray())}";
+                        var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, fileName, " ".ToStream(), fixture.GetProgressReporter()).Result;
+
+                        var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
+                        Assert.AreEqual(1, items.Count(i => i.Name == fileName), $"Expected file with name of length {fileName.Length} is missing");
+                        Assert.AreEqual(items.Single(i => i.Name == fileName).Id, newFile.Id, $"Mismatched file Id for file with name of length {fileName.Length}");
+                        using (var result = gateway.GetContentAsync(rootName, newFile.Id).Result)
+                        using (var streamReader = new StreamReader(result)) {
+                            Assert.AreEqual(" ", streamReader.ReadToEnd(), $"Mismatched content for file with name of length {fileName.Length}");
+                        }
+                    });
+                }
+            });
+        }
+
         [TestMethod, TestCategory(nameof(TestCategories.Online)), Timeout(300000)]
         public void NewFileItemAsync_WhereContentIsLarge_CreatesFile()
         {
@@ -580,7 +630,7 @@ namespace IgorSoft.CloudFS.GatewayTests
 
                     fixture.OnCondition(config, GatewayCapabilities.NewFileItem, () =>
                     {
-                        var content = fixture.GetArbitraryBytes(config.MaxFileSize * new FileSize("1MB"));
+                        var content = fixture.GetArbitraryBytes(config.MaxFileSize);
                         var newFile = gateway.NewFileItemAsync(rootName, testDirectory.Id, "File.ext", new MemoryStream(content), fixture.GetProgressReporter()).Result;
 
                         var items = gateway.GetChildItemAsync(rootName, testDirectory.Id).Result;
